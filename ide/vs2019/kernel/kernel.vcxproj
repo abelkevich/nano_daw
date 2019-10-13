@@ -120,7 +120,8 @@
     </CustomBuildStep>
     <CustomBuildStep>
       <Message>Copy linked file to root bin</Message>
-      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\$(TargetName)$(TargetExt)</Outputs>
+      <Outputs>
+      </Outputs>
       <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
       <RootFolder>
       </RootFolder>
@@ -145,7 +146,8 @@
     </CustomBuildStep>
     <CustomBuildStep>
       <Message>Copy linked file to root bin</Message>
-      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\$(TargetName)$(TargetExt)</Outputs>
+      <Outputs>
+      </Outputs>
       <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
       <RootFolder>
       </RootFolder>
@@ -174,7 +176,8 @@
     </CustomBuildStep>
     <CustomBuildStep>
       <Message>Copy linked file to root bin</Message>
-      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\$(TargetName)$(TargetExt)</Outputs>
+      <Outputs>
+      </Outputs>
       <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
       <RootFolder>
       </RootFolder>
@@ -203,7 +206,8 @@
     </CustomBuildStep>
     <CustomBuildStep>
       <Message>Copy linked file to root bin</Message>
-      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\$(TargetName)$(TargetExt)</Outputs>
+      <Outputs>
+      </Outputs>
       <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
       <RootFolder>
       </RootFolder>
