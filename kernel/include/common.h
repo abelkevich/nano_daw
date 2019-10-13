@@ -6,5 +6,15 @@
 #include <thread>
 #include <vector>
 
+#ifdef _WIN32
+    # ifdef WIN_EXPORT
+        #define EXPORTED __declspec(dllexport)
+    # else
+        #define EXPORTED __declspec(dllimport)
+    # endif
+#else
+    #define EXPORTED
+#endif
+
 typedef uint8_t status_t;
 typedef std::function<status_t(std::string)> callback_t;

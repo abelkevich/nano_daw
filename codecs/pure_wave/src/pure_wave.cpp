@@ -3,7 +3,7 @@
 
 namespace Codecs::PureWave
 {
-    __declspec(dllexport) status_t readHeader(FILE* f, WavHeader& header)
+    status_t readHeader(FILE* f, WavHeader& header)
     {
         if (!f)
         {
@@ -21,7 +21,7 @@ namespace Codecs::PureWave
         return 1;
     }
 
-    __declspec(dllexport) status_t readData(FILE* f, const WavHeader& header, level_t* buffer)
+    status_t readData(FILE* f, const WavHeader& header, level_t* buffer)
     {
         if (!f || !buffer)
         {
@@ -39,7 +39,7 @@ namespace Codecs::PureWave
         return 1;
     }
 
-    __declspec(dllexport) status_t writeHeader(FILE* f, const WavHeader& header)
+    status_t writeHeader(FILE* f, const WavHeader& header)
     {
         if (!f)
         {
@@ -58,7 +58,7 @@ namespace Codecs::PureWave
         return 1;
     }
 
-    __declspec(dllexport) status_t writeData(FILE* f, const WavHeader& header, const level_t* buffer)
+    status_t writeData(FILE* f, const WavHeader& header, const level_t* buffer)
     {
         if (!f || !buffer)
         {
@@ -76,7 +76,7 @@ namespace Codecs::PureWave
         return 1;
     }
 
-    __declspec(dllexport) status_t allocBuffer(const WavHeader& header, level_t** buffer)
+    status_t allocBuffer(const WavHeader& header, level_t** buffer)
     {
         if (!buffer)
         {
@@ -93,12 +93,12 @@ namespace Codecs::PureWave
         return 1;
     }
 
-    __declspec(dllexport) void freeBuffer(level_t* buffer)
+    void freeBuffer(level_t* buffer)
     {
         free(buffer);
     }
 
-    __declspec(dllexport) WavHeader makeDefaultHeader(uint32_t sample_rate, uint32_t buf_size)
+    WavHeader makeDefaultHeader(uint32_t sample_rate, uint32_t buf_size)
     {
         WavHeader h =
         {

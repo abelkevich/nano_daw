@@ -29,11 +29,11 @@ namespace Codecs::PureWave
     typedef struct wav_header wav_header;
     typedef int16_t level_t;
 
-    __declspec(dllexport) uint8_t readHeader(FILE* f, WavHeader& header);
-    __declspec(dllexport) uint8_t readData(FILE* f, const WavHeader& header, level_t* buffer);
-    __declspec(dllexport) uint8_t writeHeader(FILE* f, const WavHeader& header);
-    __declspec(dllexport) uint8_t writeData(FILE* f, const WavHeader& header, const level_t* buffer);
-    __declspec(dllexport) uint8_t allocBuffer(const WavHeader& header, level_t** buffer);
-    __declspec(dllexport) void freeBuffer(level_t* buffer);
-    __declspec(dllexport) WavHeader makeDefaultHeader(uint32_t sample_rate, uint32_t buf_size);
+    EXPORTED uint8_t readHeader(FILE* f, WavHeader& header);
+    EXPORTED uint8_t readData(FILE* f, const WavHeader& header, level_t* buffer);
+    EXPORTED uint8_t writeHeader(FILE* f, const WavHeader& header);
+    EXPORTED uint8_t writeData(FILE* f, const WavHeader& header, const level_t* buffer);
+    EXPORTED uint8_t allocBuffer(const WavHeader& header, level_t** buffer);
+    EXPORTED void freeBuffer(level_t* buffer);
+    EXPORTED WavHeader makeDefaultHeader(uint32_t sample_rate, uint32_t buf_size);
 };
