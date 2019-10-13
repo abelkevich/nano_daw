@@ -39,11 +39,11 @@ Session genDummySession()
         return Audio(path, 0, 0, 20000, file_buffer_float, file_samples_len);
     };
 
-    Audio audio_1 = loadAudio("..\\res\\samples_16bit_48khz\\bass_di.wav");
-    Audio audio_2 = loadAudio("..\\res\\samples_16bit_48khz\\drums_overhead_l.wav");
-    Audio audio_3 = loadAudio("..\\res\\samples_16bit_48khz\\drums_overhead_r.wav");
-    Audio audio_4 = loadAudio("..\\res\\samples_16bit_48khz\\drums_kick.wav");
-    Audio audio_5 = loadAudio("..\\res\\samples_16bit_48khz\\sax.wav");
+    Audio audio_1 = loadAudio("res\\samples_16bit_48khz\\bass_di.wav");
+    Audio audio_2 = loadAudio("res\\samples_16bit_48khz\\drums_overhead_l.wav");
+    Audio audio_3 = loadAudio("res\\samples_16bit_48khz\\drums_overhead_r.wav");
+    Audio audio_4 = loadAudio("res\\samples_16bit_48khz\\drums_kick.wav");
+    Audio audio_5 = loadAudio("res\\samples_16bit_48khz\\sax.wav");
 
     Effect effect_1("echo", "100ms");
 

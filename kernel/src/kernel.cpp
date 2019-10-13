@@ -37,7 +37,7 @@ static status_t cmdReceiver(std::string cmd)
             return 1;
         }
 
-        render(g_session, "..\\res\\sample_mix.wav");
+        render(g_session, "res\\sample_mix.wav");
         g_cmd_transmitter("rendered");
     }
     else if (cmd == "quit")

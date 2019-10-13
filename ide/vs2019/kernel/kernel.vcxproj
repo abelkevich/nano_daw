@@ -84,18 +84,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)\..\..\kernel\bin\$(Platform)\$(Configuration)</OutDir>
     <IntDir>$(SolutionDir)\..\..\kernel\obj\$(Platform)\$(Configuration)</IntDir>
+    <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)\..\..\kernel\bin\$(Platform)\$(Configuration)</OutDir>
     <IntDir>$(SolutionDir)\..\..\kernel\obj\$(Platform)\$(Configuration)</IntDir>
+    <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)\..\..\kernel\bin\$(Platform)\$(Configuration)</OutDir>
     <IntDir>$(SolutionDir)\..\..\kernel\obj\$(Platform)\$(Configuration)</IntDir>
+    <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)\..\..\kernel\bin\$(Platform)\$(Configuration)</OutDir>
     <IntDir>$(SolutionDir)\..\..\kernel\obj\$(Platform)\$(Configuration)</IntDir>
+    <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -111,6 +115,16 @@
       <AdditionalLibraryDirectories>$(SolutionDir)\..\..\codecs\pure_wave\bin\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>pure_wave.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <CustomBuildStep>
+      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\$(Platform)\$(Configuration)</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Message>Copy linked file to root bin</Message>
+      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\$(TargetName)$(TargetExt)</Outputs>
+      <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
+      <RootFolder>
+      </RootFolder>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -126,6 +140,16 @@
       <AdditionalLibraryDirectories>$(SolutionDir)\..\..\codecs\pure_wave\bin\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>pure_wave.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <CustomBuildStep>
+      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\$(Platform)\$(Configuration)</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Message>Copy linked file to root bin</Message>
+      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\$(TargetName)$(TargetExt)</Outputs>
+      <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
+      <RootFolder>
+      </RootFolder>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -145,6 +169,16 @@
       <AdditionalLibraryDirectories>$(SolutionDir)\..\..\codecs\pure_wave\bin\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>pure_wave.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <CustomBuildStep>
+      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\$(Platform)\$(Configuration)</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Message>Copy linked file to root bin</Message>
+      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\$(TargetName)$(TargetExt)</Outputs>
+      <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
+      <RootFolder>
+      </RootFolder>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -164,6 +198,16 @@
       <AdditionalLibraryDirectories>$(SolutionDir)\..\..\codecs\pure_wave\bin\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>pure_wave.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <CustomBuildStep>
+      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\$(Platform)\$(Configuration)</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Message>Copy linked file to root bin</Message>
+      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\$(TargetName)$(TargetExt)</Outputs>
+      <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
+      <RootFolder>
+      </RootFolder>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

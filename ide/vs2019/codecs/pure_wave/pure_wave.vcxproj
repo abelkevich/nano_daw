@@ -78,18 +78,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)\..\..\codecs\$(ProjectName)\bin\$(Platform)\$(Configuration)</OutDir>
     <IntDir>$(SolutionDir)\..\..\codecs\$(ProjectName)\obj\$(Platform)\$(Configuration)</IntDir>
+    <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)\..\..\codecs\$(ProjectName)\bin\$(Platform)\$(Configuration)</OutDir>
     <IntDir>$(SolutionDir)\..\..\codecs\$(ProjectName)\obj\$(Platform)\$(Configuration)</IntDir>
+    <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)\..\..\codecs\$(ProjectName)\bin\$(Platform)\$(Configuration)</OutDir>
     <IntDir>$(SolutionDir)\..\..\codecs\$(ProjectName)\obj\$(Platform)\$(Configuration)</IntDir>
+    <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)\..\..\codecs\$(ProjectName)\bin\$(Platform)\$(Configuration)</OutDir>
     <IntDir>$(SolutionDir)\..\..\codecs\$(ProjectName)\obj\$(Platform)\$(Configuration)</IntDir>
+    <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -103,6 +107,16 @@
     <Link>
       <SubSystem>Console</SubSystem>
     </Link>
+    <CustomBuildStep>
+      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\$(Platform)\$(Configuration)</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Message>Copy linked file to root bin</Message>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)</Outputs>
+      <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -116,6 +130,16 @@
     <Link>
       <SubSystem>Console</SubSystem>
     </Link>
+    <CustomBuildStep>
+      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\$(Platform)\$(Configuration)</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Message>Copy linked file to root bin</Message>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)</Outputs>
+      <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -133,6 +157,16 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <CustomBuildStep>
+      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\$(Platform)\$(Configuration)</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Message>Copy linked file to root bin</Message>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)</Outputs>
+      <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -150,6 +184,16 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <CustomBuildStep>
+      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\$(Platform)\$(Configuration)</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Message>Copy linked file to root bin</Message>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)</Outputs>
+      <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
