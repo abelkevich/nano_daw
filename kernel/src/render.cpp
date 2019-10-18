@@ -74,7 +74,7 @@ status_t render(Session ses, std::string mix_path)
 
     float* arr[2] = {left_buf, right_buf};
 
-    CodecFileInfo file_info(mix_path, arr, ses_len, 2, ses.sample_rate);
+    CodecFileInfo file_info(mix_path, arr, ses_len, 1, ses.sample_rate);
     
     codec_info.save_file_proc(file_info, 2);
 
