@@ -12,6 +12,9 @@
     <ClCompile Include="..\..\..\..\codecs\pure_wave\src\pure_wave.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\kernel\src\codec_file_info.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\codecs\pure_wave\include\pure_wave.h">

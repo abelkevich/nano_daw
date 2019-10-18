@@ -1,5 +1,5 @@
 #include "render.h"
-#include "pure_wave.h"
+#include "codec_manager.h"
 
 uint32_t msToSamples(Session ses, uint32_t ms)
 {
@@ -42,7 +42,12 @@ static void mixAudioToOutBuffer(Session ses, Audio audio, float *out_buf)
 
 status_t render(Session ses, std::string mix_path)
 {
-    using namespace Codecs::PureWave;
+    CodecInfo codec_info;
+    
+    if (getCodec("pure_wave.dll", codec_info) != 0)
+    {
+        return 1;
+    }
 
     // calc session length in samples
     uint32_t ses_len = msToSamples(ses, calcSessionLength(ses));
@@ -67,31 +72,14 @@ status_t render(Session ses, std::string mix_path)
         }
     }
 
-    // Create and fill stereo 16-bit mix buffer
-    level_t* mix_buf = new level_t[ses_len * 2];
-    for (uint32_t i = 0; i < ses_len; i++)
-    {
-        mix_buf[i * 2] = left_buf[i] * INT16_MAX;
-        mix_buf[i * 2 + 1] = right_buf[i] * INT16_MAX;
-    }
+    float* arr[2] = {left_buf, right_buf};
+
+    CodecFileInfo file_info(mix_path, arr, ses_len, 2, ses.sample_rate);
     
-    // free intermediate buffs
+    codec_info.save_file_proc(file_info, 2);
+
     delete[] left_buf;
     delete[] right_buf;
-
-    // save mix buffer to file
-    uint32_t mix_buf_size = ses_len * sizeof(level_t);
-    WavHeader mix_header = makeDefaultHeader(ses.sample_rate, mix_buf_size);
-
-    FILE* file_mix = fopen(mix_path.c_str(), "wb");
-
-    writeHeader(file_mix, mix_header);
-    writeData(file_mix, mix_header, mix_buf);
-
-    fclose(file_mix);
-
-    // free mix buf
-    delete[] mix_buf;
 
     return 0;
 }

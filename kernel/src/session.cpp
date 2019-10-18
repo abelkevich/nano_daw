@@ -1,42 +1,24 @@
 #include "session.h"
-#include "pure_wave.h"
-
-uint32_t loadWavFile(std::string path, Codecs::PureWave::level_t** file_buffer)
-{
-    using namespace Codecs::PureWave;
-
-    WavHeader wav_header;
-
-    FILE* f = fopen(path.c_str(), "rb");
-    readHeader(f, wav_header);
-    allocBuffer(wav_header, file_buffer);
-    readData(f, wav_header, *file_buffer);
-    fclose(f);
-
-    return wav_header.data_bytes / 2; // buf len in samples
-}
+#include "codec_manager.h"
 
 Session genDummySession()
 {
-    using namespace Codecs::PureWave;
+    CodecInfo codec;
 
-    auto loadAudio = [](std::string path) -> Audio
+    if (getCodec("pure_wave.dll", codec) != 0)
     {
-        level_t* file_buffer_fixed = nullptr;
-        uint32_t file_samples_len = loadWavFile(path, &file_buffer_fixed);
+        return Session("none", "none", 0, {});
+    }
 
-        float* file_buffer_float = new float[file_samples_len];
+    auto loadAudio = [=](std::string path) -> Audio
+    {
+        CodecFileInfo file_info;
 
-        for (uint32_t i = 0; i < file_samples_len; i++)
+        if (codec.load_file_proc(file_info, path))
         {
-            level_t val = file_buffer_fixed[i];
-
-            file_buffer_float[i] = (float) val / INT16_MAX;
         }
-
-        freeBuffer(file_buffer_fixed);
-
-        return Audio(path, 0, 0, 20000, file_buffer_float, file_samples_len);
+        
+        return Audio(path, 0, 0, 20000, file_info.buffers[0], file_info.samples_per_channel);
     };
 
     Audio audio_1 = loadAudio("res\\samples_16bit_48khz\\bass_di.wav");

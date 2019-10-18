@@ -2,6 +2,9 @@
 #include "terminal.h"
 #include "session.h"
 #include "render.h"
+#include "codec_manager.h"
+
+#include <sstream>
 
 static bool g_working = true;
 static callback_t g_cmd_transmitter;
@@ -21,8 +24,31 @@ static status_t cmdReceiver(std::string cmd)
     }
     else if (cmd == "init codecs")
     {
-        // initCodecs();
-        g_cmd_transmitter("codecs inited");
+        status_t status = initCodecs();
+        if (!status)
+        {
+            g_cmd_transmitter("codecs inited");
+        }
+        else
+        {
+            g_cmd_transmitter("something get wrong! Status: " + std::to_string(status));
+        }
+        
+    }
+    else if (cmd == "get codecs")
+    {
+        std::vector<CodecInfo> codecs = getInitedCodecs();
+
+        std::stringstream str_stream;
+        str_stream << "Codecs available:\n";
+
+        for (auto codec : codecs)
+        {
+            str_stream << "\t" << codec.lib_name << std::endl;
+        }
+
+        g_cmd_transmitter(str_stream.str());
+
     }
     else if (cmd == "load dummy session")
     {
