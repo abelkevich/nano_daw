@@ -21,18 +21,36 @@
     <ClInclude Include="..\..\..\kernel\include\terminal.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\kernel\include\codec_manager.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\kernel\include\codec_api.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\kernel\include\codec_file_info.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\kernel\src\kernel.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\kernel\src\render.cpp">
+    <ClCompile Include="..\..\..\kernel\src\terminal.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\kernel\src\codec_manager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\kernel\src\codec_api.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\kernel\src\session.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\kernel\src\terminal.cpp">
+    <ClCompile Include="..\..\..\kernel\src\render.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\kernel\src\codec_file_info.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
