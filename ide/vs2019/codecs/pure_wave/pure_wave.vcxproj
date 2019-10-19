@@ -109,13 +109,13 @@
       <SubSystem>Console</SubSystem>
     </Link>
     <CustomBuildStep>
-      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\$(Platform)\$(Configuration)</Command>
+      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\codecs\$(Platform)\$(Configuration)</Command>
     </CustomBuildStep>
     <CustomBuildStep>
       <Message>Copy linked file to root bin</Message>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\$(TargetName)$(TargetExt)</Outputs>
+      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\codecs\$(TargetName)$(TargetExt)</Outputs>
       <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
@@ -133,13 +133,13 @@
       <SubSystem>Console</SubSystem>
     </Link>
     <CustomBuildStep>
-      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\$(Platform)\$(Configuration)</Command>
+      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\codecs\$(Platform)\$(Configuration)</Command>
     </CustomBuildStep>
     <CustomBuildStep>
       <Message>Copy linked file to root bin</Message>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\$(TargetName)$(TargetExt)</Outputs>
+      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\codecs\$(TargetName)$(TargetExt)</Outputs>
       <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
@@ -161,13 +161,13 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <CustomBuildStep>
-      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\$(Platform)\$(Configuration)</Command>
+      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\codecs\$(Platform)\$(Configuration)</Command>
     </CustomBuildStep>
     <CustomBuildStep>
       <Message>Copy linked file to root bin</Message>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\$(TargetName)$(TargetExt)</Outputs>
+      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\codecs\$(TargetName)$(TargetExt)</Outputs>
       <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
@@ -189,13 +189,13 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <CustomBuildStep>
-      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\$(Platform)\$(Configuration)</Command>
+      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\codecs\$(Platform)\$(Configuration)</Command>
     </CustomBuildStep>
     <CustomBuildStep>
       <Message>Copy linked file to root bin</Message>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\$(TargetName)$(TargetExt)</Outputs>
+      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\codecs\$(TargetName)$(TargetExt)</Outputs>
       <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>

@@ -116,8 +116,8 @@
       <AdditionalDependencies>pure_wave.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
-      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\$(Platform)\$(Configuration)</Command>
-      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\$(TargetName)$(TargetExt)</Outputs>
+      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\codecs\$(Platform)\$(Configuration)</Command>
+      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\codecs\$(TargetName)$(TargetExt)</Outputs>
       <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
@@ -139,8 +139,8 @@
       <AdditionalDependencies>pure_wave.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
-      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\$(Platform)\$(Configuration)</Command>
-      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\$(TargetName)$(TargetExt)</Outputs>
+      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\codecs\$(Platform)\$(Configuration)</Command>
+      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\codecs\$(TargetName)$(TargetExt)</Outputs>
       <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
@@ -166,8 +166,8 @@
       <AdditionalDependencies>pure_wave.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
-      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\$(Platform)\$(Configuration)</Command>
-      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\$(TargetName)$(TargetExt)</Outputs>
+      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\codecs\$(Platform)\$(Configuration)</Command>
+      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\codecs\$(TargetName)$(TargetExt)</Outputs>
       <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
@@ -193,8 +193,8 @@
       <AdditionalDependencies>pure_wave.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
-      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\$(Platform)\$(Configuration)</Command>
-      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\$(TargetName)$(TargetExt)</Outputs>
+      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\codecs\$(Platform)\$(Configuration)</Command>
+      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\codecs\$(TargetName)$(TargetExt)</Outputs>
       <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
