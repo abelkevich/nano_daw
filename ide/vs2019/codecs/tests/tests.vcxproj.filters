@@ -14,5 +14,8 @@
     <ClCompile Include="..\..\..\..\codecs\codecs_tests\src\tests_pure_wave.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\kernel\src\codec_file_info.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
