@@ -23,6 +23,7 @@
     <ClInclude Include="..\..\..\kernel\include\codec_api.h" />
     <ClInclude Include="..\..\..\kernel\include\codec_manager.h" />
     <ClInclude Include="..\..\..\kernel\include\common.h" />
+    <ClInclude Include="..\..\..\kernel\include\kernel_api.h" />
     <ClInclude Include="..\..\..\kernel\include\render.h" />
     <ClInclude Include="..\..\..\kernel\include\session.h" />
     <ClInclude Include="..\..\..\kernel\include\terminal.h" />
@@ -32,6 +33,7 @@
     <ClCompile Include="..\..\..\kernel\src\codec_file_info.cpp" />
     <ClCompile Include="..\..\..\kernel\src\codec_manager.cpp" />
     <ClCompile Include="..\..\..\kernel\src\kernel.cpp" />
+    <ClCompile Include="..\..\..\kernel\src\kernel_api.cpp" />
     <ClCompile Include="..\..\..\kernel\src\render.cpp" />
     <ClCompile Include="..\..\..\kernel\src\session.cpp" />
     <ClCompile Include="..\..\..\kernel\src\terminal.cpp" />

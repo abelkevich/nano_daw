@@ -30,6 +30,9 @@
     <ClInclude Include="..\..\..\kernel\include\codec_file_info.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\kernel\include\kernel_api.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\kernel\src\kernel.cpp">
@@ -51,6 +54,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\kernel\src\codec_file_info.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\kernel\src\kernel_api.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
