@@ -78,7 +78,7 @@ std::list <std::string> recursiveDLLSearch(const std::string& search_path, const
 
 	std::list <std::string> list_of_path_to_dll; // create local list? what contained pathes
 
-	try {
+	if (std::filesystem::exists(search_path)) {
 		for (auto& p : std::filesystem::recursive_directory_iterator(search_path)) {//cycle what run in all folders
 
 			if (!std::filesystem::is_regular_file(p.status()))//check if isn`t directory, if it not file we are continue our cycle
@@ -91,11 +91,12 @@ std::list <std::string> recursiveDLLSearch(const std::string& search_path, const
 				continue;
 			list_of_path_to_dll.push_back(p.path().u8string());//write path to file into list
 		}
+		return list_of_path_to_dll;
 	}
-	// catch error and return what error we have(like unfound file
-	catch (std::exception & e) {
-		std::cout << "Error: " << e.what() << '\n';
-	}
-	return list_of_path_to_dll;
+	else
+		return list_of_path_to_dll;//TODO: check this return
+	
+
+	
 
 }
