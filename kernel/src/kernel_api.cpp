@@ -6,42 +6,93 @@
 #include "render.h"
 
 #include <sstream>
+#include <string>
+#include <algorithm>
+#include <iterator>
+#include <set>
+#include <queue>
+#include <map>
 
 static callback_t g_cmd_transmitter;
-
 static status_t cmdReceiver(std::string cmd);
+static std::queue<std::string> splitString(const std::string& str, char delim);
 
 void initKernelAPI()
 {
 	g_cmd_transmitter = spawnTerminal(cmdReceiver);
 }
 
-static status_t cmdReceiver(std::string cmd)
+std::queue<std::string> splitString(const std::string& str, char delim)
 {
-	if (cmd == "init io")
+	std::queue<std::string> tokens;
+	std::stringstream ss(str);
+	std::string t;
+	
+	while (std::getline(ss, t, delim)) 
 	{
-		// initIO();
-		g_cmd_transmitter("io inited");
+		tokens.push(t);
 	}
-	else if (cmd == "init effects")
+
+	return tokens;
+}
+
+void cmdInit(std::queue<std::string> tokens)
+{
+	enum EIdents { eCodecs, eEffects, eIOs};
+	static const std::map<std::string, EIdents> idents_map = { {"codecs", eCodecs }, {"effects", eEffects}, {"ios", eIOs} };
+
+	auto id_it = idents_map.find(tokens.front());
+
+	if (id_it == idents_map.end())
 	{
-		// initEffects();
-		g_cmd_transmitter("effects inited");
+		// log err
+		return;
 	}
-	else if (cmd == "init codecs")
+
+	tokens.pop();
+
+	switch (id_it->second)
 	{
-		status_t status = initCodecs();
-		if (!status)
+	case eCodecs:
+	{
+		if (initCodecs() == 0)
 		{
 			g_cmd_transmitter("codecs inited");
+			return;
 		}
-		else
-		{
-			g_cmd_transmitter("something get wrong! Status: " + std::to_string(status));
-		}
+		g_cmd_transmitter("error");
 
+		break;
 	}
-	else if (cmd == "get codecs")
+	case eEffects:
+		break;
+
+	case eIOs:
+		break;
+
+	default:
+		break;
+	}
+}
+
+void cmdList(std::queue<std::string> tokens)
+{
+	enum EIdents { eCodecs, eEffects, eIOs };
+	static const std::map<std::string, EIdents> idents_map = { {"codecs", eCodecs }, {"effects", eEffects}, {"ios", eIOs} };
+
+	auto id_it = idents_map.find(tokens.front());
+
+	if (id_it == idents_map.end())
+	{
+		// log err
+		return;
+	}
+
+	tokens.pop();
+
+	switch (id_it->second)
+	{
+	case eCodecs:
 	{
 		std::vector<CodecInfo> codecs = getInitedCodecs();
 
@@ -55,27 +106,133 @@ static status_t cmdReceiver(std::string cmd)
 
 		g_cmd_transmitter(str_stream.str());
 
+		break;
 	}
-	else if (cmd == "load dummy session")
+	case eEffects:
+		break;
+
+	case eIOs:
+		break;
+
+	default:
+		break;
+	}
+}
+
+void cmdSession(std::queue<std::string> tokens)
+{
+	enum EIdents { eLoad, eCreate, eSave };
+	static const std::map<std::string, EIdents> idents_map = { {"load", eLoad }, {"create", eCreate}, {"save", eSave} };
+
+	auto id_it = idents_map.find(tokens.front());
+
+	if (id_it == idents_map.end())
+	{
+		// log err
+		return;
+	}
+
+	tokens.pop();
+
+	switch (id_it->second)
+	{
+	case eLoad:
 	{
 		g_session = genDummySession();
-		g_cmd_transmitter("loaded");
+
+		break;
 	}
-	else if (cmd == "render")
+	case eCreate:
+		break;
+
+	case eSave:
+		break;
+
+	default:
+		break;
+	}
+}
+
+void cmdRender(std::queue<std::string> tokens)
+{
+	enum EIdents { eAll};
+	static const std::map<std::string, EIdents> idents_map = { {"all", eAll} };
+
+	auto id_it = idents_map.find(tokens.front());
+
+	if (id_it == idents_map.end())
+	{
+		// log err
+		return;
+	}
+
+	tokens.pop();
+
+	switch (id_it->second)
+	{
+	case eAll:
 	{
 		if (g_session.state == ESessionState::eNonInited)
 		{
 			g_cmd_transmitter("no session loaded");
-			return 1;
+			return;
 		}
 
 		render(g_session, "res\\sample_mix.wav");
 		g_cmd_transmitter("rendered");
+		break;
 	}
-	else if (cmd == "quit")
+	default:
+		break;
+	}
+}
+
+static status_t cmdReceiver(std::string cmd)
+{
+	std::queue<std::string> tokens = splitString(cmd, ' ');
+
+	if (tokens.empty())
 	{
-		g_working = false;
+		return 1;
 	}
+
+	enum EIdents { eInit, eList, eSession, eQuit, ePlayback, eRender };
+	static const std::map<std::string, EIdents> idents_map = { {"init", eInit }, {"list", eList}, {"session", eSession}, {"quit", eQuit},
+															   {"playback", ePlayback}, {"render", eRender} };
+	
+	auto id_it = idents_map.find(tokens.front());
+
+	if (id_it == idents_map.end())
+	{
+		// log err
+		return 1;
+	}
+
+	tokens.pop();
+
+	switch (id_it->second)
+	{
+	case eInit:
+		cmdInit(tokens);
+		break;
+
+	case eList:
+		cmdList(tokens);
+		break;
+
+	case eSession:
+		cmdSession(tokens);
+		break;
+
+	case eRender:
+		cmdRender(tokens);
+		break;
+
+	default:
+		return 1;
+		break;
+	}
+
 
 	return 0;
 }
