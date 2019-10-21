@@ -187,6 +187,30 @@ void cmdRender(std::queue<std::string> tokens)
 	}
 }
 
+void cmdTrack(std::queue<std::string> tokens)
+{
+	enum EIdents { eAdd, eRemove, eMute, eSolo, eVolume, eGain, ePan, eEffect };
+	static const std::map<std::string, EIdents> idents_map = { {"add", eAdd}, {"remove", eRemove}, {"mute", eMute},
+															   {"solo", eSolo}, {"volume", eVolume}, {"gain", eGain},
+															   {"pan", ePan}, {"effect", eEffect}};
+
+	auto id_it = idents_map.find(tokens.front());
+
+	if (id_it == idents_map.end())
+	{
+		// log err
+		return;
+	}
+
+	tokens.pop();
+
+	switch (id_it->second)
+	{
+	default:
+		break;
+	}
+}
+
 static status_t cmdReceiver(std::string cmd)
 {
 	std::queue<std::string> tokens = splitString(cmd, ' ');
