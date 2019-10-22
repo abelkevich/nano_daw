@@ -1,6 +1,11 @@
 #pragma once
 #include "common.h"
 
-typedef std::function<status_t(std::string)> callback_t;
+enum class EKernelAPIStatus
+{
+    eOk, eErr, eWarn
+};
+
+typedef std::function<EKernelAPIStatus(std::string)> callback_t;
 
 void initKernelAPI();

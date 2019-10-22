@@ -14,7 +14,7 @@
 #include <map>
 
 static callback_t g_cmd_transmitter;
-static status_t cmdReceiver(std::string cmd);
+static EKernelAPIStatus cmdReceiver(std::string cmd);
 static std::queue<std::string> splitString(const std::string& str, char delim);
 
 void initKernelAPI()
@@ -211,13 +211,13 @@ void cmdTrack(std::queue<std::string> tokens)
 	}
 }
 
-static status_t cmdReceiver(std::string cmd)
+static EKernelAPIStatus cmdReceiver(std::string cmd)
 {
 	std::queue<std::string> tokens = splitString(cmd, ' ');
 
 	if (tokens.empty())
 	{
-		return 1;
+		return EKernelAPIStatus::eErr;
 	}
 
 	enum EIdents { eInit, eList, eSession, eQuit, ePlayback, eRender };
@@ -229,7 +229,7 @@ static status_t cmdReceiver(std::string cmd)
 	if (id_it == idents_map.end())
 	{
 		// log err
-		return 1;
+		return EKernelAPIStatus::eErr;
 	}
 
 	tokens.pop();
@@ -253,10 +253,10 @@ static status_t cmdReceiver(std::string cmd)
 		break;
 
 	default:
-		return 1;
+		return EKernelAPIStatus::eErr;
 		break;
 	}
 
 
-	return 0;
+	return EKernelAPIStatus::eOk;
 }
