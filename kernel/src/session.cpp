@@ -159,7 +159,7 @@ Session* genDummySession()
 
     if (getCodec("pure_wave.dll", codec) != 0)
     {
-        return new Session("none", "none", 0);
+        return nullptr;
     }
 
     auto loadAudio = [=](std::string path) -> Audio

@@ -33,6 +33,9 @@
     <ClInclude Include="..\..\..\kernel\include\kernel_api.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\kernel\include\kernel.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\kernel\src\kernel.cpp">

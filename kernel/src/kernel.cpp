@@ -1,43 +1,74 @@
 #include "kernel.h"
 #include "kernel_api.h"
 #include "codec_manager.h"
+#include "render.h"
+
+#include <sstream>
 
 bool g_working = true;
 Session *g_session = nullptr;
 
-void addTrack(std::string name)
+namespace Kernel
 {
-    Track t(name);
-    g_session->addTrack(t);
-}
+	status_t initKernelCodecs()
+	{
+		return initCodecs();
+	}
 
-status_t loadAudioOnTrack(std::string audio_path, id_t track_id)
-{
-    Track* track = g_session->getTrack(track_id);
-    
-    if (!track)
-    {
-        return 1;
-    }
+	void addTrack(std::string name)
+	{
+		Track t(name);
+		g_session->addTrack(t);
+	}
 
-    CodecInfo codec;
+	status_t loadAudioOnTrack(std::string audio_path, id_t track_id)
+	{
+		Track* track = g_session->getTrack(track_id);
 
-    if (getCodec("pure_wave.dll", codec) != 0)
-    {
-        return 2;
-    }
+		if (!track)
+		{
+			return 1;
+		}
 
-    CodecFileInfo file_info;
-    if (codec.load_file_proc(file_info, audio_path) != 0)
-    {
-        return 3;
-    }
+		CodecInfo codec;
 
-    Audio a(audio_path, file_info.buffers[0], file_info.samples_per_channel);
-    
-    track->addAudio(a);
+		if (getCodec("pure_wave.dll", codec) != 0)
+		{
+			return 2;
+		}
 
-    return 0;
+		CodecFileInfo file_info;
+		if (codec.load_file_proc(file_info, audio_path) != 0)
+		{
+			return 3;
+		}
+
+		Audio a(audio_path, file_info.buffers[0], file_info.samples_per_channel);
+
+		track->addAudio(a);
+
+		return 0;
+	}
+
+	status_t renderAll(std::string mix_path)
+	{
+		return render(*g_session, mix_path);
+	}
+
+	std::string listInitedCodecs()
+	{
+		std::vector<CodecInfo> codecs = getInitedCodecs();
+
+		std::stringstream str_stream;
+		str_stream << "Codecs available:\n";
+
+		for (auto codec : codecs)
+		{
+			str_stream << "\t" << codec.lib_name << std::endl;
+		}
+
+		return str_stream.str();
+	}
 }
 
 int main(int argc, char **argv)

@@ -2,8 +2,6 @@
 #include "kernel.h"
 #include "terminal.h"
 
-#include "codec_manager.h"
-#include "render.h"
 
 #include <sstream>
 #include <string>
@@ -15,50 +13,91 @@
 
 static callback_t g_cmd_transmitter;
 static EKernelAPIStatus cmdReceiver(std::string cmd);
-static std::queue<std::string> splitString(const std::string& str, char delim);
+
+class CommandSeq
+{
+private:
+	std::queue<std::string> tokens;
+
+public:
+
+	CommandSeq(std::string cmd_line)
+	{
+		std::stringstream ss(cmd_line);
+		std::string t;
+
+		while (std::getline(ss, t, ' '))
+		{
+			tokens.push(t);
+		}
+	}
+
+	std::string sliceNextToken()
+	{
+		if (tokens.empty())
+		{
+			return std::string();
+		}
+
+		std::string t = tokens.front();
+		tokens.pop();
+
+		return t;
+	}
+
+	bool hasNTokens(uint8_t n)
+	{
+		return tokens.size() == n;
+	}
+};
+
+template<typename ENUM>
+class IdentsMap
+{
+private:
+	const std::map<std::string, ENUM> m_idents;
+
+public:
+	IdentsMap(std::initializer_list<std::pair<const std::string, ENUM>> init_list)
+		: m_idents(init_list)
+	{
+	}
+
+	bool hasIdent(std::string token)
+	{
+		return m_idents.find(token) != m_idents.end();
+	}
+
+	ENUM getIdent(std::string token)
+	{
+		return m_idents.at(token);
+	}
+};
 
 void initKernelAPI()
 {
 	g_cmd_transmitter = spawnTerminal(cmdReceiver);
 }
 
-std::queue<std::string> splitString(const std::string& str, char delim)
+
+static EKernelAPIStatus cmdInit(CommandSeq seq)
 {
-	std::queue<std::string> tokens;
-	std::stringstream ss(str);
-	std::string t;
-	
-	while (std::getline(ss, t, delim)) 
-	{
-		tokens.push(t);
-	}
+	enum EIdents { eCodecs, eEffects, eIOs, eNone };
+	IdentsMap<EIdents> idents_map{ {"codecs", eCodecs }, {"effects", eEffects}, {"ios", eIOs} };
 
-	return tokens;
-}
+	std::string token = seq.sliceNextToken();
 
-void cmdInit(std::queue<std::string> tokens)
-{
-	enum EIdents { eCodecs, eEffects, eIOs};
-	static const std::map<std::string, EIdents> idents_map = { {"codecs", eCodecs }, {"effects", eEffects}, {"ios", eIOs} };
+	EIdents cmd = idents_map.hasIdent(token) ?
+				  idents_map.getIdent(token) : eNone;
 
-	auto id_it = idents_map.find(tokens.front());
-
-	if (id_it == idents_map.end())
-	{
-		// log err
-		return;
-	}
-
-	tokens.pop();
-
-	switch (id_it->second)
+	switch (cmd)
 	{
 	case eCodecs:
 	{
-		if (initCodecs() == 0)
+		if (Kernel::initKernelCodecs() == 0)
 		{
 			g_cmd_transmitter("codecs inited");
-			return;
+			return EKernelAPIStatus::eOk;
 		}
 		g_cmd_transmitter("error");
 
@@ -69,43 +108,26 @@ void cmdInit(std::queue<std::string> tokens)
 
 	case eIOs:
 		break;
-
-	default:
-		break;
 	}
+
+	return EKernelAPIStatus::eErr;
 }
 
-void cmdList(std::queue<std::string> tokens)
+static EKernelAPIStatus cmdList(CommandSeq seq)
 {
-	enum EIdents { eCodecs, eEffects, eIOs };
-	static const std::map<std::string, EIdents> idents_map = { {"codecs", eCodecs }, {"effects", eEffects}, {"ios", eIOs} };
+	enum EIdents { eCodecs, eEffects, eIOs, eNone };
+	IdentsMap<EIdents> idents_map{ {"codecs", eCodecs }, {"effects", eEffects}, {"ios", eIOs} };
 
-	auto id_it = idents_map.find(tokens.front());
+	std::string token = seq.sliceNextToken();
 
-	if (id_it == idents_map.end())
-	{
-		// log err
-		return;
-	}
+	EIdents cmd = idents_map.hasIdent(token) ?
+				  idents_map.getIdent(token) : eNone;
 
-	tokens.pop();
-
-	switch (id_it->second)
+	switch (cmd)
 	{
 	case eCodecs:
 	{
-		std::vector<CodecInfo> codecs = getInitedCodecs();
-
-		std::stringstream str_stream;
-		str_stream << "Codecs available:\n";
-
-		for (auto codec : codecs)
-		{
-			str_stream << "\t" << codec.lib_name << std::endl;
-		}
-
-		g_cmd_transmitter(str_stream.str());
-
+		g_cmd_transmitter(Kernel::listInitedCodecs());
 		break;
 	}
 	case eEffects:
@@ -113,32 +135,28 @@ void cmdList(std::queue<std::string> tokens)
 
 	case eIOs:
 		break;
-
-	default:
-		break;
 	}
+
+	return EKernelAPIStatus::eErr;
 }
 
-void cmdSession(std::queue<std::string> tokens)
+static EKernelAPIStatus cmdSession(CommandSeq seq)
 {
-	enum EIdents { eLoad, eCreate, eSave };
-	static const std::map<std::string, EIdents> idents_map = { {"load", eLoad }, {"create", eCreate}, {"save", eSave} };
+	enum EIdents { eLoad, eCreate, eSave, eNone };
+	IdentsMap<EIdents> idents_map{ {"load", eLoad }, {"create", eCreate}, {"save", eSave} };
 
-	auto id_it = idents_map.find(tokens.front());
+	std::string token = seq.sliceNextToken();
 
-	if (id_it == idents_map.end())
-	{
-		// log err
-		return;
-	}
+	EIdents cmd = idents_map.hasIdent(token) ?
+				  idents_map.getIdent(token) : eNone;
 
-	tokens.pop();
 
-	switch (id_it->second)
+	switch (cmd)
 	{
 	case eLoad:
 	{
 		g_session = genDummySession();
+		g_cmd_transmitter(g_session ? "loaded" : "err");
 
 		break;
 	}
@@ -147,116 +165,99 @@ void cmdSession(std::queue<std::string> tokens)
 
 	case eSave:
 		break;
-
-	default:
-		break;
 	}
+
+	return EKernelAPIStatus::eErr;
 }
 
-void cmdRender(std::queue<std::string> tokens)
+static EKernelAPIStatus cmdRender(CommandSeq seq)
 {
-	enum EIdents { eAll};
-	static const std::map<std::string, EIdents> idents_map = { {"all", eAll} };
+	enum EIdents {eNone, eAll};
+	IdentsMap<EIdents> idents_map{{"all", eAll}, {"all", eAll}};
+	std::string token = seq.sliceNextToken();
 
-	auto id_it = idents_map.find(tokens.front());
-
-	if (id_it == idents_map.end())
-	{
-		// log err
-		return;
-	}
-
-	tokens.pop();
-
-	switch (id_it->second)
+	EIdents cmd = idents_map.hasIdent(token) ? 
+				  idents_map.getIdent(token) : eNone;
+	
+	switch (cmd)
 	{
 	case eAll:
 	{
-		if (g_session->state == ESessionState::eNonInited)
+		if (!seq.hasNTokens(1))
 		{
-			g_cmd_transmitter("no session loaded");
-			return;
+			g_cmd_transmitter("err: invalid syntax for render all");
+
+			return EKernelAPIStatus::eOk;
 		}
 
-		render(*g_session, "res\\sample_mix.wav");
-		g_cmd_transmitter("rendered");
+		std::string mix_name = seq.sliceNextToken();
+		
+		if (Kernel::renderAll(mix_name) != 0)
+		{
+			g_cmd_transmitter("rendered");
+			return EKernelAPIStatus::eOk;
+		}
+
+		g_cmd_transmitter("err: rendered");
+		
 		break;
 	}
 	default:
 		break;
 	}
+
+	return EKernelAPIStatus::eErr;
 }
 
-void cmdTrack(std::queue<std::string> tokens)
+static EKernelAPIStatus cmdTrack(CommandSeq seq)
 {
-	enum EIdents { eAdd, eRemove, eMute, eSolo, eVolume, eGain, ePan, eEffect };
-	static const std::map<std::string, EIdents> idents_map = { {"add", eAdd}, {"remove", eRemove}, {"mute", eMute},
-															   {"solo", eSolo}, {"volume", eVolume}, {"gain", eGain},
-															   {"pan", ePan}, {"effect", eEffect}};
+	enum EIdents { eAdd, eRemove, eMute, eSolo, eVolume, eGain, ePan, eEffect, eNone };
+	IdentsMap<EIdents> idents_map{ {"add", eAdd}, {"remove", eRemove}, {"mute", eMute},
+								   {"solo", eSolo}, {"volume", eVolume}, {"gain", eGain},
+								   {"pan", ePan}, {"effect", eEffect} };
 
-	auto id_it = idents_map.find(tokens.front());
+	std::string token = seq.sliceNextToken();
 
-	if (id_it == idents_map.end())
-	{
-		// log err
-		return;
-	}
+	EIdents cmd = idents_map.hasIdent(token) ?
+				  idents_map.getIdent(token) : eNone;
 
-	tokens.pop();
-
-	switch (id_it->second)
+	switch (cmd)
 	{
 	default:
 		break;
 	}
+
+	return EKernelAPIStatus::eErr;
 }
 
-static EKernelAPIStatus cmdReceiver(std::string cmd)
+static EKernelAPIStatus cmdReceiver(std::string user_cmd_line)
 {
-	std::queue<std::string> tokens = splitString(cmd, ' ');
+	CommandSeq seq(user_cmd_line);
 
-	if (tokens.empty())
-	{
-		return EKernelAPIStatus::eErr;
-	}
-
-	enum EIdents { eInit, eList, eSession, eQuit, ePlayback, eRender };
-	static const std::map<std::string, EIdents> idents_map = { {"init", eInit }, {"list", eList}, {"session", eSession}, {"quit", eQuit},
-															   {"playback", ePlayback}, {"render", eRender} };
+	enum EIdents { eInit, eList, eSession, eQuit, ePlayback, eRender, eNone };
+	IdentsMap<EIdents> idents_map{ {"init", eInit }, {"list", eList}, {"session", eSession}, {"quit", eQuit},
+								   {"playback", ePlayback}, {"render", eRender} };
 	
-	auto id_it = idents_map.find(tokens.front());
+	std::string token = seq.sliceNextToken();
 
-	if (id_it == idents_map.end())
-	{
-		// log err
-		return EKernelAPIStatus::eErr;
-	}
+	EIdents cmd = idents_map.hasIdent(token) ?
+				  idents_map.getIdent(token) : eNone;	
 
-	tokens.pop();
-
-	switch (id_it->second)
+	switch (cmd)
 	{
 	case eInit:
-		cmdInit(tokens);
-		break;
+		return cmdInit(seq);
 
 	case eList:
-		cmdList(tokens);
-		break;
+		return cmdList(seq);
 
 	case eSession:
-		cmdSession(tokens);
-		break;
+		return cmdSession(seq);
 
 	case eRender:
-		cmdRender(tokens);
-		break;
-
-	default:
-		return EKernelAPIStatus::eErr;
-		break;
+		return cmdRender(seq);
 	}
 
 
-	return EKernelAPIStatus::eOk;
+	return EKernelAPIStatus::eErr;
 }

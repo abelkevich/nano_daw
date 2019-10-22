@@ -27,8 +27,8 @@ status_t initCodecs()
 {
 	std::list <std::string> path_to_dll = recursiveDLLSearch("bin/", ".dll");
 
-
 	for (std::string dll_file : path_to_dll) {
+
 		HINSTANCE hinstLib = LoadLibrary(TEXT(dll_file.c_str()));
 
 		if (!hinstLib)
@@ -36,18 +36,15 @@ status_t initCodecs()
 			return 1;
 		}
 
-		LoadFileProc_t load_file_proc;
-		SaveFileProc_t save_file_proc;
-
-		load_file_proc = (LoadFileProc_t)GetProcAddress(hinstLib, "loadFile");
-		save_file_proc = (SaveFileProc_t)GetProcAddress(hinstLib, "saveFile");
+		LoadFileProc_t load_file_proc = (LoadFileProc_t)GetProcAddress(hinstLib, "loadFile");
+		SaveFileProc_t save_file_proc = (SaveFileProc_t)GetProcAddress(hinstLib, "saveFile");
 
 		if (!load_file_proc || !save_file_proc)
 		{
 			return 2;
 		}
 
-		g_codecs.push_back(CodecInfo(dll_file, load_file_proc, save_file_proc));
+		g_codecs.push_back(CodecInfo("pure_wave.dll", load_file_proc, save_file_proc));
 	}
 
 
