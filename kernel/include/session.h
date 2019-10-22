@@ -1,9 +1,14 @@
 #pragma once
 #include "common.h"
+#include <map>
+
+typedef uint32_t id_t;
+
 
 struct Effect
 {
-    std::string name; // lib name
+    const id_t id;
+    const std::string name; // lib name
     std::string params; // serialized params
 
     Effect(std::string _name, std::string _params);
@@ -11,32 +16,42 @@ struct Effect
 
 struct Audio
 {
-    std::string path; // fs path 
+    const std::string path; // fs path 
+    const id_t id;
 
     uint32_t time_offset; // timeline start point
     uint32_t crop_from; // if zero -> disabled
     uint32_t crop_to;   // same
 
     float *buffer; // decoded data
-    uint32_t buffer_size;
+    const uint32_t buffer_size;
 
-    Audio(std::string _path, uint32_t _time_offset, uint32_t _crop_from, uint32_t _crop_to, float* _buffer, uint32_t _buffer_size);
+    Audio(std::string _path, float* _buffer, uint32_t _buffer_size);
 };
 
 struct Track
 {
-    std::vector<Audio> audio;
-    std::vector<Effect> effects;
+    std::map<id_t, Audio> audio;
+    std::map<id_t, Effect> effects;
+
+    const id_t id;
 
     std::string name;
-  
     bool mute;
     bool solo;
     int32_t pan;
     uint8_t gain;
     float level;
 
-    Track(std::string _name, bool _mute, bool _solo, int32_t _pan, uint8_t _gain, float _level, std::vector<Audio> _audio, std::vector<Effect> _effects);
+    Track(std::string _name);
+
+    status_t addAudio(const Audio &audio);
+    Audio* getAudio(id_t id);
+    status_t removeAudio(id_t);
+    
+    status_t addEffect(const Effect& audio);
+    Effect* getEffect(id_t id);
+    status_t removeEffect(id_t id);
 };
 
 enum class ESessionState
@@ -48,16 +63,18 @@ struct Session
 {
     ESessionState state;
   
-    uint32_t sample_rate;
+    const uint32_t sample_rate;
 
     std::string name;
-    std::string path;
+    const std::string path;
 
-    std::vector<Track> tracks;
+    std::map<id_t, Track> tracks;
 
-    Session();
-    Session(std::string _name, std::string _path, uint32_t _sample_rate, std::vector<Track> _tracks);
-    Track* getTrack(const std::string& name);
+    Session(std::string _name, std::string _path, uint32_t _sample_rate);
+
+    status_t addTrack(const Track& track);
+    Track* getTrack(id_t id);
+    status_t removeTrack(id_t id);
 };
 
-Session genDummySession();
+Session* genDummySession();

@@ -172,13 +172,13 @@ void cmdRender(std::queue<std::string> tokens)
 	{
 	case eAll:
 	{
-		if (g_session.state == ESessionState::eNonInited)
+		if (g_session->state == ESessionState::eNonInited)
 		{
 			g_cmd_transmitter("no session loaded");
 			return;
 		}
 
-		render(g_session, "res\\sample_mix.wav");
+		render(*g_session, "res\\sample_mix.wav");
 		g_cmd_transmitter("rendered");
 		break;
 	}

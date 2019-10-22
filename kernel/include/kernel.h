@@ -4,4 +4,4 @@
 #include "session.h"
 
 extern bool g_working;
-extern Session g_session;
+extern Session *g_session;

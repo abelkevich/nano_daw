@@ -12,10 +12,10 @@ static uint32_t calcSessionLength(Session ses)
 
     for (auto t: ses.tracks)
     {
-        for (auto a : t.audio)
+        for (auto a : t.second.audio)
         {
-            uint32_t len = a.crop_to - a.crop_from;
-            uint32_t overall_len = len + a.time_offset;
+            uint32_t len = a.second.crop_to - a.second.crop_from;
+            uint32_t overall_len = len + a.second.time_offset;
 
             if (max_audio_len < overall_len)
             {
@@ -65,10 +65,10 @@ status_t render(Session ses, std::string mix_path)
     // mix right and left channels
     for (auto t: ses.tracks)
     {
-        for (auto a: t.audio)
+        for (auto a: t.second.audio)
         {
-            mixAudioToOutBuffer(ses, a, left_buf);
-            mixAudioToOutBuffer(ses, a, right_buf);
+            mixAudioToOutBuffer(ses, a.second, left_buf);
+            mixAudioToOutBuffer(ses, a.second, right_buf);
         }
     }
 

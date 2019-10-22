@@ -3,17 +3,17 @@
 #include "codec_manager.h"
 
 bool g_working = true;
-Session g_session;
+Session *g_session = nullptr;
 
 void addTrack(std::string name)
 {
-    Track t(name, false, false, 0, 0, 0, {}, {});
-    g_session.tracks.push_back(t);
+    Track t(name);
+    g_session->addTrack(t);
 }
 
-status_t loadAudioOnTrack(std::string audio_path, std::string track_name)
+status_t loadAudioOnTrack(std::string audio_path, id_t track_id)
 {
-    Track* track = g_session.getTrack(track_name);
+    Track* track = g_session->getTrack(track_id);
     
     if (!track)
     {
@@ -33,9 +33,9 @@ status_t loadAudioOnTrack(std::string audio_path, std::string track_name)
         return 3;
     }
 
-    Audio a(audio_path, 0, 0, 20000, file_info.buffers[0], file_info.samples_per_channel);
+    Audio a(audio_path, file_info.buffers[0], file_info.samples_per_channel);
     
-    track->audio.push_back(a);
+    track->addAudio(a);
 
     return 0;
 }
