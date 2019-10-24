@@ -10,6 +10,17 @@ Session *g_session = nullptr;
 
 namespace Kernel
 {
+    status_t createSession(std::string name, std::string path, uint32_t sample_rate)
+    {
+        if (g_session)
+        {
+            return 1;
+        }
+
+        g_session = new Session(name, path, sample_rate);
+        return 0;
+    }
+
 	status_t initKernelCodecs()
 	{
 		return initCodecs();

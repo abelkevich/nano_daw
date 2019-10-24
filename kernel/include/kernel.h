@@ -8,6 +8,7 @@ extern Session *g_session;
 
 namespace Kernel
 {
+    status_t createSession(std::string name, std::string path, uint32_t sample_rate);
 	status_t initKernelCodecs();
 	std::string listInitedCodecs();
 	status_t renderAll(std::string mix_path);

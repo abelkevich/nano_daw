@@ -161,6 +161,35 @@ static EKernelAPIStatus cmdSession(CommandSeq seq)
 		break;
 	}
 	case eCreate:
+    {
+        if (!seq.hasNTokens(3))
+        {
+            g_cmd_transmitter("invalid parameters");
+            return EKernelAPIStatus::eErr;
+        }
+
+        std::string name = seq.sliceNextToken();
+        std::string path = seq.sliceNextToken();
+        std::string smp_rate_str = seq.sliceNextToken();
+
+        uint32_t smp_rate = stoi(smp_rate_str);
+
+        if (smp_rate != 48000)
+        {
+            g_cmd_transmitter("supporting only 48kHz format");
+            return EKernelAPIStatus::eErr;
+        }
+
+        status_t status = Kernel::createSession(name, path, smp_rate);
+
+        if (status != 0)
+        {
+            g_cmd_transmitter("Warn: command exited with code: " + std::to_string(status));
+            return EKernelAPIStatus::eWarn;
+        }
+
+        return EKernelAPIStatus::eOk;
+    }
 		break;
 
 	case eSave:
