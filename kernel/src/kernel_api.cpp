@@ -115,8 +115,8 @@ static EKernelAPIStatus cmdInit(CommandSeq seq)
 
 static EKernelAPIStatus cmdList(CommandSeq seq)
 {
-	enum EIdents { eCodecs, eEffects, eIOs, eNone };
-	IdentsMap<EIdents> idents_map{ {"codecs", eCodecs }, {"effects", eEffects}, {"ios", eIOs} };
+	enum EIdents { eCodecs, eEffects, eIOs, eTracks, eNone };
+    IdentsMap<EIdents> idents_map{ {"codecs", eCodecs }, {"effects", eEffects}, {"ios", eIOs}, {"tracks", eTracks}};
 
 	std::string token = seq.sliceNextToken();
 
@@ -130,6 +130,12 @@ static EKernelAPIStatus cmdList(CommandSeq seq)
 		g_cmd_transmitter(Kernel::listInitedCodecs());
 		break;
 	}
+    case eTracks:
+    {
+        g_cmd_transmitter(Kernel::listTracks());
+        return EKernelAPIStatus::eOk;
+    }
+
 	case eEffects:
 		break;
 
@@ -240,7 +246,7 @@ static EKernelAPIStatus cmdRender(CommandSeq seq)
 
 static EKernelAPIStatus cmdTrack(CommandSeq seq)
 {
-	enum EIdents { eAdd, eRemove, eMute, eSolo, eVolume, eGain, ePan, eEffect, eNone };
+	enum EIdents { eList, eAdd, eRemove, eMute, eSolo, eVolume, eGain, ePan, eEffect, eNone };
 	IdentsMap<EIdents> idents_map{ {"add", eAdd}, {"remove", eRemove}, {"mute", eMute},
 								   {"solo", eSolo}, {"volume", eVolume}, {"gain", eGain},
 								   {"pan", ePan}, {"effect", eEffect} };
@@ -252,8 +258,70 @@ static EKernelAPIStatus cmdTrack(CommandSeq seq)
 
 	switch (cmd)
 	{
-	default:
-		break;
+    case eList:
+    {
+        g_cmd_transmitter(Kernel::listTracks());
+        return EKernelAPIStatus::eOk;
+    }
+
+    case eAdd:
+    {
+        if (!seq.hasNTokens(1))
+        {
+            g_cmd_transmitter("Err: invalid args");
+            return EKernelAPIStatus::eErr;
+        }
+
+        std::string name = seq.sliceNextToken();
+
+        status_t status = Kernel::addTrack(name);
+
+        if (status != 0)
+        {
+            g_cmd_transmitter("Err: status: " + std::to_string(status));
+            return EKernelAPIStatus::eErr;
+        }
+
+        g_cmd_transmitter("Track added!");
+        return EKernelAPIStatus::eOk;
+    }
+
+    case eRemove:
+    {
+
+        break;
+    }
+
+    case eMute:
+    {
+
+        break;
+    }
+
+    case eSolo:
+    {
+
+        break;
+    }
+
+    case eVolume:
+    {
+
+        break;
+    }
+
+    case eGain:
+    {
+
+        break;
+    }
+
+    case ePan:
+    {
+
+        break;
+    }
+
 	}
 
 	return EKernelAPIStatus::eErr;
@@ -263,7 +331,7 @@ static EKernelAPIStatus cmdReceiver(std::string user_cmd_line)
 {
 	CommandSeq seq(user_cmd_line);
 
-	enum EIdents { eInit, eList, eSession, eQuit, ePlayback, eRender, eNone };
+	enum EIdents { eInit, eList, eTrack, eSession, eQuit, ePlayback, eRender, eNone };
 	IdentsMap<EIdents> idents_map{ {"init", eInit }, {"list", eList}, {"session", eSession}, {"quit", eQuit},
 								   {"playback", ePlayback}, {"render", eRender} };
 	
@@ -285,6 +353,9 @@ static EKernelAPIStatus cmdReceiver(std::string user_cmd_line)
 
 	case eRender:
 		return cmdRender(seq);
+
+    case eTrack:
+        return cmdTrack(seq);
 	}
 
 

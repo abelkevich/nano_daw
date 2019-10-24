@@ -26,10 +26,10 @@ namespace Kernel
 		return initCodecs();
 	}
 
-	void addTrack(std::string name)
+	status_t addTrack(std::string name)
 	{
-		Track t(name);
-		g_session->addTrack(t);
+        if (!g_session) { return 1; }
+        return g_session->addTrack(Track(name));
 	}
 
 	status_t loadAudioOnTrack(std::string audio_path, id_t track_id)
@@ -80,6 +80,21 @@ namespace Kernel
 
 		return str_stream.str();
 	}
+
+    std::string listTracks()
+    {
+        std::stringstream str_stream;
+        str_stream << "Tracks available:\n";
+
+        for (auto track : g_session->tracks)
+        {
+            str_stream << "\tid:" << track.first;
+            str_stream << " name: " << track.second.name;
+            str_stream << std::endl;
+        }
+
+        return str_stream.str();
+    }
 }
 
 int main(int argc, char **argv)
