@@ -246,10 +246,10 @@ static EKernelAPIStatus cmdRender(CommandSeq seq)
 
 static EKernelAPIStatus cmdTrack(CommandSeq seq)
 {
-	enum EIdents { eList, eAdd, eRemove, eMute, eSolo, eVolume, eGain, ePan, eEffect, eNone };
+	enum EIdents { eList, eAdd, eRemove, eMute, eSolo, eVolume, eGain, ePan, eNone };
 	IdentsMap<EIdents> idents_map{ {"add", eAdd}, {"remove", eRemove}, {"mute", eMute},
 								   {"solo", eSolo}, {"volume", eVolume}, {"gain", eGain},
-								   {"pan", ePan}, {"effect", eEffect} };
+								   {"pan", ePan}};
 
 	std::string token = seq.sliceNextToken();
 
@@ -288,38 +288,157 @@ static EKernelAPIStatus cmdTrack(CommandSeq seq)
 
     case eRemove:
     {
+		if (!seq.hasNTokens(1))
+		{
+			g_cmd_transmitter("Err: invalid args");
+			return EKernelAPIStatus::eErr;
+		}
 
-        break;
+		std::string id_str = seq.sliceNextToken();
+
+		id_t id = stoi(id_str);
+
+		status_t status = Kernel::removeTrack(id);
+
+		if (status != 0)
+		{
+			g_cmd_transmitter("Err: status: " + std::to_string(status));
+			return EKernelAPIStatus::eErr;
+		}
+
+		g_cmd_transmitter("Track removed!");
+		return EKernelAPIStatus::eOk;
     }
 
     case eMute:
     {
+		if (!seq.hasNTokens(1))
+		{
+			g_cmd_transmitter("Err: invalid args");
+			return EKernelAPIStatus::eErr;
+		}
 
+		std::string id_str = seq.sliceNextToken();
+
+		id_t id = stoi(id_str);
+
+		status_t status = Kernel::muteTrack(id);
+
+		if (status != 0)
+		{
+			g_cmd_transmitter("Err: status: " + std::to_string(status));
+			return EKernelAPIStatus::eErr;
+		}
+
+		g_cmd_transmitter("Track muted!");
+		return EKernelAPIStatus::eOk;
         break;
     }
 
     case eSolo:
     {
+		if (!seq.hasNTokens(1))
+		{
+			g_cmd_transmitter("Err: invalid args");
+			return EKernelAPIStatus::eErr;
+		}
 
+		std::string id_str = seq.sliceNextToken();
+
+		id_t id = stoi(id_str);
+
+		status_t status = Kernel::soloTrack(id);
+
+		if (status != 0)
+		{
+			g_cmd_transmitter("Err: status: " + std::to_string(status));
+			return EKernelAPIStatus::eErr;
+		}
+
+		g_cmd_transmitter("Track solo active!");
+		return EKernelAPIStatus::eOk;
         break;
     }
 
     case eVolume:
     {
+		if (!seq.hasNTokens(2))
+		{
+			g_cmd_transmitter("Err: invalid args");
+			return EKernelAPIStatus::eErr;
+		}
 
-        break;
+		std::string id_str = seq.sliceNextToken();
+		id_t id = stoi(id_str);
+
+
+		std::string volume_str = seq.sliceNextToken();
+		uint32_t volume = stoi(volume_str);
+
+		status_t status = Kernel::volumeTrack(id, volume);
+
+		if (status != 0)
+		{
+			g_cmd_transmitter("Err: status: " + std::to_string(status));
+			return EKernelAPIStatus::eErr;
+		}
+
+		g_cmd_transmitter("Track volume changed!");
+		return EKernelAPIStatus::eOk;
     }
 
     case eGain:
     {
+		if (!seq.hasNTokens(2))
+		{
+			g_cmd_transmitter("Err: invalid args");
+			return EKernelAPIStatus::eErr;
+		}
 
-        break;
+		std::string id_str = seq.sliceNextToken();
+		id_t id = stoi(id_str);
+
+
+		std::string gain_str = seq.sliceNextToken();
+		uint32_t gain = stoi(gain_str);
+
+		status_t status = Kernel::gainTrack(id, gain);
+
+		if (status != 0)
+		{
+			g_cmd_transmitter("Err: status: " + std::to_string(status));
+			return EKernelAPIStatus::eErr;
+		}
+
+		g_cmd_transmitter("Track gain changed!");
+		return EKernelAPIStatus::eOk;
     }
 
     case ePan:
     {
+		if (!seq.hasNTokens(2))
+		{
+			g_cmd_transmitter("Err: invalid args");
+			return EKernelAPIStatus::eErr;
+		}
 
-        break;
+		std::string id_str = seq.sliceNextToken();
+		id_t id = stoi(id_str);
+
+
+		std::string pan_str = seq.sliceNextToken();
+		uint32_t pan = stoi(pan_str);
+
+		status_t status = Kernel::panTrack(id, pan);
+
+		if (status != 0)
+		{
+			g_cmd_transmitter("Err: status: " + std::to_string(status));
+			return EKernelAPIStatus::eErr;
+		}
+
+		g_cmd_transmitter("Track pan changed!");
+		return EKernelAPIStatus::eOk;
     }
 
 	}
@@ -331,9 +450,9 @@ static EKernelAPIStatus cmdReceiver(std::string user_cmd_line)
 {
 	CommandSeq seq(user_cmd_line);
 
-	enum EIdents { eInit, eList, eTrack, eSession, eQuit, ePlayback, eRender, eNone };
-	IdentsMap<EIdents> idents_map{ {"init", eInit }, {"list", eList}, {"session", eSession}, {"quit", eQuit},
-								   {"playback", ePlayback}, {"render", eRender} };
+	enum EIdents { eCodec, eEffect, eAudio, eFragment, eTrack, eSession, eQuit, ePlayback, eRender, eNone };
+	IdentsMap<EIdents> idents_map{ {"codec", eCodec }, {"effect", eEffect}, {"audio", eAudio}, {"fragment", eFragment}, {"track", eTrack},
+								   {"session", eSession}, {"quit", eQuit}, {"playback", ePlayback}, {"render", eRender} };
 	
 	std::string token = seq.sliceNextToken();
 
@@ -342,20 +461,33 @@ static EKernelAPIStatus cmdReceiver(std::string user_cmd_line)
 
 	switch (cmd)
 	{
-	case eInit:
-		return cmdInit(seq);
+	case eCodec:
+		//return cmdCodec(seq);
 
-	case eList:
-		return cmdList(seq);
+	case eEffect:
+		//return cmdEffect(seq);
+
+	case eFragment:
+		//return cmdFragment(seq);
+
+	case eAudio:
+		//return cmdAudio(seq);
+
+	case eTrack:
+		return cmdTrack(seq);
 
 	case eSession:
 		return cmdSession(seq);
 
+    case ePlayback:
+        //return cmdPlayback(seq);
+
 	case eRender:
 		return cmdRender(seq);
-
-    case eTrack:
-        return cmdTrack(seq);
+		
+	case eQuit:
+		g_working = false;
+		return EKernelAPIStatus::eOk;
 	}
 
 

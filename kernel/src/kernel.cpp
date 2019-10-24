@@ -12,10 +12,7 @@ namespace Kernel
 {
     status_t createSession(std::string name, std::string path, uint32_t sample_rate)
     {
-        if (g_session)
-        {
-            return 1;
-        }
+        if (g_session) { return 1; }
 
         g_session = new Session(name, path, sample_rate);
         return 0;
@@ -29,40 +26,33 @@ namespace Kernel
 	status_t addTrack(std::string name)
 	{
         if (!g_session) { return 1; }
+
         return g_session->addTrack(Track(name));
 	}
 
 	status_t loadAudioOnTrack(std::string audio_path, id_t track_id)
 	{
-		Track* track = g_session->getTrack(track_id);
+		if (!g_session) { return 1; }
 
-		if (!track)
-		{
-			return 1;
-		}
+		Track* track = g_session->getTrack(track_id);
+		if (!track) { return 1; }
 
 		CodecInfo codec;
-
-		if (getCodec("pure_wave.dll", codec) != 0)
-		{
-			return 2;
-		}
+		if (getCodec("pure_wave.dll", codec) != 0) { return 2; }
 
 		CodecFileInfo file_info;
-		if (codec.load_file_proc(file_info, audio_path) != 0)
-		{
-			return 3;
-		}
+		if (codec.load_file_proc(file_info, audio_path) != 0) { return 3; }
 
 		Audio a(audio_path, file_info.buffers[0], file_info.samples_per_channel);
 
 		track->addAudio(a);
-
 		return 0;
 	}
 
 	status_t renderAll(std::string mix_path)
 	{
+		if (!g_session) { return 1; }
+
 		return render(*g_session, mix_path);
 	}
 
@@ -83,6 +73,8 @@ namespace Kernel
 
     std::string listTracks()
     {
+		if (!g_session) { return std::string(); }
+
         std::stringstream str_stream;
         str_stream << "Tracks available:\n";
 
@@ -95,6 +87,68 @@ namespace Kernel
 
         return str_stream.str();
     }
+
+	status_t removeTrack(id_t id)
+	{
+		if (!g_session) { return 1; }
+
+		return g_session->removeTrack(id);
+	}
+
+	status_t muteTrack(id_t id)
+	{
+		if (!g_session) { return 1; }
+
+		Track* track = g_session->getTrack(id);
+		if (!track) { return 2; }
+
+		track->mute = !track->mute;
+		return 0;
+	}
+
+	status_t soloTrack(id_t id)
+	{
+		if (!g_session) { return 1; }
+
+		Track* track = g_session->getTrack(id);
+		if (!track) { return 2; }
+
+		track->solo = !track->solo;
+		return 0;
+	}
+
+	status_t volumeTrack(id_t id, uint32_t volume)
+	{
+		if (!g_session) { return 1; }
+
+		Track* track = g_session->getTrack(id);
+		if (!track) { return 2; }
+
+		track->level = volume;
+		return 0;
+	}
+
+	status_t panTrack(id_t id, uint32_t pan)
+	{
+		if (!g_session) { return 1; }
+
+		Track* track = g_session->getTrack(id);
+		if (!track) { return 2; }
+
+		track->pan = pan;
+		return 0;
+	}
+
+	status_t gainTrack(id_t id, uint32_t gain)
+	{
+		if (!g_session) { return 1; }
+
+		Track* track = g_session->getTrack(id);
+		if (!track) { return 2; }
+
+		track->gain = gain;
+		return 0;
+	}
 }
 
 int main(int argc, char **argv)
