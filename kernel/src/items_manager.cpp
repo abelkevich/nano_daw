@@ -1,4 +1,5 @@
 #include "items_manager.h"
+#include "codec_manager.h"
 #include <map>
 
 namespace ItemsManager
@@ -25,9 +26,23 @@ namespace ItemsManager
 		return id;
 	}
 
-	id_t createAudio(std::string path, float* buffer, uint32_t buffer_size)
+	id_t createAudio(std::string path)
 	{
-		Audio *audio = new Audio(path, buffer, buffer_size);
+        CodecInfo codec_info;
+        if (getCodec("pure_wave.dll", codec_info) != 0)
+        {
+            return 0;
+        }
+
+        CodecFileInfo codec_file_info;
+        if (codec_info.load_file_proc(codec_file_info, path) != 0)
+        {
+            return 0;
+        }
+
+
+
+		Audio *audio = new Audio(path, codec_file_info.buffers[0], codec_file_info.samples_per_channel);
 		id_t id = genUniqueId();
 
 		auto rec = std::make_pair(id, audio);

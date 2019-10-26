@@ -4,7 +4,7 @@
 namespace ItemsManager
 {
 	id_t createEffect(std::string name, std::string params);
-	id_t createAudio(std::string path, float* buffer, uint32_t buffer_size);
+	id_t createAudio(std::string path);
 	id_t createFragment(id_t linked_audio);
 	id_t createTrack(std::string name);
 
