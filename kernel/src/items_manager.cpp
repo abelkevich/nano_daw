@@ -28,8 +28,8 @@ namespace ItemsManager
 
 	id_t createAudio(std::string path)
 	{
-        CodecInfo codec_info;
-        if (getCodec("pure_wave.dll", codec_info) != 0)
+        CodecManager::CodecInfo codec_info;
+        if (CodecManager::getCodec("pure_wave.dll", codec_info) != 0)
         {
             return 0;
         }

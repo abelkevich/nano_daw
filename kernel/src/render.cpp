@@ -63,9 +63,9 @@ static void mixAudioToOutBuffer(Session ses, Fragment *fragment, float *out_buf)
 
 status_t render(Session ses, std::string mix_path)
 {
-    CodecInfo codec_info;
+    CodecManager::CodecInfo codec_info;
     
-    if (getCodec("pure_wave.dll", codec_info) != 0)
+    if (CodecManager::getCodec("pure_wave.dll", codec_info) != 0)
     {
         return 1;
     }
