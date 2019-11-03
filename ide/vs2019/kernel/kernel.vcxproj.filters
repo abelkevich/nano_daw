@@ -7,6 +7,15 @@
     <Filter Include="src">
       <UniqueIdentifier>{2d2292f7-b8d6-4f87-afde-97407c05db67}</UniqueIdentifier>
     </Filter>
+    <Filter Include="api">
+      <UniqueIdentifier>{4125bab3-aa16-4827-8e68-c76c1a686106}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="api\include">
+      <UniqueIdentifier>{45ba6b9e-2d19-47ea-b442-833e1c0266e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="api\src">
+      <UniqueIdentifier>{d2fede8f-a524-45c8-8bd4-69bc4769970d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\kernel\include\common.h">
@@ -30,6 +39,42 @@
     <ClInclude Include="..\..\..\kernel\include\codec_file_info.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\kernel\include\kernel_api.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\kernel\include\kernel.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\kernel\api\include\api.h">
+      <Filter>api\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\kernel\api\include\api_audio.h">
+      <Filter>api\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\kernel\api\include\api_effect.h">
+      <Filter>api\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\kernel\api\include\api_fragment.h">
+      <Filter>api\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\kernel\api\include\api_playback.h">
+      <Filter>api\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\kernel\api\include\api_session.h">
+      <Filter>api\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\kernel\api\include\api_track.h">
+      <Filter>api\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\kernel\api\include\api_render.h">
+      <Filter>api\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\kernel\include\items_manager.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\kernel\api\include\api_codec.h">
+      <Filter>api\include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\kernel\src\kernel.cpp">
@@ -52,6 +97,36 @@
     </ClCompile>
     <ClCompile Include="..\..\..\kernel\src\codec_file_info.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\kernel\api\src\api.cpp">
+      <Filter>api\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\kernel\api\src\api_audio.cpp">
+      <Filter>api\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\kernel\api\src\api_effect.cpp">
+      <Filter>api\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\kernel\api\src\api_fragment.cpp">
+      <Filter>api\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\kernel\api\src\api_playback.cpp">
+      <Filter>api\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\kernel\api\src\api_session.cpp">
+      <Filter>api\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\kernel\api\src\api_track.cpp">
+      <Filter>api\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\kernel\api\src\api_render.cpp">
+      <Filter>api\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\kernel\src\items_manager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\kernel\api\src\api_codec.cpp">
+      <Filter>api\src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

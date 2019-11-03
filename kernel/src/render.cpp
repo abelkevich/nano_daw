@@ -1,5 +1,6 @@
 #include "render.h"
 #include "codec_manager.h"
+#include "items_manager.h"
 
 uint32_t msToSamples(Session ses, uint32_t ms)
 {
@@ -10,12 +11,25 @@ static uint32_t calcSessionLength(Session ses)
 {
     uint32_t max_audio_len = 0;
 
-    for (auto t: ses.tracks)
-    {
-        for (auto a : t.audio)
-        {
-            uint32_t len = a.crop_to - a.crop_from;
-            uint32_t overall_len = len + a.time_offset;
+	for (auto track_id : ses.tracks)
+	{
+		Track *track = ItemsManager::getTrack(track_id);
+
+		if (!track)
+		{
+			continue;
+		}
+
+		for (auto fragment_id : track->fragments)
+		{
+			Fragment *fragment = ItemsManager::getFragment(fragment_id);
+
+			if (!fragment)
+			{
+				continue;
+			}
+            uint32_t len = fragment->crop_to - fragment->crop_from;
+            uint32_t overall_len = len + fragment->time_offset;
 
             if (max_audio_len < overall_len)
             {
@@ -27,12 +41,19 @@ static uint32_t calcSessionLength(Session ses)
     return max_audio_len;
 }
 
-static void mixAudioToOutBuffer(Session ses, Audio audio, float *out_buf)
+static void mixAudioToOutBuffer(Session ses, Fragment *fragment, float *out_buf)
 {
-    float* out_shifted_buf = out_buf + msToSamples(ses, audio.time_offset);
+    float* out_shifted_buf = out_buf + msToSamples(ses, fragment->time_offset);
 
-    float* audio_shifted_buf = audio.buffer + msToSamples(ses, audio.crop_from);
-    uint32_t audio_buf_len = msToSamples(ses, audio.crop_to);
+	Audio *audio = ItemsManager::getAudio(fragment->linked_audio);
+
+	if (!audio)
+	{
+		return;
+	}
+
+    float* audio_shifted_buf = audio->buffer + msToSamples(ses, fragment->crop_from);
+    uint32_t audio_buf_len = msToSamples(ses, fragment->crop_to);
 
     for (uint32_t i = 0; i < audio_buf_len; i++)
     {
@@ -42,9 +63,9 @@ static void mixAudioToOutBuffer(Session ses, Audio audio, float *out_buf)
 
 status_t render(Session ses, std::string mix_path)
 {
-    CodecInfo codec_info;
+    CodecManager::CodecInfo codec_info;
     
-    if (getCodec("pure_wave.dll", codec_info) != 0)
+    if (CodecManager::getCodec("pure_wave.dll", codec_info) != 0)
     {
         return 1;
     }
@@ -63,12 +84,26 @@ status_t render(Session ses, std::string mix_path)
     }
 
     // mix right and left channels
-    for (auto t: ses.tracks)
+    for (auto track_id: ses.tracks)
     {
-        for (auto a: t.audio)
+		Track *track = ItemsManager::getTrack(track_id);
+
+		if (!track)
+		{
+			continue;
+		}
+
+        for (auto fragment_id: track->fragments)
         {
-            mixAudioToOutBuffer(ses, a, left_buf);
-            mixAudioToOutBuffer(ses, a, right_buf);
+			Fragment *fragment = ItemsManager::getFragment(fragment_id);
+
+			if (!fragment)
+			{
+				continue;
+			}
+
+            mixAudioToOutBuffer(ses, fragment, left_buf);
+            mixAudioToOutBuffer(ses, fragment, right_buf);
         }
     }
 

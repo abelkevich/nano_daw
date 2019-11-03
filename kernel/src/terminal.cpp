@@ -4,12 +4,12 @@
 static callback_t g_transmitter;
 static std::thread g_wait_cmd_thread;
 
-static status_t cmdReceiver(std::string cmd)
+static EKernelAPIStatus cmdReceiver(std::string cmd)
 {
     std::cout << "Received: \n";
     std::cout << cmd << std::endl;
 
-    return 0;
+    return EKernelAPIStatus::eOk;
 }
 
 void waitCmd()

@@ -19,18 +19,40 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\kernel\api\include\api.h" />
+    <ClInclude Include="..\..\..\kernel\api\include\api_audio.h" />
+    <ClInclude Include="..\..\..\kernel\api\include\api_codec.h" />
+    <ClInclude Include="..\..\..\kernel\api\include\api_effect.h" />
+    <ClInclude Include="..\..\..\kernel\api\include\api_fragment.h" />
+    <ClInclude Include="..\..\..\kernel\api\include\api_playback.h" />
+    <ClInclude Include="..\..\..\kernel\api\include\api_render.h" />
+    <ClInclude Include="..\..\..\kernel\api\include\api_session.h" />
+    <ClInclude Include="..\..\..\kernel\api\include\api_track.h" />
     <ClInclude Include="..\..\..\kernel\include\codec_file_info.h" />
     <ClInclude Include="..\..\..\kernel\include\codec_api.h" />
     <ClInclude Include="..\..\..\kernel\include\codec_manager.h" />
     <ClInclude Include="..\..\..\kernel\include\common.h" />
+    <ClInclude Include="..\..\..\kernel\include\items_manager.h" />
+    <ClInclude Include="..\..\..\kernel\include\kernel.h" />
+    <ClInclude Include="..\..\..\kernel\include\kernel_api.h" />
     <ClInclude Include="..\..\..\kernel\include\render.h" />
     <ClInclude Include="..\..\..\kernel\include\session.h" />
     <ClInclude Include="..\..\..\kernel\include\terminal.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\kernel\api\src\api.cpp" />
+    <ClCompile Include="..\..\..\kernel\api\src\api_audio.cpp" />
+    <ClCompile Include="..\..\..\kernel\api\src\api_codec.cpp" />
+    <ClCompile Include="..\..\..\kernel\api\src\api_effect.cpp" />
+    <ClCompile Include="..\..\..\kernel\api\src\api_fragment.cpp" />
+    <ClCompile Include="..\..\..\kernel\api\src\api_playback.cpp" />
+    <ClCompile Include="..\..\..\kernel\api\src\api_render.cpp" />
+    <ClCompile Include="..\..\..\kernel\api\src\api_session.cpp" />
+    <ClCompile Include="..\..\..\kernel\api\src\api_track.cpp" />
     <ClCompile Include="..\..\..\kernel\src\codec_api.cpp" />
     <ClCompile Include="..\..\..\kernel\src\codec_file_info.cpp" />
     <ClCompile Include="..\..\..\kernel\src\codec_manager.cpp" />
+    <ClCompile Include="..\..\..\kernel\src\items_manager.cpp" />
     <ClCompile Include="..\..\..\kernel\src\kernel.cpp" />
     <ClCompile Include="..\..\..\kernel\src\render.cpp" />
     <ClCompile Include="..\..\..\kernel\src\session.cpp" />
@@ -40,32 +62,32 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{A554C2C7-E782-4524-9CF8-B98D3FE011AC}</ProjectGuid>
     <RootNamespace>kernel</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -114,7 +136,7 @@
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\kernel\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\kernel\include;$(SolutionDir)..\..\kernel\api\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -140,7 +162,7 @@
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\kernel\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\kernel\include;$(SolutionDir)..\..\kernel\api\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -168,7 +190,7 @@
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\kernel\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\kernel\include;$(SolutionDir)..\..\kernel\api\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -198,7 +220,7 @@
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\kernel\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\kernel\include;$(SolutionDir)..\..\kernel\api\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
