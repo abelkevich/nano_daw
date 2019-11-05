@@ -24,9 +24,9 @@ namespace ClientAPI
 
 			std::string mix_path = seq.sliceNextToken();
 
-			if (!render(*g_session, mix_path))
+			if (render(*g_session, mix_path) != 0)
 			{
-				sendToClient("err: render");
+				sendToClient("Err! Cannot render");
 				return EKernelAPIStatus::eErr;
 			}
 
@@ -37,6 +37,7 @@ namespace ClientAPI
 			break;
 		}
 
+        sendToClient("Err! Cannot find such command in 'render' section");
 		return EKernelAPIStatus::eErr;
 	}
 }

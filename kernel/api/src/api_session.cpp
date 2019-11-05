@@ -6,7 +6,7 @@ namespace ClientAPI
 	EKernelAPIStatus cmdSession(CommandSeq seq)
 	{
 		enum EIdents { eLoad, eCreate, eSave, eLink, eNone };
-		IdentsMap<EIdents> idents_map{ {"load", eLoad }, {"create", eCreate}, {"save", eSave} };
+        IdentsMap<EIdents> idents_map{ {"load", eLoad }, {"create", eCreate}, {"save", eSave}, {"link", eLink} };
 
 		std::string token = seq.sliceNextToken();
 
@@ -18,15 +18,15 @@ namespace ClientAPI
 		{
 		case eLoad:
 		{
-			
-			break;
+            sendToClient("Err! Unimplemented method");
+            return EKernelAPIStatus::eErr;
 		}
 
 		case eLink:
 		{
 			if (!seq.hasNTokens(1))
 			{
-				sendToClient("Err: invalid args");
+				sendToClient("Err! Invalid args");
 				return EKernelAPIStatus::eErr;
 			}
 
@@ -35,13 +35,13 @@ namespace ClientAPI
 
 			if (!ItemsManager::getTrack(track_id))
 			{
-				sendToClient("Err");
+				sendToClient("Err! Cannot find track by id");
 				return EKernelAPIStatus::eErr;
 			}
 
 			g_session->tracks.insert(track_id);
 
-			sendToClient("Track linked!");
+			sendToClient("Track linked");
 			return EKernelAPIStatus::eOk;
 		}
 
@@ -49,7 +49,7 @@ namespace ClientAPI
 		{
 			if (!seq.hasNTokens(3))
 			{
-				sendToClient("invalid parameters");
+				sendToClient("Err! Invalid parameters");
 				return EKernelAPIStatus::eErr;
 			}
 
@@ -61,18 +61,24 @@ namespace ClientAPI
 
 			if (smp_rate != 48000)
 			{
-				sendToClient("supporting only 48kHz format");
+				sendToClient("Err! Supporting only 48kHz format");
 				return EKernelAPIStatus::eErr;
 			}
 
 			g_session = new Session(name, path, smp_rate);
 
+            sendToClient("Session created!");
 			return EKernelAPIStatus::eOk;
 		}
+
 		case eSave:
-			break;
+        {
+            sendToClient("Err! Unimplemented method");
+            return EKernelAPIStatus::eErr;
+        }
 		}
 
+        sendToClient("Err! Cannot find such command in 'session' section");
 		return EKernelAPIStatus::eErr;
 	}
 }

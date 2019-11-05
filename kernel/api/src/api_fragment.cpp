@@ -55,7 +55,7 @@ namespace ClientAPI
 
 			if (!id)
 			{
-				sendToClient("Err");
+				sendToClient("Err! Cannot create fragment");
 				return EKernelAPIStatus::eErr;
 			}
 
@@ -100,7 +100,7 @@ namespace ClientAPI
 
 			if (!fragment)
 			{
-				sendToClient("Err");
+				sendToClient("Err! Cannot find fragment by id");
 				return EKernelAPIStatus::eErr;
 			}
 
@@ -122,6 +122,7 @@ namespace ClientAPI
 
         }
 
+        sendToClient("Err! Cannot find such command in 'fragment' section");
         return EKernelAPIStatus::eErr;
     }
 }

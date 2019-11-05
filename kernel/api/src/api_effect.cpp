@@ -11,6 +11,7 @@ namespace ClientAPI
 		EIdents cmd = idents_map.hasIdent(token) ?
 			idents_map.getIdent(token) : eNone;
 
+        sendToClient("Err! Cannot find such command in 'effect' section");
 		return EKernelAPIStatus::eErr;
 	}
 }
