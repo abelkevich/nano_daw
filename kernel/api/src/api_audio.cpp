@@ -55,11 +55,11 @@ namespace ClientAPI
 
             if (!id)
             {
-                sendToClient("Err");
+                sendToClient("Err! Cannot create audio");
                 return EKernelAPIStatus::eErr;
             }
 
-            sendToClient("Audio added! id: " + std::to_string(id));
+            sendToClient("Audio added with id: " + std::to_string(id));
             return EKernelAPIStatus::eOk;
         }
 
@@ -81,12 +81,13 @@ namespace ClientAPI
                 return EKernelAPIStatus::eErr;
             }
 
-            sendToClient("Audio removed!");
+            sendToClient("Audio removed");
             return EKernelAPIStatus::eOk;
         }
 
         }
 
+        sendToClient("Err! Cannot find such command in 'audio' section");
         return EKernelAPIStatus::eErr;
     }
 }

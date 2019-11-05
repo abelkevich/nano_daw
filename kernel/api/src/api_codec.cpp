@@ -44,6 +44,7 @@ namespace ClientAPI
         }
         }
 
+        sendToClient("Err! Cannot find such command in 'codec' section");
 		return EKernelAPIStatus::eErr;
 	}
 }

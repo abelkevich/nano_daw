@@ -101,7 +101,7 @@ namespace ClientAPI
 			return EKernelAPIStatus::eOk;
 		}
 
-
+        sendToClient("Err! Cannot find such command in 'root' section");
 		return EKernelAPIStatus::eErr;
 	}
 }

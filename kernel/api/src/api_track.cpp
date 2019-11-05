@@ -52,11 +52,11 @@ namespace ClientAPI
 
 			if (!id)
 			{
-				sendToClient("Err!");
+				sendToClient("Err! Cannot create track");
 				return EKernelAPIStatus::eErr;
 			}
 
-			sendToClient("Track added! id: " + std::to_string(id));
+			sendToClient("Track added with id: " + std::to_string(id));
 			return EKernelAPIStatus::eOk;
 		}
 
@@ -74,11 +74,11 @@ namespace ClientAPI
 
 			if (!ItemsManager::removeTrack(id))
 			{
-				sendToClient("Err");
+				sendToClient("Err! Cannot find track by id");
 				return EKernelAPIStatus::eErr;
 			}
 
-			sendToClient("Track removed!");
+			sendToClient("Track removed");
 			return EKernelAPIStatus::eOk;
 		}
 
@@ -96,13 +96,13 @@ namespace ClientAPI
 			std::string fragment_id_str = seq.sliceNextToken();
 			id_t fragment_id = stoi(fragment_id_str);
 
-			if (!ItemsManager::linkFragmentToTrack(track_id, fragment_id))
+			if (ItemsManager::linkFragmentToTrack(track_id, fragment_id))
 			{
-				sendToClient("Err");
+				sendToClient("Err! Cannot link");
 				return EKernelAPIStatus::eErr;
 			}
 
-			sendToClient("Track linked!");
+			sendToClient("Track linked");
 			return EKernelAPIStatus::eOk;
 		}
 
@@ -122,13 +122,13 @@ namespace ClientAPI
 
 			if (!track)
 			{
-				sendToClient("Err");
+				sendToClient("Err! Cannot find track by id");
 				return EKernelAPIStatus::eErr;
 			}
 
 			track->mute = !track->mute;
 
-			sendToClient("Track muted!");
+			sendToClient("Track mute inverted");
 			return EKernelAPIStatus::eOk;
 			break;
 		}
@@ -149,13 +149,13 @@ namespace ClientAPI
 
 			if (!track)
 			{
-				sendToClient("Err");
+				sendToClient("Err! Cannot find track by id");
 				return EKernelAPIStatus::eErr;
 			}
 
 			track->solo = !track->solo;
 
-			sendToClient("Track solo active!");
+			sendToClient("Track solo inverted");
 			return EKernelAPIStatus::eOk;
 			break;
 		}
@@ -179,13 +179,13 @@ namespace ClientAPI
 
 			if (!track)
 			{
-				sendToClient("Err");
+				sendToClient("Err! Cannot find track by id");
 				return EKernelAPIStatus::eErr;
 			}
 
 			track->level = volume;
 
-			sendToClient("Track volume changed!");
+			sendToClient("Track volume changed");
 			return EKernelAPIStatus::eOk;
 		}
 
@@ -208,13 +208,13 @@ namespace ClientAPI
 
 			if (!track)
 			{
-				sendToClient("Err");
+				sendToClient("Err! Cannot find track by id");
 				return EKernelAPIStatus::eErr;
 			}
 
 			track->gain = gain;
 
-			sendToClient("Track gain changed!");
+			sendToClient("Track gain changed");
 			return EKernelAPIStatus::eOk;
 		}
 
@@ -249,6 +249,7 @@ namespace ClientAPI
 
 		}
 
+        sendToClient("Err! Cannot find such command in 'track' section");
 		return EKernelAPIStatus::eErr;
 	}
 }
