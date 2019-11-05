@@ -11,7 +11,7 @@ namespace ItemsManager
 
 	id_t genUniqueId()
 	{
-		static id_t n = 0;
+		static id_t n = 1;
 		return n++;
 	}
 
@@ -71,6 +71,31 @@ namespace ItemsManager
 		g_tracks.insert(rec);
 
 		return id;
+	}
+
+	status_t linkFragmentToTrack(id_t track_id, id_t fragment_id)
+	{
+		Track* track = getTrack(track_id);
+
+		if (!track)
+		{
+			return 1;
+		}
+
+		// Pre-check if fragment exist
+		if (!getFragment(fragment_id))
+		{
+			return 2;
+		}
+
+		// Track already have this fragment
+		if (track->fragments.find(fragment_id) != track->fragments.end())
+		{
+			return 3;
+		}
+
+		track->fragments.insert(fragment_id);
+		return 0;
 	}
 
 	Effect* getEffect(id_t id)
