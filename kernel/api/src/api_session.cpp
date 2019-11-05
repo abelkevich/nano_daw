@@ -40,18 +40,10 @@ namespace ClientAPI
 				return EKernelAPIStatus::eErr;
 			}
 
-			status_t status = 0; //createSession(name, path, smp_rate);
-
-			if (status != 0)
-			{
-				sendToClient("Warn: command exited with code: " + std::to_string(status));
-				return EKernelAPIStatus::eWarn;
-			}
+			g_session = new Session(name, path, smp_rate);
 
 			return EKernelAPIStatus::eOk;
 		}
-		break;
-
 		case eSave:
 			break;
 		}

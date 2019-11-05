@@ -5,10 +5,10 @@ namespace ClientAPI
 {
 	EKernelAPIStatus cmdTrack(CommandSeq seq)
 	{
-		enum EIdents { eList, eAdd, eRemove, eMute, eSolo, eVolume, eGain, ePan, eNone };
+		enum EIdents { eList, eAdd, eRemove, eMute, eSolo, eVolume, eGain, ePan, eLink, eUnlink, eNone };
 		IdentsMap<EIdents> idents_map{ {"add", eAdd}, {"remove", eRemove}, {"mute", eMute},
 									   {"solo", eSolo}, {"volume", eVolume}, {"gain", eGain},
-									   {"pan", ePan}, {"list", eList} };
+									   {"pan", ePan}, {"list", eList}, {"link", eLink}, {"unlink", eUnlink} };
 
 		std::string token = seq.sliceNextToken();
 
@@ -50,6 +50,12 @@ namespace ClientAPI
 
 			id_t id = ItemsManager::createTrack(name);
 
+			if (!id)
+			{
+				sendToClient("Err!");
+				return EKernelAPIStatus::eErr;
+			}
+
 			sendToClient("Track added! id: " + std::to_string(id));
 			return EKernelAPIStatus::eOk;
 		}
@@ -73,6 +79,30 @@ namespace ClientAPI
 			}
 
 			sendToClient("Track removed!");
+			return EKernelAPIStatus::eOk;
+		}
+
+		case eLink:
+		{
+			if (!seq.hasNTokens(2))
+			{
+				sendToClient("Err: invalid args");
+				return EKernelAPIStatus::eErr;
+			}
+
+			std::string track_id_str = seq.sliceNextToken();
+			id_t track_id = stoi(track_id_str);
+
+			std::string fragment_id_str = seq.sliceNextToken();
+			id_t fragment_id = stoi(fragment_id_str);
+
+			if (!ItemsManager::linkFragmentToTrack(track_id, fragment_id))
+			{
+				sendToClient("Err");
+				return EKernelAPIStatus::eErr;
+			}
+
+			sendToClient("Track linked!");
 			return EKernelAPIStatus::eOk;
 		}
 
