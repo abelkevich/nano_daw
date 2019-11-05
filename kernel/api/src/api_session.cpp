@@ -1,10 +1,11 @@
 #include "api_session.h"
+#include "items_manager.h"
 
 namespace ClientAPI
 {
 	EKernelAPIStatus cmdSession(CommandSeq seq)
 	{
-		enum EIdents { eLoad, eCreate, eSave, eNone };
+		enum EIdents { eLoad, eCreate, eSave, eLink, eNone };
 		IdentsMap<EIdents> idents_map{ {"load", eLoad }, {"create", eCreate}, {"save", eSave} };
 
 		std::string token = seq.sliceNextToken();
@@ -20,6 +21,30 @@ namespace ClientAPI
 			
 			break;
 		}
+
+		case eLink:
+		{
+			if (!seq.hasNTokens(1))
+			{
+				sendToClient("Err: invalid args");
+				return EKernelAPIStatus::eErr;
+			}
+
+			std::string track_id_str = seq.sliceNextToken();
+			id_t track_id = stoi(track_id_str);
+
+			if (!ItemsManager::getTrack(track_id))
+			{
+				sendToClient("Err");
+				return EKernelAPIStatus::eErr;
+			}
+
+			g_session->tracks.insert(track_id);
+
+			sendToClient("Track linked!");
+			return EKernelAPIStatus::eOk;
+		}
+
 		case eCreate:
 		{
 			if (!seq.hasNTokens(3))

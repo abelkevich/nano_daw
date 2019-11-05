@@ -11,7 +11,7 @@ namespace ItemsManager
 
 	id_t genUniqueId()
 	{
-		static id_t n = 0;
+		static id_t n = 1;
 		return n++;
 	}
 
