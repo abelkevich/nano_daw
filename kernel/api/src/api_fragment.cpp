@@ -5,8 +5,9 @@ namespace ClientAPI
 {
     EKernelAPIStatus cmdFragment(CommandSeq seq)
     {
-        enum EIdents { eList, eAdd, eRemove, eCrop, eNone };
-		IdentsMap<EIdents> idents_map{ {"add", eAdd}, {"remove", eRemove}, {"list", eList}, {"crop", eCrop} };
+        enum EIdents { eList, eAdd, eRemove, eCrop, eOffset, eInfo, eNone };
+		IdentsMap<EIdents> idents_map{ {"add", eAdd}, {"remove", eRemove}, {"list", eList}, 
+                                       {"crop", eCrop}, {"offset", eOffset}, {"info", eInfo} };
 
         std::string token = seq.sliceNextToken();
 
@@ -15,6 +16,36 @@ namespace ClientAPI
 
         switch (cmd)
         {
+
+        case eInfo:
+        {
+            if (!seq.hasNTokens(1))
+            {
+                sendToClient("Err: invalid args");
+                return EKernelAPIStatus::eErr;
+            }
+
+            std::string id_str = seq.sliceNextToken();
+            id_t id = stoi(id_str);
+
+            Fragment* fragment = ItemsManager::getFragment(id);
+            if (!fragment)
+            {
+                sendToClient("Err! Cannot find fragment by id");
+                return EKernelAPIStatus::eErr;
+            }
+
+            std::stringstream sstream;
+            sstream << "linked: " << fragment->linked_audio << ";";
+            sstream << "crop from: " << fragment->crop_from << ";";
+            sstream << "crop to: " << fragment->crop_to << ";";
+            sstream << "offset: " << fragment->time_offset << ";";
+
+            sendToClient(sstream.str());
+
+            return EKernelAPIStatus::eOk;
+        }
+
         case eList:
         {
             std::set<id_t> fragment_ids = ItemsManager::getFragments();
@@ -119,6 +150,35 @@ namespace ClientAPI
 			sendToClient("Fragment cropped!");
 			return EKernelAPIStatus::eOk;
 		}
+
+        case eOffset:
+        {
+            if (!seq.hasNTokens(2))
+            {
+                sendToClient("Err: invalid args");
+                return EKernelAPIStatus::eErr;
+            }
+
+            std::string id_str = seq.sliceNextToken();
+            id_t id = stoi(id_str);
+
+            Fragment* fragment = ItemsManager::getFragment(id);
+
+            if (!fragment)
+            {
+                sendToClient("Err! Cannot find fragment by id");
+                return EKernelAPIStatus::eErr;
+            }
+
+            {
+                std::string offset_str = seq.sliceNextToken();
+                uint32_t offset = stoi(offset_str);
+                fragment->time_offset = offset;
+            }
+
+            sendToClient("Fragment offseted");
+            return EKernelAPIStatus::eOk;
+        }
 
         }
 

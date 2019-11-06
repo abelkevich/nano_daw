@@ -5,8 +5,8 @@ namespace ClientAPI
 {
     EKernelAPIStatus cmdAudio(CommandSeq seq)
     {
-        enum EIdents { eList, eAdd, eRemove, eNone };
-        IdentsMap<EIdents> idents_map{ {"add", eAdd}, {"remove", eRemove}, {"list", eList} };
+        enum EIdents { eList, eAdd, eRemove, eInfo, eNone };
+        IdentsMap<EIdents> idents_map{ {"add", eAdd}, {"remove", eRemove}, {"list", eList}, {"info", eInfo} };
 
         std::string token = seq.sliceNextToken();
 
@@ -15,6 +15,32 @@ namespace ClientAPI
 
         switch (cmd)
         {
+
+        case eInfo:
+        {
+            if (!seq.hasNTokens(1))
+            {
+                sendToClient("Err: invalid args");
+                return EKernelAPIStatus::eErr;
+            }
+
+            std::string id_str = seq.sliceNextToken();
+            id_t id = stoi(id_str);
+
+            Audio* audio = ItemsManager::getAudio(id);
+            if (!audio)
+            {
+                sendToClient("Err! Cannot find audio by id");
+                return EKernelAPIStatus::eErr;
+            }
+
+            std::stringstream sstream;
+            sstream << "size: " << audio->buffer_size << ";";
+            sendToClient(sstream.str());
+
+            return EKernelAPIStatus::eOk;
+        }
+
         case eList:
         {
 

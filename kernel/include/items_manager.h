@@ -9,6 +9,7 @@ namespace ItemsManager
 	id_t createTrack(std::string name);
 
 	status_t linkFragmentToTrack(id_t track_id, id_t fragment_id);
+    status_t unlinkFragmentFromTrack(id_t track_id, id_t fragment_id);
 
 	Effect* getEffect(id_t id);
 	Audio* getAudio(id_t id);
