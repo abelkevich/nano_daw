@@ -5,10 +5,13 @@ namespace ClientAPI
 {
 	EKernelAPIStatus cmdTrack(CommandSeq seq)
 	{
-		enum EIdents { eList, eAdd, eRemove, eMute, eSolo, eVolume, eGain, ePan, eLink, eUnlink, eNone };
+		enum EIdents { eList, eAdd, eRemove, eMute, eSolo, 
+                       eVolume, eGain, ePan, eLink, eUnlink,
+                       eName, eInfo, eNone };
 		IdentsMap<EIdents> idents_map{ {"add", eAdd}, {"remove", eRemove}, {"mute", eMute},
 									   {"solo", eSolo}, {"volume", eVolume}, {"gain", eGain},
-									   {"pan", ePan}, {"list", eList}, {"link", eLink}, {"unlink", eUnlink} };
+									   {"pan", ePan}, {"list", eList}, {"link", eLink}, 
+                                       {"unlink", eUnlink}, {"info", eInfo}, {"none", eNone} };
 
 		std::string token = seq.sliceNextToken();
 
@@ -17,6 +20,46 @@ namespace ClientAPI
 
 		switch (cmd)
 		{
+        case eInfo:
+        {
+            if (!seq.hasNTokens(1))
+            {
+                sendToClient("Err: invalid args");
+                return EKernelAPIStatus::eErr;
+            }
+
+            std::string id_str = seq.sliceNextToken();
+            id_t id = stoi(id_str);
+
+            Track* track = ItemsManager::getTrack(id);
+            if (!track)
+            {
+                sendToClient("Err! Cannot find track by id");
+                return EKernelAPIStatus::eErr;
+            }
+
+
+            std::stringstream sstream;
+
+            sstream << "name: " << track->name << ";";
+            sstream << "solo: " << track->solo << ";";
+            sstream << "mute: " << track->mute << ";";
+            sstream << "gain: " << track->gain << ";";
+            sstream << "level: " << track->level << ";";
+            sstream << "fragments: [";
+
+            for (id_t id : track->fragments)
+            {
+                sstream << id << ",";
+            }
+
+            sstream << "];";
+
+            sendToClient(sstream.str());
+
+            return EKernelAPIStatus::eOk;
+        }
+
 		case eList:
 		{
 
@@ -105,6 +148,30 @@ namespace ClientAPI
 			sendToClient("Track linked");
 			return EKernelAPIStatus::eOk;
 		}
+
+        case eUnlink:
+        {
+            if (!seq.hasNTokens(2))
+            {
+                sendToClient("Err: invalid args");
+                return EKernelAPIStatus::eErr;
+            }
+
+            std::string track_id_str = seq.sliceNextToken();
+            id_t track_id = stoi(track_id_str);
+
+            std::string fragment_id_str = seq.sliceNextToken();
+            id_t fragment_id = stoi(fragment_id_str);
+
+            if (ItemsManager::unlinkFragmentFromTrack(track_id, fragment_id))
+            {
+                sendToClient("Err! Cannot unlink");
+                return EKernelAPIStatus::eErr;
+            }
+
+            sendToClient("Track unlinked");
+            return EKernelAPIStatus::eOk;
+        }
 
 		case eMute:
 		{
@@ -246,6 +313,34 @@ namespace ClientAPI
 			sendToClient("Track pan changed!");
 			return EKernelAPIStatus::eOk;
 		}
+
+        case eName:
+        {
+            if (!seq.hasNTokens(2))
+            {
+                sendToClient("Err: invalid args");
+                return EKernelAPIStatus::eErr;
+            }
+
+            std::string id_str = seq.sliceNextToken();
+            id_t id = stoi(id_str);
+
+
+            std::string name_str = seq.sliceNextToken();
+            
+            Track* track = ItemsManager::getTrack(id);
+
+            if (!track)
+            {
+                sendToClient("Err");
+                return EKernelAPIStatus::eErr;
+            }
+
+            track->name = name_str;
+
+            sendToClient("Track name changed!");
+            return EKernelAPIStatus::eOk;
+        }
 
 		}
 
