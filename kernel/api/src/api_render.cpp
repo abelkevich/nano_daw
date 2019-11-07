@@ -3,7 +3,7 @@
 
 namespace ClientAPI
 {
-	EKernelAPIStatus cmdRender(CommandSeq seq)
+	APIResponse cmdRender(CommandSeq seq)
 	{
 		enum EIdents { eNone, eSession };
 		IdentsMap<EIdents> idents_map{ {"session", eSession}, {"none", eNone} };
@@ -18,26 +18,22 @@ namespace ClientAPI
 		{
 			if (!seq.hasNTokens(1))
 			{
-				sendToClient("err: invalid syntax");
-				return EKernelAPIStatus::eOk;
+				return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
 			}
 
 			std::string mix_path = seq.sliceNextToken();
 
 			if (render(*g_session, mix_path) != 0)
 			{
-				sendToClient("Err! Cannot render");
-				return EKernelAPIStatus::eErr;
+				return APIResponse(EKernelAPIStatus::eErr);
 			}
 
-			sendToClient("Session rendered");
-			return EKernelAPIStatus::eOk;
+			return APIResponse(EKernelAPIStatus::eOk);
 		}
 		default:
 			break;
 		}
 
-        sendToClient("Err! Cannot find such command in 'render' section");
-		return EKernelAPIStatus::eErr;
+		return APIResponse(EKernelAPIStatus::eErr, "Cannot find such command in 'render' section");
 	}
 }

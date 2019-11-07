@@ -46,7 +46,6 @@ namespace ClientAPI
 		}
 	};
 
-	EKernelAPIStatus cmdReceiver(std::string user_cmd_line);
-	void sendToClient(std::string msg);
+	APIResponse cmdReceiver(std::string user_cmd_line);
 	void initAPI();
 }

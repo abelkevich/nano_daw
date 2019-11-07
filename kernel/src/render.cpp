@@ -11,13 +11,13 @@ static uint32_t calcSessionLength(Session ses)
 {
     uint32_t max_audio_len = 0;
 
-	for (auto track_id : ses.tracks)
+	for (auto track_id: ses.tracks)
 	{
 		Track *track = ItemsManager::getTrack(track_id);
 
 		if (!track)
 		{
-			continue;
+			return 0;
 		}
 
 		for (auto fragment_id : track->fragments)
@@ -26,8 +26,9 @@ static uint32_t calcSessionLength(Session ses)
 
 			if (!fragment)
 			{
-				continue;
+				return 0;
 			}
+
             uint32_t len = fragment->crop_to - fragment->crop_from;
             uint32_t overall_len = len + fragment->time_offset;
 
@@ -71,13 +72,13 @@ status_t render(Session ses, std::string mix_path)
     }
 
     // calc session length in samples
-    uint32_t ses_len = msToSamples(ses, calcSessionLength(ses));
+    uint32_t ses_len_smp = msToSamples(ses, calcSessionLength(ses));
     
     // allocate intermediate buffs
-    float* left_buf = new float[ses_len];
-    float* right_buf = new float[ses_len];
+    float* left_buf = new float[ses_len_smp];
+    float* right_buf = new float[ses_len_smp];
 
-    for (uint32_t i = 0; i < ses_len; i++)
+    for (uint32_t i = 0; i < ses_len_smp; i++)
     {
         left_buf[i] = 0;
         right_buf[i] = 0;
@@ -109,7 +110,7 @@ status_t render(Session ses, std::string mix_path)
 
     float* arr[2] = {left_buf, right_buf};
 
-    CodecFileInfo file_info(mix_path, arr, ses_len, 1, ses.sample_rate);
+    CodecFileInfo file_info(mix_path, arr, ses_len_smp, 1, ses.sample_rate);
     
     codec_info.save_file_proc(file_info, 2);
 

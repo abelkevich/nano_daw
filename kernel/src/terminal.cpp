@@ -4,6 +4,21 @@
 static callback_t g_transmitter;
 static std::thread g_wait_cmd_thread;
 
+std::string APIStatusToString(EKernelAPIStatus status)
+{
+	switch (status)
+	{
+	case EKernelAPIStatus::eOk:
+		return "Ok";
+	case EKernelAPIStatus::eErr:
+		return "Error";
+	case EKernelAPIStatus::eWarn:
+		return "Warning";
+	}
+
+	return "err-parsing-status";
+}
+
 static EKernelAPIStatus cmdReceiver(std::string cmd)
 {
     std::cout << "Received: \n";
@@ -17,16 +32,20 @@ void waitCmd()
     while (1)
     {
         std::string cmd;
+
+		std::cout << "nano_daw shell> ";
         std::getline(std::cin, cmd);
 
-        g_transmitter(cmd);
+		APIResponse api_response = g_transmitter(cmd);
+
+		std::cout << "Received: ";
+		std::cout << APIStatusToString(api_response.status) << ": ";
+		std::cout << api_response.data << std::endl;
     }
 }
 
-callback_t spawnTerminal(callback_t transmitter)
+void spawnTerminal(callback_t transmitter)
 {
     g_transmitter = transmitter;
     g_wait_cmd_thread = std::thread(waitCmd);
-
-    return cmdReceiver;
 }

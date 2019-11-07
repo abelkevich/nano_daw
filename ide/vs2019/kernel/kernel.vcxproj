@@ -54,6 +54,7 @@
     <ClCompile Include="..\..\..\kernel\src\codec_manager.cpp" />
     <ClCompile Include="..\..\..\kernel\src\items_manager.cpp" />
     <ClCompile Include="..\..\..\kernel\src\kernel.cpp" />
+    <ClCompile Include="..\..\..\kernel\src\kernel_api.cpp" />
     <ClCompile Include="..\..\..\kernel\src\render.cpp" />
     <ClCompile Include="..\..\..\kernel\src\session.cpp" />
     <ClCompile Include="..\..\..\kernel\src\terminal.cpp" />
