@@ -3,7 +3,7 @@
 
 namespace ClientAPI
 {
-    EKernelAPIStatus cmdFragment(CommandSeq seq)
+    APIResponse cmdFragment(CommandSeq seq)
     {
         enum EIdents { eList, eAdd, eRemove, eCrop, eOffset, eInfo, eNone };
 		IdentsMap<EIdents> idents_map{ {"add", eAdd}, {"remove", eRemove}, {"list", eList}, 
@@ -21,8 +21,7 @@ namespace ClientAPI
         {
             if (!seq.hasNTokens(1))
             {
-                sendToClient("Err: invalid args");
-                return EKernelAPIStatus::eErr;
+                return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
             }
 
             std::string id_str = seq.sliceNextToken();
@@ -31,8 +30,7 @@ namespace ClientAPI
             Fragment* fragment = ItemsManager::getFragment(id);
             if (!fragment)
             {
-                sendToClient("Err! Cannot find fragment by id");
-                return EKernelAPIStatus::eErr;
+				return APIResponse(EKernelAPIStatus::eErr, "Cannot find fragment by id");
             }
 
             std::stringstream sstream;
@@ -41,9 +39,7 @@ namespace ClientAPI
             sstream << "crop to: " << fragment->crop_to << ";";
             sstream << "offset: " << fragment->time_offset << ";";
 
-            sendToClient(sstream.str());
-
-            return EKernelAPIStatus::eOk;
+            return APIResponse(EKernelAPIStatus::eOk, sstream.str());
         }
 
         case eList:
@@ -58,7 +54,7 @@ namespace ClientAPI
 
                 if (!fragment)
                 {
-                    continue;
+					return APIResponse(EKernelAPIStatus::eErr, sstream.str());
                 }
 
                 sstream << "Fragment: id: " << id;
@@ -66,17 +62,14 @@ namespace ClientAPI
                 sstream << std::endl;
             }
 
-            sendToClient(sstream.str());
-
-            return EKernelAPIStatus::eOk;
+            return APIResponse(EKernelAPIStatus::eOk, sstream.str());
         }
 
         case eAdd:
         {
             if (!seq.hasNTokens(1))
             {
-                sendToClient("Err: invalid args");
-                return EKernelAPIStatus::eErr;
+				return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
             }
 
             std::string audio_id_str = seq.sliceNextToken();
@@ -86,20 +79,17 @@ namespace ClientAPI
 
 			if (!id)
 			{
-				sendToClient("Err! Cannot create fragment");
-				return EKernelAPIStatus::eErr;
+				return APIResponse(EKernelAPIStatus::eErr);
 			}
 
-            sendToClient("Fragment added! id: " + std::to_string(id));
-            return EKernelAPIStatus::eOk;
+			return APIResponse(EKernelAPIStatus::eOk, "id: " + std::to_string(id));
         }
 
         case eRemove:
         {
             if (!seq.hasNTokens(1))
             {
-                sendToClient("Err: invalid args");
-                return EKernelAPIStatus::eErr;
+				return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
             }
 
             std::string id_str = seq.sliceNextToken();
@@ -108,20 +98,17 @@ namespace ClientAPI
 
             if (!ItemsManager::removeFragment(id))
             {
-                sendToClient("Err");
-                return EKernelAPIStatus::eErr;
+				return APIResponse(EKernelAPIStatus::eErr);
             }
 
-            sendToClient("Fragment removed!");
-            return EKernelAPIStatus::eOk;
+			return APIResponse(EKernelAPIStatus::eOk);
         }
 
 		case eCrop:
 		{
 			if (!seq.hasNTokens(3))
 			{
-				sendToClient("Err: invalid args");
-				return EKernelAPIStatus::eErr;
+				return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
 			}
 
 			std::string id_str = seq.sliceNextToken();
@@ -131,8 +118,7 @@ namespace ClientAPI
 
 			if (!fragment)
 			{
-				sendToClient("Err! Cannot find fragment by id");
-				return EKernelAPIStatus::eErr;
+				return APIResponse(EKernelAPIStatus::eErr, "Cannot find id");
 			}
 
 			{
@@ -147,16 +133,14 @@ namespace ClientAPI
 				fragment->crop_to = crop_to;
 			}
 
-			sendToClient("Fragment cropped!");
-			return EKernelAPIStatus::eOk;
+			return APIResponse(EKernelAPIStatus::eOk);
 		}
 
         case eOffset:
         {
             if (!seq.hasNTokens(2))
             {
-                sendToClient("Err: invalid args");
-                return EKernelAPIStatus::eErr;
+				return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
             }
 
             std::string id_str = seq.sliceNextToken();
@@ -166,8 +150,7 @@ namespace ClientAPI
 
             if (!fragment)
             {
-                sendToClient("Err! Cannot find fragment by id");
-                return EKernelAPIStatus::eErr;
+				return APIResponse(EKernelAPIStatus::eErr, "Cannot find id");
             }
 
             {
@@ -176,13 +159,11 @@ namespace ClientAPI
                 fragment->time_offset = offset;
             }
 
-            sendToClient("Fragment offseted");
-            return EKernelAPIStatus::eOk;
+            return APIResponse(EKernelAPIStatus::eOk);
         }
 
         }
 
-        sendToClient("Err! Cannot find such command in 'fragment' section");
-        return EKernelAPIStatus::eErr;
+        return APIResponse(EKernelAPIStatus::eErr, "Cannot find such command in 'fragment' section");
     }
 }

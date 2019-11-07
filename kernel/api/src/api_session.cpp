@@ -3,7 +3,7 @@
 
 namespace ClientAPI
 {
-	EKernelAPIStatus cmdSession(CommandSeq seq)
+	APIResponse cmdSession(CommandSeq seq)
 	{
 		enum EIdents { eLoad, eCreate, eSave, eLink, eNone };
         IdentsMap<EIdents> idents_map{ {"load", eLoad }, {"create", eCreate}, {"save", eSave}, {"link", eLink} };
@@ -18,16 +18,14 @@ namespace ClientAPI
 		{
 		case eLoad:
 		{
-            sendToClient("Err! Unimplemented method");
-            return EKernelAPIStatus::eErr;
+            return APIResponse(EKernelAPIStatus::eErr, "Unimplemented method");
 		}
 
 		case eLink:
 		{
 			if (!seq.hasNTokens(1))
 			{
-				sendToClient("Err! Invalid args");
-				return EKernelAPIStatus::eErr;
+				return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
 			}
 
 			std::string track_id_str = seq.sliceNextToken();
@@ -35,22 +33,19 @@ namespace ClientAPI
 
 			if (!ItemsManager::getTrack(track_id))
 			{
-				sendToClient("Err! Cannot find track by id");
-				return EKernelAPIStatus::eErr;
+				return APIResponse(EKernelAPIStatus::eErr, "Cannot find id");
 			}
 
 			g_session->tracks.insert(track_id);
 
-			sendToClient("Track linked");
-			return EKernelAPIStatus::eOk;
+			return APIResponse(EKernelAPIStatus::eOk);
 		}
 
 		case eCreate:
 		{
 			if (!seq.hasNTokens(3))
 			{
-				sendToClient("Err! Invalid parameters");
-				return EKernelAPIStatus::eErr;
+				return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
 			}
 
 			std::string name = seq.sliceNextToken();
@@ -61,24 +56,20 @@ namespace ClientAPI
 
 			if (smp_rate != 48000)
 			{
-				sendToClient("Err! Supporting only 48kHz format");
-				return EKernelAPIStatus::eErr;
+				return APIResponse(EKernelAPIStatus::eErr, "Supporting only 48kHz format");
 			}
 
 			g_session = new Session(name, path, smp_rate);
 
-            sendToClient("Session created!");
-			return EKernelAPIStatus::eOk;
+			return APIResponse(EKernelAPIStatus::eOk);
 		}
 
 		case eSave:
         {
-            sendToClient("Err! Unimplemented method");
-            return EKernelAPIStatus::eErr;
+			return APIResponse(EKernelAPIStatus::eErr, "Unimplemented method");
         }
 		}
 
-        sendToClient("Err! Cannot find such command in 'session' section");
-		return EKernelAPIStatus::eErr;
+		return APIResponse(EKernelAPIStatus::eErr, "Cannot find such command in 'session' section");
 	}
 }

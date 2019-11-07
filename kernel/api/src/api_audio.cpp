@@ -3,7 +3,7 @@
 
 namespace ClientAPI
 {
-    EKernelAPIStatus cmdAudio(CommandSeq seq)
+    APIResponse cmdAudio(CommandSeq seq)
     {
         enum EIdents { eList, eAdd, eRemove, eInfo, eNone };
         IdentsMap<EIdents> idents_map{ {"add", eAdd}, {"remove", eRemove}, {"list", eList}, {"info", eInfo} };
@@ -20,8 +20,7 @@ namespace ClientAPI
         {
             if (!seq.hasNTokens(1))
             {
-                sendToClient("Err: invalid args");
-                return EKernelAPIStatus::eErr;
+                return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
             }
 
             std::string id_str = seq.sliceNextToken();
@@ -30,15 +29,13 @@ namespace ClientAPI
             Audio* audio = ItemsManager::getAudio(id);
             if (!audio)
             {
-                sendToClient("Err! Cannot find audio by id");
-                return EKernelAPIStatus::eErr;
+				return APIResponse(EKernelAPIStatus::eErr, "Cannot find id");
             }
 
             std::stringstream sstream;
             sstream << "size: " << audio->buffer_size << ";";
-            sendToClient(sstream.str());
 
-            return EKernelAPIStatus::eOk;
+            return APIResponse(EKernelAPIStatus::eOk, sstream.str());
         }
 
         case eList:
@@ -54,7 +51,7 @@ namespace ClientAPI
 
                 if (!audio)
                 {
-                    continue;
+					return APIResponse(EKernelAPIStatus::eErr, sstream.str());
                 }
 
                 sstream << "Audio: id: " << id;
@@ -62,17 +59,14 @@ namespace ClientAPI
                 sstream << std::endl;
             }
 
-            sendToClient(sstream.str());
-
-            return EKernelAPIStatus::eOk;
+            return APIResponse(EKernelAPIStatus::eOk, sstream.str());
         }
 
         case eAdd:
         {
             if (!seq.hasNTokens(1))
             {
-                sendToClient("Err: invalid args");
-                return EKernelAPIStatus::eErr;
+				return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
             }
 
             std::string path = seq.sliceNextToken();
@@ -81,20 +75,17 @@ namespace ClientAPI
 
             if (!id)
             {
-                sendToClient("Err! Cannot create audio");
-                return EKernelAPIStatus::eErr;
+				return APIResponse(EKernelAPIStatus::eErr);
             }
 
-            sendToClient("Audio added with id: " + std::to_string(id));
-            return EKernelAPIStatus::eOk;
+            return APIResponse(EKernelAPIStatus::eOk, "id: " + std::to_string(id));
         }
 
         case eRemove:
         {
             if (!seq.hasNTokens(1))
             {
-                sendToClient("Err: invalid args");
-                return EKernelAPIStatus::eErr;
+				return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
             }
 
             std::string id_str = seq.sliceNextToken();
@@ -103,17 +94,14 @@ namespace ClientAPI
 
             if (!ItemsManager::removeAudio(id))
             {
-                sendToClient("Err");
-                return EKernelAPIStatus::eErr;
+                return APIResponse(EKernelAPIStatus::eErr);
             }
 
-            sendToClient("Audio removed");
-            return EKernelAPIStatus::eOk;
+            return APIResponse(EKernelAPIStatus::eOk);
         }
 
         }
 
-        sendToClient("Err! Cannot find such command in 'audio' section");
-        return EKernelAPIStatus::eErr;
+        return APIResponse(EKernelAPIStatus::eErr, "Cannot find such command in 'audio' section");
     }
 }

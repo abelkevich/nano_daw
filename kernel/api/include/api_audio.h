@@ -4,5 +4,5 @@
 
 namespace ClientAPI
 {
-	EKernelAPIStatus cmdAudio(CommandSeq seq);
+	APIResponse cmdAudio(CommandSeq seq);
 }

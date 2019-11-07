@@ -53,6 +53,11 @@ namespace ItemsManager
 
 	id_t createFragment(id_t linked_audio)
 	{
+		if (!getAudio(linked_audio))
+		{
+			return 0;
+		}
+
 		Fragment *fragment = new Fragment(linked_audio);
 		id_t id = genUniqueId();
 
@@ -75,17 +80,16 @@ namespace ItemsManager
 
 	status_t linkFragmentToTrack(id_t track_id, id_t fragment_id)
 	{
+		if (!getFragment(fragment_id))
+		{
+			return 2;
+		}
+
 		Track* track = getTrack(track_id);
 
 		if (!track)
 		{
 			return 1;
-		}
-
-		// Pre-check if fragment exist
-		if (!getFragment(fragment_id))
-		{
-			return 2;
 		}
 
 		// Track already have this fragment
@@ -100,17 +104,16 @@ namespace ItemsManager
 
     status_t unlinkFragmentFromTrack(id_t track_id, id_t fragment_id)
     {
+		if (!getFragment(fragment_id))
+		{
+			return 2;
+		}
+
         Track* track = getTrack(track_id);
 
         if (!track)
         {
             return 1;
-        }
-
-        // Pre-check if fragment exist
-        if (!getFragment(fragment_id))
-        {
-            return 2;
         }
 
         // Track don't have this fragment

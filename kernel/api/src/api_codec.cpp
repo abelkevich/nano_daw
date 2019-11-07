@@ -3,7 +3,7 @@
 
 namespace ClientAPI
 {
-	EKernelAPIStatus cmdCodec(CommandSeq seq)
+	APIResponse cmdCodec(CommandSeq seq)
 	{
 		enum EIdents { eInit, eList, eNone };
         IdentsMap<EIdents> idents_map{ {"init", eInit}, {"list", eList}, {"none", eNone} };
@@ -19,12 +19,10 @@ namespace ClientAPI
         {
             if (CodecManager::initCodecs() != 0)
             {
-                sendToClient("Failed to init codecs");
-                return EKernelAPIStatus::eErr;
+				return APIResponse(EKernelAPIStatus::eErr, "Failed to init codecs");
             }
 
-            sendToClient("Codecs inited");
-            return EKernelAPIStatus::eOk;
+            return APIResponse(EKernelAPIStatus::eOk, "Codecs inited");
         }
         case eList:
         {
@@ -38,13 +36,10 @@ namespace ClientAPI
                 sstream << std::endl;
             }
 
-            sendToClient(sstream.str());
-
-            return EKernelAPIStatus::eOk;
+			return APIResponse(EKernelAPIStatus::eOk, sstream.str());
         }
         }
 
-        sendToClient("Err! Cannot find such command in 'codec' section");
-		return EKernelAPIStatus::eErr;
+		return APIResponse(EKernelAPIStatus::eErr, "Cannot find such command in 'codec' section");
 	}
 }

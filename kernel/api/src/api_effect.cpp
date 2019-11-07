@@ -2,7 +2,7 @@
 
 namespace ClientAPI
 {
-	EKernelAPIStatus cmdEffect(CommandSeq seq)
+	APIResponse cmdEffect(CommandSeq seq)
 	{
 		enum EIdents { eNone };
 		IdentsMap<EIdents> idents_map{};
@@ -11,7 +11,6 @@ namespace ClientAPI
 		EIdents cmd = idents_map.hasIdent(token) ?
 			idents_map.getIdent(token) : eNone;
 
-        sendToClient("Err! Cannot find such command in 'effect' section");
-		return EKernelAPIStatus::eErr;
+		return APIResponse(EKernelAPIStatus::eErr, "Cannot find such command in 'effect' section");
 	}
 }

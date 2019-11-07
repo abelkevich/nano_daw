@@ -44,20 +44,10 @@ namespace ClientAPI
 
 	void initAPI()
 	{
-		g_cmd_transmitter = spawnTerminal(cmdReceiver);
+		spawnTerminal(cmdReceiver);
 	}
 
-	void sendToClient(std::string msg)
-	{
-		if (!g_cmd_transmitter)
-		{
-			return;
-		}
-
-		g_cmd_transmitter(msg);
-	}
-
-	EKernelAPIStatus cmdReceiver(std::string user_cmd_line)
+	APIResponse cmdReceiver(std::string user_cmd_line)
 	{
 		CommandSeq seq(user_cmd_line);
 
@@ -101,7 +91,6 @@ namespace ClientAPI
 			return EKernelAPIStatus::eOk;
 		}
 
-        sendToClient("Err! Cannot find such command in 'root' section");
-		return EKernelAPIStatus::eErr;
+		return APIResponse(EKernelAPIStatus::eErr, "Cannot find such command");
 	}
 }
