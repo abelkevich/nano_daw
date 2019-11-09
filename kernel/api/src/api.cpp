@@ -13,6 +13,14 @@ static EKernelAPIStatus cmdReceiver(std::string cmd);
 
 namespace ClientAPI
 {
+	std::string c_err_invalid_id = "invalid id";
+	std::string c_err_invalid_args_number = "invalid args number";
+	std::string c_err_unimplemented_method = "unimplemented method";
+	std::string c_err_invalid_session = "invalid session";
+	std::string c_err_operation_failed = "operation failed";
+	std::string c_err_invalid_arg_value = "invalid arg value";
+	std::string c_err_cannot_find_command = "cannot find command";
+
 	CommandSeq::CommandSeq(std::string cmd_line)
 	{
 		std::stringstream ss(cmd_line);

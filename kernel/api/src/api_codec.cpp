@@ -19,10 +19,10 @@ namespace ClientAPI
         {
             if (CodecManager::initCodecs() != 0)
             {
-				return APIResponse(EKernelAPIStatus::eErr, "Failed to init codecs");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_operation_failed);
             }
 
-            return APIResponse(EKernelAPIStatus::eOk, "Codecs inited");
+            return APIResponse(EKernelAPIStatus::eOk);
         }
         case eList:
         {
@@ -30,16 +30,19 @@ namespace ClientAPI
 
             std::stringstream sstream;
 
+			sstream << "[";
+
             for (auto c: codecs)
             {
-                sstream << "Lib: " << c.lib_name;
-                sstream << std::endl;
+                sstream << "name: " << c.lib_name << ";";
             }
+
+			sstream << "]";
 
 			return APIResponse(EKernelAPIStatus::eOk, sstream.str());
         }
         }
 
-		return APIResponse(EKernelAPIStatus::eErr, "Cannot find such command in 'codec' section");
+		return APIResponse(EKernelAPIStatus::eErr, c_err_cannot_find_command);
 	}
 }

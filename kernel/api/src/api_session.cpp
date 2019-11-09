@@ -18,14 +18,19 @@ namespace ClientAPI
 		{
 		case eLoad:
 		{
-            return APIResponse(EKernelAPIStatus::eErr, "Unimplemented method");
+            return APIResponse(EKernelAPIStatus::eErr, c_err_unimplemented_method);
 		}
 
 		case eLink:
 		{
 			if (!seq.hasNTokens(1))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
+			}
+
+			if (!g_session)
+			{
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_session);
 			}
 
 			std::string track_id_str = seq.sliceNextToken();
@@ -33,7 +38,7 @@ namespace ClientAPI
 
 			if (!ItemsManager::getTrack(track_id))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, "Cannot find id");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
 			}
 
 			g_session->tracks.insert(track_id);
@@ -45,7 +50,7 @@ namespace ClientAPI
 		{
 			if (!seq.hasNTokens(3))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
 			}
 
 			std::string name = seq.sliceNextToken();
@@ -56,7 +61,7 @@ namespace ClientAPI
 
 			if (smp_rate != 48000)
 			{
-				return APIResponse(EKernelAPIStatus::eErr, "Supporting only 48kHz format");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_arg_value);
 			}
 
 			g_session = new Session(name, path, smp_rate);
@@ -66,10 +71,10 @@ namespace ClientAPI
 
 		case eSave:
         {
-			return APIResponse(EKernelAPIStatus::eErr, "Unimplemented method");
+			return APIResponse(EKernelAPIStatus::eErr, c_err_unimplemented_method);
         }
 		}
 
-		return APIResponse(EKernelAPIStatus::eErr, "Cannot find such command in 'session' section");
+		return APIResponse(EKernelAPIStatus::eErr, c_err_cannot_find_command);
 	}
 }

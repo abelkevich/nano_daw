@@ -20,7 +20,7 @@ namespace ClientAPI
         {
             if (!seq.hasNTokens(1))
             {
-                return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
+                return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
             }
 
             std::string id_str = seq.sliceNextToken();
@@ -29,7 +29,7 @@ namespace ClientAPI
             Audio* audio = ItemsManager::getAudio(id);
             if (!audio)
             {
-				return APIResponse(EKernelAPIStatus::eErr, "Cannot find id");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
             }
 
             std::stringstream sstream;
@@ -45,6 +45,8 @@ namespace ClientAPI
 
             std::stringstream sstream;
 
+			sstream << "[";
+
             for (id_t id : audio_ids)
             {
                 Audio* audio = ItemsManager::getAudio(id);
@@ -54,10 +56,12 @@ namespace ClientAPI
 					return APIResponse(EKernelAPIStatus::eErr, sstream.str());
                 }
 
-                sstream << "Audio: id: " << id;
+                sstream << "id: " << id;
                 sstream << " path: " << audio->path;
-                sstream << std::endl;
+				sstream << "; ";
             }
+
+			sstream << "]";
 
             return APIResponse(EKernelAPIStatus::eOk, sstream.str());
         }
@@ -66,7 +70,7 @@ namespace ClientAPI
         {
             if (!seq.hasNTokens(1))
             {
-				return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
             }
 
             std::string path = seq.sliceNextToken();
@@ -75,7 +79,7 @@ namespace ClientAPI
 
             if (!id)
             {
-				return APIResponse(EKernelAPIStatus::eErr);
+				return APIResponse(EKernelAPIStatus::eErr, c_err_operation_failed);
             }
 
             return APIResponse(EKernelAPIStatus::eOk, "id: " + std::to_string(id));
@@ -85,16 +89,21 @@ namespace ClientAPI
         {
             if (!seq.hasNTokens(1))
             {
-				return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
             }
 
             std::string id_str = seq.sliceNextToken();
 
             id_t id = stoi(id_str);
 
+			if (!ItemsManager::getAudio(id))
+			{
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
+			}
+
             if (!ItemsManager::removeAudio(id))
             {
-                return APIResponse(EKernelAPIStatus::eErr);
+                return APIResponse(EKernelAPIStatus::eErr, c_err_operation_failed);
             }
 
             return APIResponse(EKernelAPIStatus::eOk);
@@ -102,6 +111,6 @@ namespace ClientAPI
 
         }
 
-        return APIResponse(EKernelAPIStatus::eErr, "Cannot find such command in 'audio' section");
+        return APIResponse(EKernelAPIStatus::eErr, c_err_cannot_find_command);
     }
 }

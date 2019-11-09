@@ -21,7 +21,7 @@ namespace ClientAPI
         {
             if (!seq.hasNTokens(1))
             {
-                return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
+                return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
             }
 
             std::string id_str = seq.sliceNextToken();
@@ -30,11 +30,11 @@ namespace ClientAPI
             Fragment* fragment = ItemsManager::getFragment(id);
             if (!fragment)
             {
-				return APIResponse(EKernelAPIStatus::eErr, "Cannot find fragment by id");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
             }
 
             std::stringstream sstream;
-            sstream << "linked: " << fragment->linked_audio << ";";
+            sstream << "audio: " << fragment->linked_audio << ";";
             sstream << "crop from: " << fragment->crop_from << ";";
             sstream << "crop to: " << fragment->crop_to << ";";
             sstream << "offset: " << fragment->time_offset << ";";
@@ -48,6 +48,8 @@ namespace ClientAPI
 
             std::stringstream sstream;
 
+			sstream << "[";
+
             for (id_t id : fragment_ids)
             {
                 Fragment* fragment = ItemsManager::getFragment(id);
@@ -57,10 +59,12 @@ namespace ClientAPI
 					return APIResponse(EKernelAPIStatus::eErr, sstream.str());
                 }
 
-                sstream << "Fragment: id: " << id;
-                sstream << " linked audio: " << fragment->linked_audio;
-                sstream << std::endl;
+                sstream << "id: " << id;
+                sstream << " audio: " << fragment->linked_audio;
+                sstream << "; ";
             }
+
+			sstream << "]";
 
             return APIResponse(EKernelAPIStatus::eOk, sstream.str());
         }
@@ -69,17 +73,22 @@ namespace ClientAPI
         {
             if (!seq.hasNTokens(1))
             {
-				return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
             }
 
             std::string audio_id_str = seq.sliceNextToken();
-
             id_t audio_id = stoi(audio_id_str);
+
+			if (!ItemsManager::getAudio(audio_id))
+			{
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
+			}
+
             id_t id = ItemsManager::createFragment(audio_id);
 
 			if (!id)
 			{
-				return APIResponse(EKernelAPIStatus::eErr);
+				return APIResponse(EKernelAPIStatus::eErr, c_err_operation_failed);
 			}
 
 			return APIResponse(EKernelAPIStatus::eOk, "id: " + std::to_string(id));
@@ -89,16 +98,21 @@ namespace ClientAPI
         {
             if (!seq.hasNTokens(1))
             {
-				return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
             }
 
             std::string id_str = seq.sliceNextToken();
 
             id_t id = stoi(id_str);
 
+			if (!ItemsManager::getFragment(id))
+			{
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
+			}
+
             if (!ItemsManager::removeFragment(id))
             {
-				return APIResponse(EKernelAPIStatus::eErr);
+				return APIResponse(EKernelAPIStatus::eErr, c_err_operation_failed);
             }
 
 			return APIResponse(EKernelAPIStatus::eOk);
@@ -108,7 +122,7 @@ namespace ClientAPI
 		{
 			if (!seq.hasNTokens(3))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
 			}
 
 			std::string id_str = seq.sliceNextToken();
@@ -118,18 +132,22 @@ namespace ClientAPI
 
 			if (!fragment)
 			{
-				return APIResponse(EKernelAPIStatus::eErr, "Cannot find id");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
 			}
 
 			{
 				std::string crop_from_str = seq.sliceNextToken();
-				uint32_t crop_from = stoi(crop_from_str);
-				fragment->crop_from = crop_from;
-			}
+				int32_t crop_from = stoi(crop_from_str);
 
-			{
 				std::string crop_to_str = seq.sliceNextToken();
-				uint32_t crop_to = stoi(crop_to_str);
+				int32_t crop_to = stoi(crop_to_str);
+
+				if (crop_from < 0 || crop_to < 0 || crop_to <= crop_from)
+				{
+					return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_arg_value);
+				}
+
+				fragment->crop_from = crop_from;
 				fragment->crop_to = crop_to;
 			}
 
@@ -140,7 +158,7 @@ namespace ClientAPI
         {
             if (!seq.hasNTokens(2))
             {
-				return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
             }
 
             std::string id_str = seq.sliceNextToken();
@@ -150,12 +168,18 @@ namespace ClientAPI
 
             if (!fragment)
             {
-				return APIResponse(EKernelAPIStatus::eErr, "Cannot find id");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
             }
 
             {
                 std::string offset_str = seq.sliceNextToken();
-                uint32_t offset = stoi(offset_str);
+                int offset = stoi(offset_str);
+
+				if (offset < 0)
+				{
+					return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_arg_value);
+				}
+
                 fragment->time_offset = offset;
             }
 
@@ -164,6 +188,6 @@ namespace ClientAPI
 
         }
 
-        return APIResponse(EKernelAPIStatus::eErr, "Cannot find such command in 'fragment' section");
+        return APIResponse(EKernelAPIStatus::eErr, c_err_cannot_find_command);
     }
 }
