@@ -38,8 +38,12 @@ void waitCmd()
 
 		APIResponse api_response = g_transmitter(cmd);
 
-		std::cout << "Received: ";
-		std::cout << APIStatusToString(api_response.status) << ": ";
+		if (api_response.status == EKernelAPIStatus::eOk && api_response.data.empty())
+		{
+			continue;
+		}
+
+		std::cout << '[' << APIStatusToString(api_response.status) << "]: ";
 		std::cout << api_response.data << std::endl;
     }
 }

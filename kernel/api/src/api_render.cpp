@@ -18,14 +18,19 @@ namespace ClientAPI
 		{
 			if (!seq.hasNTokens(1))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
+			}
+
+			if (!g_session)
+			{
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_session);
 			}
 
 			std::string mix_path = seq.sliceNextToken();
 
 			if (render(*g_session, mix_path) != 0)
 			{
-				return APIResponse(EKernelAPIStatus::eErr);
+				return APIResponse(EKernelAPIStatus::eErr, c_err_operation_failed);
 			}
 
 			return APIResponse(EKernelAPIStatus::eOk);
@@ -34,6 +39,6 @@ namespace ClientAPI
 			break;
 		}
 
-		return APIResponse(EKernelAPIStatus::eErr, "Cannot find such command in 'render' section");
+		return APIResponse(EKernelAPIStatus::eErr, c_err_cannot_find_command);
 	}
 }

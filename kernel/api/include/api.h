@@ -12,6 +12,14 @@
 
 namespace ClientAPI
 {
+	extern std::string c_err_invalid_id;
+	extern std::string c_err_invalid_args_number;
+	extern std::string c_err_unimplemented_method;
+	extern std::string c_err_invalid_session;
+	extern std::string c_err_operation_failed;
+	extern std::string c_err_invalid_arg_value;
+	extern std::string c_err_cannot_find_command;
+
 	class CommandSeq
 	{
 	private:

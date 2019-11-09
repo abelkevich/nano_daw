@@ -24,7 +24,7 @@ namespace ClientAPI
         {
             if (!seq.hasNTokens(1))
             {
-				return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
             }
 
             std::string id_str = seq.sliceNextToken();
@@ -33,7 +33,7 @@ namespace ClientAPI
             Track* track = ItemsManager::getTrack(id);
             if (!track)
             {
-                return APIResponse(EKernelAPIStatus::eErr, "Cannot find id");
+                return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
             }
 
 
@@ -63,6 +63,8 @@ namespace ClientAPI
 
 			std::stringstream sstream;
 
+			sstream << '[';
+
 			for (id_t id : track_ids)
 			{
 				Track *track = ItemsManager::getTrack(id);
@@ -72,10 +74,12 @@ namespace ClientAPI
 					return APIResponse(EKernelAPIStatus::eErr, sstream.str());
 				}
 
-				sstream << "Track: id: " << id;
+				sstream << "id: " << id;
 				sstream << " name: " << track->name;
-				sstream << std::endl;
+				sstream << "; ";
 			}
+
+			sstream << ']';
 
 			return APIResponse(EKernelAPIStatus::eOk, sstream.str());
 		}
@@ -84,7 +88,7 @@ namespace ClientAPI
 		{
 			if (!seq.hasNTokens(1))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
 			}
 
 			std::string name = seq.sliceNextToken();
@@ -93,7 +97,7 @@ namespace ClientAPI
 
 			if (!id)
 			{
-				return APIResponse(EKernelAPIStatus::eErr);
+				return APIResponse(EKernelAPIStatus::eErr, c_err_operation_failed);
 			}
 
 			return APIResponse(EKernelAPIStatus::eOk, "id: " + std::to_string(id));
@@ -103,16 +107,21 @@ namespace ClientAPI
 		{
 			if (!seq.hasNTokens(1))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
 			}
 
 			std::string id_str = seq.sliceNextToken();
 
 			id_t id = stoi(id_str);
 
+			if (!ItemsManager::getTrack(id))
+			{
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
+			}
+
 			if (!ItemsManager::removeTrack(id))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, "Cannot find id");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_operation_failed);
 			}
 
 			return APIResponse(EKernelAPIStatus::eOk);
@@ -122,7 +131,7 @@ namespace ClientAPI
 		{
 			if (!seq.hasNTokens(2))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
 			}
 
 			std::string track_id_str = seq.sliceNextToken();
@@ -131,9 +140,19 @@ namespace ClientAPI
 			std::string fragment_id_str = seq.sliceNextToken();
 			id_t fragment_id = stoi(fragment_id_str);
 
+			if (!ItemsManager::getTrack(track_id))
+			{
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
+			}
+
+			if (!ItemsManager::getFragment(fragment_id))
+			{
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
+			}
+
 			if (ItemsManager::linkFragmentToTrack(track_id, fragment_id))
 			{
-				return APIResponse(EKernelAPIStatus::eErr);
+				return APIResponse(EKernelAPIStatus::eErr, c_err_operation_failed);
 			}
 
 			return APIResponse(EKernelAPIStatus::eOk);
@@ -143,7 +162,7 @@ namespace ClientAPI
         {
             if (!seq.hasNTokens(2))
             {
-				return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
             }
 
             std::string track_id_str = seq.sliceNextToken();
@@ -152,9 +171,19 @@ namespace ClientAPI
             std::string fragment_id_str = seq.sliceNextToken();
             id_t fragment_id = stoi(fragment_id_str);
 
+			if (!ItemsManager::getTrack(track_id))
+			{
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
+			}
+
+			if (!ItemsManager::getFragment(fragment_id))
+			{
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
+			}
+
             if (ItemsManager::unlinkFragmentFromTrack(track_id, fragment_id))
             {
-				return APIResponse(EKernelAPIStatus::eErr);
+				return APIResponse(EKernelAPIStatus::eErr, c_err_operation_failed);
             }
 
 			return APIResponse(EKernelAPIStatus::eOk);
@@ -164,7 +193,7 @@ namespace ClientAPI
 		{
 			if (!seq.hasNTokens(1))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
 			}
 
 			std::string id_str = seq.sliceNextToken();
@@ -175,7 +204,7 @@ namespace ClientAPI
 
 			if (!track)
 			{
-				return APIResponse(EKernelAPIStatus::eErr, "Cannot find id");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
 			}
 
 			track->mute = !track->mute;
@@ -187,7 +216,7 @@ namespace ClientAPI
 		{
 			if (!seq.hasNTokens(1))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
 			}
 
 			std::string id_str = seq.sliceNextToken();
@@ -198,7 +227,7 @@ namespace ClientAPI
 
 			if (!track)
 			{
-				return APIResponse(EKernelAPIStatus::eErr, "Cannot find id");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
 			}
 
 			track->solo = !track->solo;
@@ -210,7 +239,7 @@ namespace ClientAPI
 		{
 			if (!seq.hasNTokens(2))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
 			}
 
 			std::string id_str = seq.sliceNextToken();
@@ -218,13 +247,17 @@ namespace ClientAPI
 
 
 			std::string volume_str = seq.sliceNextToken();
-			uint32_t volume = stoi(volume_str);
+			int volume = stoi(volume_str);
+
+			if (volume > 0)
+			{
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_arg_value);
+			}
 
 			Track* track = ItemsManager::getTrack(id);
-
 			if (!track)
 			{
-				return APIResponse(EKernelAPIStatus::eErr, "Cannot find id");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
 			}
 
 			track->level = volume;
@@ -236,19 +269,24 @@ namespace ClientAPI
 		{
 			if (!seq.hasNTokens(2))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
 			}
 
 			std::string id_str = seq.sliceNextToken();
 			id_t id = stoi(id_str);
 
 			std::string gain_str = seq.sliceNextToken();
-			uint32_t gain = stoi(gain_str);
+			int gain = stoi(gain_str);
+
+			if (gain < 0)
+			{
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_arg_value);
+			}
 
 			Track* track = ItemsManager::getTrack(id);
 			if (!track)
 			{
-				return APIResponse(EKernelAPIStatus::eErr, "Cannot find id");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
 			}
 
 			track->gain = gain;
@@ -260,7 +298,7 @@ namespace ClientAPI
 		{
 			if (!seq.hasNTokens(2))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
 			}
 
 			std::string id_str = seq.sliceNextToken();
@@ -268,12 +306,17 @@ namespace ClientAPI
 
 
 			std::string pan_str = seq.sliceNextToken();
-			uint32_t pan = stoi(pan_str);
+			int pan = stoi(pan_str);
+
+			if (pan < 100 || pan > 100)
+			{
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_arg_value);
+			}
 
 			Track* track = ItemsManager::getTrack(id);
 			if (!track)
 			{
-				return APIResponse(EKernelAPIStatus::eErr, "Cannot find id");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
 			}
 
 			track->pan = pan;
@@ -285,7 +328,7 @@ namespace ClientAPI
         {
             if (!seq.hasNTokens(2))
             {
-                return APIResponse(EKernelAPIStatus::eErr, "Invalid args");
+                return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
             }
 
             std::string id_str = seq.sliceNextToken();
@@ -294,10 +337,15 @@ namespace ClientAPI
 
             std::string name_str = seq.sliceNextToken();
             
+			if (name_str.size() > 30)
+			{
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_arg_value);
+			}
+
             Track* track = ItemsManager::getTrack(id);
             if (!track)
             {
-				return APIResponse(EKernelAPIStatus::eErr, "Cannot find id");
+				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
             }
 
             track->name = name_str;
@@ -307,6 +355,6 @@ namespace ClientAPI
 
 		}
 
-		return APIResponse(EKernelAPIStatus::eErr, "Cannot find such command in 'track' section");
+		return APIResponse(EKernelAPIStatus::eErr, c_err_cannot_find_command);
 	}
 }

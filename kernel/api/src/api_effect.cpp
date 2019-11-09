@@ -11,6 +11,6 @@ namespace ClientAPI
 		EIdents cmd = idents_map.hasIdent(token) ?
 			idents_map.getIdent(token) : eNone;
 
-		return APIResponse(EKernelAPIStatus::eErr, "Cannot find such command in 'effect' section");
+		return APIResponse(EKernelAPIStatus::eErr, c_err_cannot_find_command);
 	}
 }
