@@ -28,7 +28,7 @@ namespace ClientAPI
 
 			std::string mix_path = seq.sliceNextToken();
 
-			if (render(*g_session, mix_path) != 0)
+			if (render(mix_path) != 0)
 			{
 				return APIResponse(EKernelAPIStatus::eErr, c_err_operation_failed);
 			}

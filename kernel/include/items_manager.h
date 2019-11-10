@@ -1,4 +1,9 @@
 #pragma once
+#include "kernel.h"
+#include "audio.h"
+#include "fragment.h"
+#include "effect.h"
+#include "track.h"
 #include "session.h"
 
 namespace ItemsManager
@@ -7,9 +12,6 @@ namespace ItemsManager
 	id_t createAudio(std::string path);
 	id_t createFragment(id_t linked_audio);
 	id_t createTrack(std::string name);
-
-	status_t linkFragmentToTrack(id_t track_id, id_t fragment_id);
-    status_t unlinkFragmentFromTrack(id_t track_id, id_t fragment_id);
 
 	Effect* getEffect(id_t id);
 	Audio* getAudio(id_t id);

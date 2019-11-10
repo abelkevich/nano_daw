@@ -40,8 +40,6 @@ namespace ItemsManager
             return 0;
         }
 
-
-
 		Audio *audio = new Audio(path, codec_file_info.buffers[0], codec_file_info.samples_per_channel);
 		id_t id = genUniqueId();
 
@@ -77,54 +75,6 @@ namespace ItemsManager
 
 		return id;
 	}
-
-	status_t linkFragmentToTrack(id_t track_id, id_t fragment_id)
-	{
-		if (!getFragment(fragment_id))
-		{
-			return 2;
-		}
-
-		Track* track = getTrack(track_id);
-
-		if (!track)
-		{
-			return 1;
-		}
-
-		// Track already have this fragment
-		if (track->fragments.find(fragment_id) != track->fragments.end())
-		{
-			return 3;
-		}
-
-		track->fragments.insert(fragment_id);
-		return 0;
-	}
-
-    status_t unlinkFragmentFromTrack(id_t track_id, id_t fragment_id)
-    {
-		if (!getFragment(fragment_id))
-		{
-			return 2;
-		}
-
-        Track* track = getTrack(track_id);
-
-        if (!track)
-        {
-            return 1;
-        }
-
-        // Track don't have this fragment
-        if (track->fragments.find(fragment_id) == track->fragments.end())
-        {
-            return 3;
-        }
-
-        track->fragments.erase(fragment_id);
-        return 0;
-    }
 
 	Effect* getEffect(id_t id)
 	{

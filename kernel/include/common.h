@@ -17,3 +17,4 @@
 #endif
 
 typedef uint8_t status_t;
+typedef uint32_t id_t;
