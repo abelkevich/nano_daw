@@ -42,35 +42,40 @@ static uint32_t calcSessionLength(Session ses)
     return max_audio_len;
 }
 
-static void mixAudioToOutBuffer(Session ses, Fragment *fragment, float *out_buf)
+static status_t mixAudioToOutBuffer(Session ses, Fragment *fragment, float *out_buf)
 {
-    float* out_shifted_buf = out_buf + msToSamples(ses, fragment->time_offset);
-
 	Audio *audio = ItemsManager::getAudio(fragment->linked_audio);
 
 	if (!audio)
 	{
-		return;
+		return 1;
 	}
 
-    float* audio_shifted_buf = audio->buffer + msToSamples(ses, fragment->crop_from);
-    uint32_t audio_buf_len = msToSamples(ses, fragment->crop_to);
+    uint32_t audio_from_smp = msToSamples(ses, fragment->crop_from);
+    uint32_t audio_to_smp = msToSamples(ses, fragment->crop_to);
+	uint32_t audio_len_smp = audio_to_smp - audio_from_smp;
+	uint32_t out_buf_from_smp = msToSamples(ses, fragment->time_offset);
 
-    for (uint32_t i = 0; i < audio_buf_len; i++)
+	if (audio_from_smp >= audio_to_smp)
+	{
+		return 2;
+	}
+
+	if (out_buf_from_smp + audio_len_smp > msToSamples(ses, calcSessionLength(ses)))
+	{
+		return 3;
+	}
+
+    for (uint32_t i = 0; i < audio_len_smp; i++)
     {
-        out_shifted_buf[i] += audio_shifted_buf[i];
+        out_buf[out_buf_from_smp + i] += audio->buffer[audio_from_smp + i];
     }
+
+	return 0;
 }
 
 status_t render(Session ses, std::string mix_path)
 {
-    CodecManager::CodecInfo codec_info;
-    
-    if (CodecManager::getCodec("pure_wave.dll", codec_info) != 0)
-    {
-        return 1;
-    }
-
     // calc session length in samples
     uint32_t ses_len_smp = msToSamples(ses, calcSessionLength(ses));
     
@@ -91,7 +96,7 @@ status_t render(Session ses, std::string mix_path)
 
 		if (!track)
 		{
-			continue;
+			return 2;
 		}
 
         for (auto fragment_id: track->fragments)
@@ -100,16 +105,26 @@ status_t render(Session ses, std::string mix_path)
 
 			if (!fragment)
 			{
-				continue;
+				return 3;
 			}
 
-            mixAudioToOutBuffer(ses, fragment, left_buf);
-            mixAudioToOutBuffer(ses, fragment, right_buf);
+			if (mixAudioToOutBuffer(ses, fragment, left_buf) != 0 ||
+				mixAudioToOutBuffer(ses, fragment, right_buf) != 0)
+			{
+				return 4;
+			}
         }
     }
 
-    float* arr[2] = {left_buf, right_buf};
 
+	CodecManager::CodecInfo codec_info;
+
+	if (CodecManager::getCodec("pure_wave.dll", codec_info) != 0)
+	{
+		return 1;
+	}
+
+	float* arr[2] = { left_buf, right_buf };
     CodecFileInfo file_info(mix_path, arr, ses_len_smp, 1, ses.sample_rate);
     
     codec_info.save_file_proc(file_info, 2);
