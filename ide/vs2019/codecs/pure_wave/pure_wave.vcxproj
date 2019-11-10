@@ -29,7 +29,7 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{B7F4CB64-9537-49AE-A653-FFD892957145}</ProjectGuid>
     <RootNamespace>kernel</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -161,7 +161,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <CustomBuildStep>
-      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\codecs\$(Platform)\$(Configuration)</Command>
+      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\codecs\</Command>
     </CustomBuildStep>
     <CustomBuildStep>
       <Message>Copy linked file to root bin</Message>
@@ -189,7 +189,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <CustomBuildStep>
-      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\codecs\$(Platform)\$(Configuration)</Command>
+      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\codecs\</Command>
     </CustomBuildStep>
     <CustomBuildStep>
       <Message>Copy linked file to root bin</Message>

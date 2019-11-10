@@ -34,10 +34,10 @@ namespace ClientAPI
             }
 
             std::stringstream sstream;
-            sstream << "audio: " << fragment->linked_audio << ";";
-            sstream << "crop from: " << fragment->crop_from << ";";
-            sstream << "crop to: " << fragment->crop_to << ";";
-            sstream << "offset: " << fragment->time_offset << ";";
+            sstream << "audio: " << fragment->getAudio() << ";";
+            sstream << "crop from: " << fragment->getCropFrom() << ";";
+            sstream << "crop to: " << fragment->getCropTo() << ";";
+            sstream << "offset: " << fragment->getTimeOffset() << ";";
 
             return APIResponse(EKernelAPIStatus::eOk, sstream.str());
         }
@@ -60,7 +60,7 @@ namespace ClientAPI
                 }
 
                 sstream << "id: " << id;
-                sstream << " audio: " << fragment->linked_audio;
+                sstream << " audio: " << fragment->getAudio();
                 sstream << "; ";
             }
 
@@ -147,8 +147,7 @@ namespace ClientAPI
 					return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_arg_value);
 				}
 
-				fragment->crop_from = crop_from;
-				fragment->crop_to = crop_to;
+				fragment->crop(crop_from, crop_to);
 			}
 
 			return APIResponse(EKernelAPIStatus::eOk);
@@ -180,7 +179,7 @@ namespace ClientAPI
 					return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_arg_value);
 				}
 
-                fragment->time_offset = offset;
+                fragment->setTimeOffset(offset);
             }
 
             return APIResponse(EKernelAPIStatus::eOk);

@@ -39,14 +39,14 @@ namespace ClientAPI
 
             std::stringstream sstream;
 
-            sstream << "name: " << track->name << ";";
-            sstream << "solo: " << track->solo << ";";
-            sstream << "mute: " << track->mute << ";";
-            sstream << "gain: " << track->gain << ";";
-            sstream << "level: " << track->level << ";";
+            sstream << "name: " << track->getName() << ";";
+            sstream << "solo: " << track->getSolo() << ";";
+            sstream << "mute: " << track->getMute() << ";";
+            sstream << "gain: " << track->getGain() << ";";
+            sstream << "level: " << track->getLevel() << ";";
             sstream << "fragments: [";
 
-            for (id_t id : track->fragments)
+            for (id_t id : track->getFragments())
             {
                 sstream << id << ",";
             }
@@ -75,7 +75,7 @@ namespace ClientAPI
 				}
 
 				sstream << "id: " << id;
-				sstream << " name: " << track->name;
+				sstream << " name: " << track->getName();
 				sstream << "; ";
 			}
 
@@ -140,7 +140,9 @@ namespace ClientAPI
 			std::string fragment_id_str = seq.sliceNextToken();
 			id_t fragment_id = stoi(fragment_id_str);
 
-			if (!ItemsManager::getTrack(track_id))
+            Track* track = ItemsManager::getTrack(track_id);
+
+			if (!track)
 			{
 				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
 			}
@@ -150,7 +152,7 @@ namespace ClientAPI
 				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
 			}
 
-			if (ItemsManager::linkFragmentToTrack(track_id, fragment_id))
+			if (track->linkFragment(fragment_id))
 			{
 				return APIResponse(EKernelAPIStatus::eErr, c_err_operation_failed);
 			}
@@ -171,7 +173,9 @@ namespace ClientAPI
             std::string fragment_id_str = seq.sliceNextToken();
             id_t fragment_id = stoi(fragment_id_str);
 
-			if (!ItemsManager::getTrack(track_id))
+            Track* track = ItemsManager::getTrack(track_id);
+
+			if (!track)
 			{
 				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
 			}
@@ -181,7 +185,7 @@ namespace ClientAPI
 				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
 			}
 
-            if (ItemsManager::unlinkFragmentFromTrack(track_id, fragment_id))
+            if (track->unlinkFragment(fragment_id))
             {
 				return APIResponse(EKernelAPIStatus::eErr, c_err_operation_failed);
             }
@@ -207,7 +211,7 @@ namespace ClientAPI
 				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
 			}
 
-			track->mute = !track->mute;
+            track->setMute(!track->getMute());
 
 			return APIResponse(EKernelAPIStatus::eOk);
 		}
@@ -230,7 +234,7 @@ namespace ClientAPI
 				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
 			}
 
-			track->solo = !track->solo;
+            track->setSolo(!track->getSolo());
 
 			return APIResponse(EKernelAPIStatus::eOk);
 		}
@@ -260,7 +264,7 @@ namespace ClientAPI
 				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
 			}
 
-			track->level = volume;
+            track->setLevel(volume);
 
 			return APIResponse(EKernelAPIStatus::eOk);
 		}
@@ -289,7 +293,7 @@ namespace ClientAPI
 				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
 			}
 
-			track->gain = gain;
+            track->setGain(gain);
 
 			return APIResponse(EKernelAPIStatus::eOk);
 		}
@@ -319,7 +323,7 @@ namespace ClientAPI
 				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
 			}
 
-			track->pan = pan;
+            track->setPan(pan);
 
 			return APIResponse(EKernelAPIStatus::eOk);
 		}
@@ -348,7 +352,7 @@ namespace ClientAPI
 				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
             }
 
-            track->name = name_str;
+            track->setName(name_str);
 
 			return APIResponse(EKernelAPIStatus::eOk);
         }

@@ -41,7 +41,7 @@ namespace ClientAPI
 				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
 			}
 
-			g_session->tracks.insert(track_id);
+			g_session->linkTrack(track_id);
 
 			return APIResponse(EKernelAPIStatus::eOk);
 		}

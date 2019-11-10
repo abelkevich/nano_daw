@@ -16,15 +16,21 @@
     <Filter Include="api\src">
       <UniqueIdentifier>{d2fede8f-a524-45c8-8bd4-69bc4769970d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="items">
+      <UniqueIdentifier>{551c2a94-ba3b-40a4-be09-39c79fce750c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="items\src">
+      <UniqueIdentifier>{a5333927-21a4-439c-973e-12d144a4b09d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="items\include">
+      <UniqueIdentifier>{d4d3faf1-dd96-4609-be40-82eb586e7ec0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\kernel\include\common.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\kernel\include\render.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\kernel\include\session.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\kernel\include\terminal.h">
@@ -75,6 +81,21 @@
     <ClInclude Include="..\..\..\kernel\api\include\api_codec.h">
       <Filter>api\include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\kernel\items\include\audio.h">
+      <Filter>items\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\kernel\items\include\fragment.h">
+      <Filter>items\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\kernel\items\include\session.h">
+      <Filter>items\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\kernel\items\include\track.h">
+      <Filter>items\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\kernel\items\include\effect.h">
+      <Filter>items\include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\kernel\src\kernel.cpp">
@@ -87,9 +108,6 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\kernel\src\codec_api.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\kernel\src\session.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\kernel\src\render.cpp">
@@ -130,6 +148,21 @@
     </ClCompile>
     <ClCompile Include="..\..\..\kernel\src\kernel_api.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\kernel\items\src\audio.cpp">
+      <Filter>items\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\kernel\items\src\fragment.cpp">
+      <Filter>items\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\kernel\items\src\session.cpp">
+      <Filter>items\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\kernel\items\src\track.cpp">
+      <Filter>items\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\kernel\items\src\effect.cpp">
+      <Filter>items\src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -33,7 +33,7 @@ namespace ClientAPI
             }
 
             std::stringstream sstream;
-            sstream << "size: " << audio->buffer_size << ";";
+            sstream << "size: " << audio->getBufferLength() << ";";
 
             return APIResponse(EKernelAPIStatus::eOk, sstream.str());
         }
@@ -57,7 +57,7 @@ namespace ClientAPI
                 }
 
                 sstream << "id: " << id;
-                sstream << " path: " << audio->path;
+                sstream << " path: " << audio->getPath();
 				sstream << "; ";
             }
 
