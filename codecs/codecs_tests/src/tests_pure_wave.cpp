@@ -9,6 +9,7 @@ void codecTest()
     if (loadFile(file_info, "res\\samples_16bit_48khz\\drums_overhead_l.wav") != 0)
     {
         std::cout << "Error loading";
+        return;
     }
 
     file_info.path = "res\\mix.wav";
@@ -16,6 +17,7 @@ void codecTest()
     if (saveFile(file_info, 2) != 0)
     {
         std::cout << "Error saving";
+        return;
     }
 }
 
@@ -54,7 +56,7 @@ void TestSetAndGetBytes()
 
 int main()
 {
-    //__debugbreak();
+    __debugbreak();
 
     //TestSetAndGetBytes();
     codecTest();
