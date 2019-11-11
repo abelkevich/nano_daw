@@ -99,42 +99,27 @@ static void freeBuffer(uint8_t* buffer)
     free(buffer);
 }
 
-/*
-static WavHeader makeHeader(uint32_t sample_rate, uint32_t buf_size)
-{
-    WavHeader h =
-    {
-        {'R', 'I', 'F', 'F'}, buf_size * 2, {'W', 'A', 'V', 'E'}, {'f', 'm', 't', ' '},
-        16, 1, 2, sample_rate, sample_rate * 2 * 2, 1, 16, {'d', 'a', 't', 'a'}, buf_size * 2 + 182
-    };
-
-    return h;
-}
-*/
-
 int32_t getBytes(uint8_t* buffer, uint8_t n)
 {
     if (n > 4) return 0;
     
-    int32_t tmp = 0;
+    int32_t signed_out_val = 0;
 
-    for (uint8_t i = 0; i < n; i++)
+    memcpy(&signed_out_val, buffer, n);
+
+    if (signed_out_val > pow(2, n * 8) / 2)
     {
-        tmp |= buffer[i] << i*8;
+        signed_out_val |= 0xFFFFFFFF << n * 8;
     }
 
-    return tmp;
+    return signed_out_val;
 }
 
 void setBytes(uint8_t* buffer, uint8_t n, int32_t val)
 {
     if (n > 4) return;
 
-    for (uint8_t i = 0; i < n; i++)
-    {
-        uint8_t tmp = (val ^ (!0x000000FF << i * 8)) >> i * 8;
-        buffer[i] = tmp;
-    }
+    memcpy(buffer, &val, n);
 }
 
 status_t loadFile(CodecFileInfo& codec_file_info, std::string path)
