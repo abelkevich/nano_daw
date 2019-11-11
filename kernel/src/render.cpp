@@ -69,6 +69,28 @@ static status_t mixAudioToOutBuffer(Fragment *fragment, float *out_buf)
 	return 0;
 }
 
+std::set<id_t> getTracksWithSolo()
+{
+    std::set<id_t> solo_tracks_id;
+
+    for (auto track_id : g_session->getTracks())
+    {
+        Track* track = ItemsManager::getTrack(track_id);
+
+        if (!track)
+        {
+            return std::set<id_t>();
+        }
+
+        if (track->getSolo())
+        {
+            solo_tracks_id.insert(track_id);
+        }
+    }
+
+    return solo_tracks_id;
+}
+
 status_t render(std::string mix_path)
 {
     if (!g_session)
@@ -89,8 +111,11 @@ status_t render(std::string mix_path)
         right_buf[i] = 0;
     }
 
+    std::set<id_t> solo_tracks = getTracksWithSolo();
+    std::set<id_t> tracks_to_mix = !solo_tracks.empty() ? solo_tracks : g_session->getTracks();
+
     // mix right and left channels
-    for (auto track_id: g_session->getTracks())
+    for (auto track_id: tracks_to_mix)
     {
 		Track *track = ItemsManager::getTrack(track_id);
 
@@ -98,6 +123,11 @@ status_t render(std::string mix_path)
 		{
 			return 2;
 		}
+
+        if (track->getSolo())
+        {
+            continue;
+        }
 
         for (auto fragment_id: track->getFragments())
         {
