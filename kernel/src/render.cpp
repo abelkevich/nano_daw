@@ -37,7 +37,7 @@ static uint32_t calcSessionLength()
     return max_audio_len;
 }
 
-static status_t mixAudioToOutBuffer(Fragment *fragment, float *out_buf)
+static status_t mixAudioToOutBuffer(Fragment *fragment, float *out_buf, uint8_t gain, uint8_t level)
 {
 	Audio *audio = ItemsManager::getAudio(fragment->getAudio());
 
@@ -61,15 +61,18 @@ static status_t mixAudioToOutBuffer(Fragment *fragment, float *out_buf)
 		return 3;
 	}
 
+    float level_normalized = level / 100.0;
+    float k = gain * level_normalized;
+
     for (uint32_t i = 0; i < audio_len_smp; i++)
     {
-        out_buf[out_buf_from_smp + i] += audio->getBuffer()[audio_from_smp + i];
+        out_buf[out_buf_from_smp + i] += (audio->getBuffer()[audio_from_smp + i])*k;
     }
 
 	return 0;
 }
 
-std::set<id_t> getTracksWithSolo()
+static std::set<id_t> getTracksWithSolo()
 {
     std::set<id_t> solo_tracks_id;
 
@@ -138,8 +141,8 @@ status_t render(std::string mix_path)
 				return 3;
 			}
 
-			if (mixAudioToOutBuffer(fragment, left_buf) != 0 ||
-				mixAudioToOutBuffer(fragment, right_buf) != 0)
+			if (mixAudioToOutBuffer(fragment, left_buf, track->getGain(), track->getLevel()) != 0 ||
+				mixAudioToOutBuffer(fragment, right_buf, track->getGain(), track->getLevel()) != 0)
 			{
 				return 4;
 			}
