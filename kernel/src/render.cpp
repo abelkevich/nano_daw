@@ -61,12 +61,11 @@ static status_t mixAudioToOutBuffer(Fragment *fragment, float *out_buf, uint8_t 
 		return 3;
 	}
 
-    float level_normalized = level / 100.0;
-    float k = gain * level_normalized;
+    float k = (gain / 10.0 + 1.0) * (level / 100.0);
 
     for (uint32_t i = 0; i < audio_len_smp; i++)
     {
-        out_buf[out_buf_from_smp + i] += (audio->getBuffer()[audio_from_smp + i])*k;
+        out_buf[out_buf_from_smp + i] += audio->getBuffer()[audio_from_smp + i] * k;
     }
 
 	return 0;
@@ -127,7 +126,7 @@ status_t render(std::string mix_path)
 			return 2;
 		}
 
-        if (track->getSolo())
+        if (track->getMute())
         {
             continue;
         }
