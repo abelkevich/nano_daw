@@ -13,4 +13,5 @@ std::string Effect::getParams() const { return m_params; }
 status_t Effect::setParams(std::string params) 
 {
     m_params = params;
+    return 0;
 }

@@ -78,6 +78,8 @@ status_t Track::setGain(uint8_t gain)
         return 1;
     }
 
+    m_gain = gain;
+
     return 0;
 }
 

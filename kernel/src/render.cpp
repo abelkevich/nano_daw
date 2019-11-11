@@ -37,7 +37,7 @@ static uint32_t calcSessionLength()
     return max_audio_len;
 }
 
-static status_t mixAudioToOutBuffer(Fragment *fragment, float *out_buf)
+static status_t mixAudioToOutBuffer(Fragment *fragment, float *out_buf, uint8_t gain, uint8_t level)
 {
 	Audio *audio = ItemsManager::getAudio(fragment->getAudio());
 
@@ -61,12 +61,36 @@ static status_t mixAudioToOutBuffer(Fragment *fragment, float *out_buf)
 		return 3;
 	}
 
+    float k = (gain / 10.0 + 1.0) * (level / 100.0);
+
     for (uint32_t i = 0; i < audio_len_smp; i++)
     {
-        out_buf[out_buf_from_smp + i] += audio->getBuffer()[audio_from_smp + i];
+        out_buf[out_buf_from_smp + i] += audio->getBuffer()[audio_from_smp + i] * k;
     }
 
 	return 0;
+}
+
+static std::set<id_t> getTracksWithSolo()
+{
+    std::set<id_t> solo_tracks_id;
+
+    for (auto track_id : g_session->getTracks())
+    {
+        Track* track = ItemsManager::getTrack(track_id);
+
+        if (!track)
+        {
+            return std::set<id_t>();
+        }
+
+        if (track->getSolo())
+        {
+            solo_tracks_id.insert(track_id);
+        }
+    }
+
+    return solo_tracks_id;
 }
 
 status_t render(std::string mix_path)
@@ -89,8 +113,11 @@ status_t render(std::string mix_path)
         right_buf[i] = 0;
     }
 
+    std::set<id_t> solo_tracks = getTracksWithSolo();
+    std::set<id_t> tracks_to_mix = !solo_tracks.empty() ? solo_tracks : g_session->getTracks();
+
     // mix right and left channels
-    for (auto track_id: g_session->getTracks())
+    for (auto track_id: tracks_to_mix)
     {
 		Track *track = ItemsManager::getTrack(track_id);
 
@@ -98,6 +125,11 @@ status_t render(std::string mix_path)
 		{
 			return 2;
 		}
+
+        if (track->getMute())
+        {
+            continue;
+        }
 
         for (auto fragment_id: track->getFragments())
         {
@@ -108,8 +140,8 @@ status_t render(std::string mix_path)
 				return 3;
 			}
 
-			if (mixAudioToOutBuffer(fragment, left_buf) != 0 ||
-				mixAudioToOutBuffer(fragment, right_buf) != 0)
+			if (mixAudioToOutBuffer(fragment, left_buf, track->getGain(), track->getLevel()) != 0 ||
+				mixAudioToOutBuffer(fragment, right_buf, track->getGain(), track->getLevel()) != 0)
 			{
 				return 4;
 			}

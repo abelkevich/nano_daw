@@ -253,7 +253,7 @@ namespace ClientAPI
 			std::string volume_str = seq.sliceNextToken();
 			int volume = stoi(volume_str);
 
-			if (volume > 0)
+			if (volume > 100 || volume < 0)
 			{
 				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_arg_value);
 			}
