@@ -9,7 +9,6 @@
 #include "api_track.h"
 
 static callback_t g_cmd_transmitter;
-static EKernelAPIStatus cmdReceiver(std::string cmd);
 
 namespace ClientAPI
 {
@@ -20,6 +19,8 @@ namespace ClientAPI
 	std::string c_err_operation_failed = "operation failed";
 	std::string c_err_invalid_arg_value = "invalid arg value";
 	std::string c_err_cannot_find_command = "cannot find command";
+
+    static std::string cmdReceiver(std::string cmd);
 
 	CommandSeq::CommandSeq(std::string cmd_line)
 	{
@@ -55,7 +56,7 @@ namespace ClientAPI
 		spawnTerminal(cmdReceiver);
 	}
 
-	APIResponse cmdReceiver(std::string user_cmd_line)
+    std::string cmdReceiver(std::string user_cmd_line)
 	{
 		CommandSeq seq(user_cmd_line);
 
@@ -71,34 +72,34 @@ namespace ClientAPI
 		switch (cmd)
 		{
 		case eCodec:
-			return cmdCodec(seq);
+			return cmdCodec(seq).data;
 
 		case eEffect:
-			return cmdEffect(seq);
+			return cmdEffect(seq).data;
 
 		case eFragment:
-			return cmdFragment(seq);
+			return cmdFragment(seq).data;
 
 		case eAudio:
-			return cmdAudio(seq);
+			return cmdAudio(seq).dump();
 
 		case eTrack:
-			return cmdTrack(seq);
+			return cmdTrack(seq).data;
 
 		case eSession:
-			return cmdSession(seq);
+			return cmdSession(seq).data;
 
 		case ePlayback:
-			return cmdPlayback(seq);
+			return cmdPlayback(seq).data;
 
 		case eRender:
-			return cmdRender(seq);
+			return cmdRender(seq).data;
 
 		case eQuit:
 			g_working = false;
-			return EKernelAPIStatus::eOk;
+            return APIResponse(EKernelAPIStatus::eOk).data;
 		}
 
-		return APIResponse(EKernelAPIStatus::eErr, "Cannot find such command");
+		return APIResponse(EKernelAPIStatus::eErr, "Cannot find such command").data;
 	}
 }

@@ -10,6 +10,9 @@
 #include <queue>
 #include <map>
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 namespace ClientAPI
 {
 	extern std::string c_err_invalid_id;
@@ -54,6 +57,5 @@ namespace ClientAPI
 		}
 	};
 
-	APIResponse cmdReceiver(std::string user_cmd_line);
 	void initAPI();
 }
