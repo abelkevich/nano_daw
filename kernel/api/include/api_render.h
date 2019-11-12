@@ -4,5 +4,5 @@
 
 namespace ClientAPI
 {
-	APIResponse cmdRender(CommandSeq seq);
+    json cmdRender(CommandSeq seq);
 }

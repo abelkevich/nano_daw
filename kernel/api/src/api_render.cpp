@@ -3,7 +3,7 @@
 
 namespace ClientAPI
 {
-	APIResponse cmdRender(CommandSeq seq)
+    json cmdRender(CommandSeq seq)
 	{
 		enum EIdents { eNone, eSession };
 		IdentsMap<EIdents> idents_map{ {"session", eSession}, {"none", eNone} };
@@ -18,27 +18,27 @@ namespace ClientAPI
 		{
 			if (!seq.hasNTokens(1))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
+                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
 			}
 
 			if (!g_session)
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_session);
+                return json({ {"error", { {"code", c_err_invalid_session_code}, {"msg", c_err_invalid_session_str}}} });
 			}
 
 			std::string mix_path = seq.sliceNextToken();
 
 			if (render(mix_path) != 0)
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_operation_failed);
+                return json({ {"error", { {"code", c_err_operation_failed_code}, {"msg", c_err_operation_failed_str}}} });
 			}
 
-			return APIResponse(EKernelAPIStatus::eOk);
+            return json({ {"path", mix_path} });
 		}
 		default:
 			break;
 		}
 
-		return APIResponse(EKernelAPIStatus::eErr, c_err_cannot_find_command);
+        return json({ {"error", { {"code", c_err_cannot_find_command_code}, {"msg", c_err_cannot_find_command_str}}} });
 	}
 }

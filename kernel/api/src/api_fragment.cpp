@@ -3,7 +3,7 @@
 
 namespace ClientAPI
 {
-    APIResponse cmdFragment(CommandSeq seq)
+    json cmdFragment(CommandSeq seq)
     {
         enum EIdents { eList, eAdd, eRemove, eCrop, eOffset, eInfo, eNone };
 		IdentsMap<EIdents> idents_map{ {"add", eAdd}, {"remove", eRemove}, {"list", eList}, 
@@ -21,7 +21,7 @@ namespace ClientAPI
         {
             if (!seq.hasNTokens(1))
             {
-                return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
+                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
             }
 
             std::string id_str = seq.sliceNextToken();
@@ -30,50 +30,39 @@ namespace ClientAPI
             Fragment* fragment = ItemsManager::getFragment(id);
             if (!fragment)
             {
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
+                return json({ {"error", { {"code", c_err_invalid_fragment_id_code}, {"msg", c_err_invalid_fragment_id_str}}} });
             }
 
-            std::stringstream sstream;
-            sstream << "audio: " << fragment->getAudio() << ";";
-            sstream << "crop from: " << fragment->getCropFrom() << ";";
-            sstream << "crop to: " << fragment->getCropTo() << ";";
-            sstream << "offset: " << fragment->getTimeOffset() << ";";
-
-            return APIResponse(EKernelAPIStatus::eOk, sstream.str());
+            return json({ {"audio", fragment->getAudio()}, {"crop_from", fragment->getCropFrom()}, {"crop_to", fragment->getCropTo()}
+                        , {"offset", fragment->getTimeOffset()}});
         }
 
         case eList:
         {
             std::set<id_t> fragment_ids = ItemsManager::getFragments();
 
-            std::stringstream sstream;
-
-			sstream << "[";
-
+            json::array_t response = json::array();
             for (id_t id : fragment_ids)
             {
                 Fragment* fragment = ItemsManager::getFragment(id);
 
                 if (!fragment)
                 {
-					return APIResponse(EKernelAPIStatus::eErr, sstream.str());
+                    return json({ {"error", { {"code", c_err_operation_failed_code}, {"msg", c_err_operation_failed_str}}} });
                 }
 
-                sstream << "id: " << id;
-                sstream << " audio: " << fragment->getAudio();
-                sstream << "; ";
+                json arr_elem({ {"id", id}, {"audio", fragment->getAudio()} });
+                response.push_back(arr_elem);
             }
 
-			sstream << "]";
-
-            return APIResponse(EKernelAPIStatus::eOk, sstream.str());
+            return response;
         }
 
         case eAdd:
         {
             if (!seq.hasNTokens(1))
             {
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
+                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
             }
 
             std::string audio_id_str = seq.sliceNextToken();
@@ -81,24 +70,24 @@ namespace ClientAPI
 
 			if (!ItemsManager::getAudio(audio_id))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
+                return json({ {"error", { {"code", c_err_invalid_audio_id_code}, {"msg", c_err_invalid_audio_id_str}}} });
 			}
 
             id_t id = ItemsManager::createFragment(audio_id);
 
 			if (!id)
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_operation_failed);
+                return json({ {"error", { {"code", c_err_operation_failed_code}, {"msg", c_err_operation_failed_str}}} });
 			}
 
-			return APIResponse(EKernelAPIStatus::eOk, "id: " + std::to_string(id));
+            return json({ {"id", id} });
         }
 
         case eRemove:
         {
             if (!seq.hasNTokens(1))
             {
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
+                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
             }
 
             std::string id_str = seq.sliceNextToken();
@@ -107,22 +96,22 @@ namespace ClientAPI
 
 			if (!ItemsManager::getFragment(id))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
+                return json({ {"error", { {"code", c_err_invalid_fragment_id_code}, {"msg", c_err_invalid_fragment_id_str}}} });
 			}
 
             if (!ItemsManager::removeFragment(id))
             {
-				return APIResponse(EKernelAPIStatus::eErr, c_err_operation_failed);
+                return json({ {"error", { {"code", c_err_operation_failed_code}, {"msg", c_err_operation_failed_str}}} });
             }
 
-			return APIResponse(EKernelAPIStatus::eOk);
+            return json({ {"id", id} });
         }
 
 		case eCrop:
 		{
 			if (!seq.hasNTokens(3))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
+                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
 			}
 
 			std::string id_str = seq.sliceNextToken();
@@ -132,7 +121,7 @@ namespace ClientAPI
 
 			if (!fragment)
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
+                return json({ {"error", { {"code", c_err_invalid_fragment_id_code}, {"msg", c_err_invalid_fragment_id_str}}} });
 			}
 
 			{
@@ -144,20 +133,20 @@ namespace ClientAPI
 
 				if (crop_from < 0 || crop_to < 0 || crop_to <= crop_from)
 				{
-					return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_arg_value);
+                    return json({ {"error", { {"code", c_err_invalid_arg_value_code}, {"msg", c_err_invalid_arg_value_str}}} });
 				}
 
 				fragment->crop(crop_from, crop_to);
 			}
 
-			return APIResponse(EKernelAPIStatus::eOk);
+            return json({ {"id", id} });
 		}
 
         case eOffset:
         {
             if (!seq.hasNTokens(2))
             {
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
+                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
             }
 
             std::string id_str = seq.sliceNextToken();
@@ -167,7 +156,7 @@ namespace ClientAPI
 
             if (!fragment)
             {
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
+                return json({ {"error", { {"code", c_err_invalid_fragment_id_code}, {"msg", c_err_invalid_fragment_id_str}}} });
             }
 
             {
@@ -176,17 +165,17 @@ namespace ClientAPI
 
 				if (offset < 0)
 				{
-					return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_arg_value);
+                    return json({ {"error", { {"code", c_err_invalid_arg_value_code}, {"msg", c_err_invalid_arg_value_str}}} });
 				}
 
                 fragment->setTimeOffset(offset);
             }
 
-            return APIResponse(EKernelAPIStatus::eOk);
+            return json({ {"id", id} });
         }
 
         }
 
-        return APIResponse(EKernelAPIStatus::eErr, c_err_cannot_find_command);
+        return json({ {"error", { {"code", c_err_cannot_find_command_code}, {"msg", c_err_cannot_find_command_str}}} });
     }
 }

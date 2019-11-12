@@ -4,5 +4,5 @@
 
 namespace ClientAPI
 {
-	APIResponse cmdEffect(CommandSeq seq);
+    json cmdEffect(CommandSeq seq);
 }

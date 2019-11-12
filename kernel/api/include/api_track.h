@@ -4,5 +4,5 @@
 
 namespace ClientAPI
 {
-	APIResponse cmdTrack(CommandSeq seq);
+    json cmdTrack(CommandSeq seq);
 }

@@ -3,7 +3,7 @@
 
 namespace ClientAPI
 {
-    APIResponse cmdAudio(CommandSeq seq)
+    json cmdAudio(CommandSeq seq)
     {
         enum EIdents { eList, eAdd, eRemove, eInfo, eNone };
         IdentsMap<EIdents> idents_map{ {"add", eAdd}, {"remove", eRemove}, {"list", eList}, {"info", eInfo} };
@@ -20,7 +20,7 @@ namespace ClientAPI
         {
             if (!seq.hasNTokens(1))
             {
-                return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
+                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
             }
 
             std::string id_str = seq.sliceNextToken();
@@ -29,23 +29,18 @@ namespace ClientAPI
             Audio* audio = ItemsManager::getAudio(id);
             if (!audio)
             {
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
+                return json({ {"error", { {"code", c_err_invalid_audio_id_code}, {"msg", c_err_invalid_audio_id_str}}} });
             }
 
-            std::stringstream sstream;
-            sstream << "size: " << audio->getBufferLength() << ";";
-
-            return APIResponse(EKernelAPIStatus::eOk, sstream.str());
+            return json({ {"path", audio->getPath()}, {"size", audio->getBufferLength()} });
         }
 
         case eList:
         {
 
             std::set<id_t> audio_ids = ItemsManager::getAudios();
-
-            std::stringstream sstream;
-
-			sstream << "[";
+            
+            json::array_t response = json::array();
 
             for (id_t id : audio_ids)
             {
@@ -53,24 +48,23 @@ namespace ClientAPI
 
                 if (!audio)
                 {
-					return APIResponse(EKernelAPIStatus::eErr, sstream.str());
+                    return json({ {"error", { {"code", c_err_invalid_audio_id_code}, {"msg", c_err_invalid_audio_id_str}}} });
                 }
 
-                sstream << "id: " << id;
-                sstream << " path: " << audio->getPath();
-				sstream << "; ";
+                
+                json arr_elem({ {"id", id}, {"path", audio->getPath()} });
+                response.push_back(arr_elem);
             }
 
-			sstream << "]";
-
-            return APIResponse(EKernelAPIStatus::eOk, sstream.str());
+			
+            return response;
         }
 
         case eAdd:
         {
             if (!seq.hasNTokens(1))
             {
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
+                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
             }
 
             std::string path = seq.sliceNextToken();
@@ -79,17 +73,17 @@ namespace ClientAPI
 
             if (!id)
             {
-				return APIResponse(EKernelAPIStatus::eErr, c_err_operation_failed);
+                return json({ {"error", { {"code", c_err_operation_failed_code}, {"msg", c_err_operation_failed_str}}} });
             }
 
-            return APIResponse(EKernelAPIStatus::eOk, "id: " + std::to_string(id));
+            return json({ {"id", id} });
         }
 
         case eRemove:
         {
             if (!seq.hasNTokens(1))
             {
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
+                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
             }
 
             std::string id_str = seq.sliceNextToken();
@@ -98,19 +92,19 @@ namespace ClientAPI
 
 			if (!ItemsManager::getAudio(id))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
+                return json({ {"error", { {"code", c_err_invalid_audio_id_code}, {"msg", c_err_invalid_audio_id_str}}} });
 			}
 
             if (!ItemsManager::removeAudio(id))
             {
-                return APIResponse(EKernelAPIStatus::eErr, c_err_operation_failed);
+                return json({ {"err_msg", c_err_operation_failed_str} });
             }
 
-            return APIResponse(EKernelAPIStatus::eOk);
+            return json({});
         }
 
         }
 
-        return APIResponse(EKernelAPIStatus::eErr, c_err_cannot_find_command);
+        return json({ {"error", { {"code", c_err_cannot_find_command_code}, {"msg", c_err_cannot_find_command_str}}} });
     }
 }

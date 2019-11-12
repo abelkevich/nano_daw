@@ -4,5 +4,5 @@
 
 namespace ClientAPI
 {
-	APIResponse cmdAudio(CommandSeq seq);
+	json cmdAudio(CommandSeq seq);
 }

@@ -17,6 +17,4 @@ struct APIResponse
 	APIResponse(EKernelAPIStatus _status);
 };
 
-typedef std::function<APIResponse(std::string)> callback_t;
-
-void initKernelAPI();
+typedef std::function<std::string(std::string)> callback_t;
