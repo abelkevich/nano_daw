@@ -3,7 +3,7 @@
 
 namespace ClientAPI
 {
-	APIResponse cmdCodec(CommandSeq seq)
+    json cmdCodec(CommandSeq seq)
 	{
 		enum EIdents { eInit, eList, eNone };
         IdentsMap<EIdents> idents_map{ {"init", eInit}, {"list", eList}, {"none", eNone} };
@@ -19,30 +19,27 @@ namespace ClientAPI
         {
             if (CodecManager::initCodecs() != 0)
             {
-				return APIResponse(EKernelAPIStatus::eErr, c_err_operation_failed);
+                return json({ {"error", { {"code", c_err_operation_failed_code}, {"msg", c_err_operation_failed_str}}} });
             }
 
-            return APIResponse(EKernelAPIStatus::eOk);
+            return json({ {"status", "ok"} });
         }
         case eList:
         {
             auto codecs = CodecManager::getInitedCodecs();
 
-            std::stringstream sstream;
-
-			sstream << "[";
+            json::array_t response = json::array();
 
             for (auto c: codecs)
             {
-                sstream << "name: " << c.lib_name << ";";
+                json arr_elem({ {"name", c.lib_name} });
+                response.push_back(arr_elem);
             }
 
-			sstream << "]";
-
-			return APIResponse(EKernelAPIStatus::eOk, sstream.str());
+			return response;
         }
         }
 
-		return APIResponse(EKernelAPIStatus::eErr, c_err_cannot_find_command);
+        return json({ {"error", { {"code", c_err_cannot_find_command_code}, {"msg", c_err_cannot_find_command_str}}} });
 	}
 }

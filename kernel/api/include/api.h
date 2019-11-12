@@ -15,13 +15,32 @@ using json = nlohmann::json;
 
 namespace ClientAPI
 {
-	extern std::string c_err_invalid_id;
-	extern std::string c_err_invalid_args_number;
-	extern std::string c_err_unimplemented_method;
-	extern std::string c_err_invalid_session;
-	extern std::string c_err_operation_failed;
-	extern std::string c_err_invalid_arg_value;
-	extern std::string c_err_cannot_find_command;
+    extern const std::string c_err_invalid_fragment_id_str;
+    extern const uint8_t c_err_invalid_fragment_id_code;
+
+    extern const std::string c_err_invalid_audio_id_str;
+    extern const uint8_t c_err_invalid_audio_id_code;
+
+    extern const std::string c_err_invalid_track_id_str;
+    extern const uint8_t c_err_invalid_track_id_code;
+
+	extern const std::string c_err_invalid_args_number_str;
+    extern const uint8_t c_err_invalid_args_number_code;
+
+	extern const std::string c_err_unimplemented_method_str;
+    extern const uint8_t c_err_unimplemented_method_code;
+
+	extern const std::string c_err_invalid_session_str;
+    extern const uint8_t c_err_invalid_session_code;
+
+	extern const std::string c_err_operation_failed_str;
+    extern const uint8_t c_err_operation_failed_code;
+
+	extern const std::string c_err_invalid_arg_value_str;
+    extern const uint8_t c_err_invalid_arg_value_code;
+
+	extern const std::string c_err_cannot_find_command_str;
+    extern const uint8_t c_err_cannot_find_command_code;
 
 	class CommandSeq
 	{

@@ -3,7 +3,7 @@
 
 namespace ClientAPI
 {
-	APIResponse cmdTrack(CommandSeq seq)
+    json cmdTrack(CommandSeq seq)
 	{
 		enum EIdents { eList, eAdd, eRemove, eMute, eSolo, 
                        eVolume, eGain, ePan, eLink, eUnlink,
@@ -24,7 +24,7 @@ namespace ClientAPI
         {
             if (!seq.hasNTokens(1))
             {
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
+                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
             }
 
             std::string id_str = seq.sliceNextToken();
@@ -33,37 +33,18 @@ namespace ClientAPI
             Track* track = ItemsManager::getTrack(id);
             if (!track)
             {
-                return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
+                return json({ {"error", { {"code", c_err_invalid_track_id_code}, {"msg", c_err_invalid_track_id_str}}} });
             }
 
-
-            std::stringstream sstream;
-
-            sstream << "name: " << track->getName() << ";";
-            sstream << "solo: " << track->getSolo() << ";";
-            sstream << "mute: " << track->getMute() << ";";
-            sstream << "gain: " << track->getGain() << ";";
-            sstream << "level: " << track->getLevel() << ";";
-            sstream << "fragments: [";
-
-            for (id_t id : track->getFragments())
-            {
-                sstream << id << ",";
-            }
-
-            sstream << "];";
-
-			return APIResponse(EKernelAPIStatus::eOk, sstream.str());
+			return json({ {"name", track->getName()}, {"solo", track->getSolo()}, {"mute", track->getMute()}
+                        , {"gain", track->getGain()}, {"level", track->getLevel()}, {"fragments", track->getFragments()} });
         }
 
 		case eList:
 		{
-
 			std::set<id_t> track_ids = ItemsManager::getTracks();
 
-			std::stringstream sstream;
-
-			sstream << '[';
+            json::array_t response = json::array();
 
 			for (id_t id : track_ids)
 			{
@@ -71,24 +52,21 @@ namespace ClientAPI
 
 				if (!track)
 				{
-					return APIResponse(EKernelAPIStatus::eErr, sstream.str());
+                    return json({ {"error", { {"code", c_err_operation_failed_code}, {"msg", c_err_operation_failed_str}}} });
 				}
 
-				sstream << "id: " << id;
-				sstream << " name: " << track->getName();
-				sstream << "; ";
+                json arr_elem({ {"id", id}, {"name", track->getName()} });
+                response.push_back(arr_elem);
 			}
 
-			sstream << ']';
-
-			return APIResponse(EKernelAPIStatus::eOk, sstream.str());
+			return response;
 		}
 
 		case eAdd:
 		{
 			if (!seq.hasNTokens(1))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
+                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
 			}
 
 			std::string name = seq.sliceNextToken();
@@ -97,17 +75,17 @@ namespace ClientAPI
 
 			if (!id)
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_operation_failed);
+                return json({ {"error", { {"code", c_err_operation_failed_code}, {"msg", c_err_operation_failed_str}}} });
 			}
 
-			return APIResponse(EKernelAPIStatus::eOk, "id: " + std::to_string(id));
+            return json({ {"id", id} });
 		}
 
 		case eRemove:
 		{
 			if (!seq.hasNTokens(1))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
+                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
 			}
 
 			std::string id_str = seq.sliceNextToken();
@@ -116,22 +94,22 @@ namespace ClientAPI
 
 			if (!ItemsManager::getTrack(id))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
+                return json({ {"error", { {"code", c_err_invalid_track_id_code}, {"msg", c_err_invalid_track_id_str}}} });
 			}
 
 			if (!ItemsManager::removeTrack(id))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_operation_failed);
+                return json({ {"error", { {"code", c_err_operation_failed_code}, {"msg", c_err_operation_failed_str}}} });
 			}
 
-			return APIResponse(EKernelAPIStatus::eOk);
+            return json({ {"id", id} });
 		}
 
 		case eLink:
 		{
 			if (!seq.hasNTokens(2))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
+                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
 			}
 
 			std::string track_id_str = seq.sliceNextToken();
@@ -144,27 +122,27 @@ namespace ClientAPI
 
 			if (!track)
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
+                return json({ {"error", { {"code", c_err_invalid_track_id_code}, {"msg", c_err_invalid_track_id_str}}} });
 			}
 
 			if (!ItemsManager::getFragment(fragment_id))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
+                return json({ {"error", { {"code", c_err_invalid_fragment_id_code}, {"msg", c_err_invalid_fragment_id_str}}} });
 			}
 
 			if (track->linkFragment(fragment_id))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_operation_failed);
+                return json({ {"error", { {"code", c_err_operation_failed_code}, {"msg", c_err_operation_failed_str}}} });
 			}
 
-			return APIResponse(EKernelAPIStatus::eOk);
+            return json({ {"id", track_id_str} });
 		}
 
         case eUnlink:
         {
             if (!seq.hasNTokens(2))
             {
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
+                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
             }
 
             std::string track_id_str = seq.sliceNextToken();
@@ -177,27 +155,27 @@ namespace ClientAPI
 
 			if (!track)
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
+                return json({ {"error", { {"code", c_err_invalid_track_id_code}, {"msg", c_err_invalid_track_id_str}}} });
 			}
 
 			if (!ItemsManager::getFragment(fragment_id))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
+                return json({ {"error", { {"code", c_err_invalid_fragment_id_code}, {"msg", c_err_invalid_fragment_id_str}}} });
 			}
 
             if (track->unlinkFragment(fragment_id))
             {
-				return APIResponse(EKernelAPIStatus::eErr, c_err_operation_failed);
+                return json({ {"error", { {"code", c_err_operation_failed_code}, {"msg", c_err_operation_failed_str}}} });
             }
 
-			return APIResponse(EKernelAPIStatus::eOk);
+            return json({ {"id", track_id_str} });
         }
 
 		case eMute:
 		{
 			if (!seq.hasNTokens(1))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
+                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
 			}
 
 			std::string id_str = seq.sliceNextToken();
@@ -208,19 +186,19 @@ namespace ClientAPI
 
 			if (!track)
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
+                return json({ {"error", { {"code", c_err_invalid_track_id_code}, {"msg", c_err_invalid_track_id_str}}} });
 			}
 
             track->setMute(!track->getMute());
 
-			return APIResponse(EKernelAPIStatus::eOk);
+            return json({ {"id", id} });
 		}
 
 		case eSolo:
 		{
 			if (!seq.hasNTokens(1))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
+                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
 			}
 
 			std::string id_str = seq.sliceNextToken();
@@ -231,19 +209,19 @@ namespace ClientAPI
 
 			if (!track)
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
+                return json({ {"error", { {"code", c_err_invalid_track_id_code}, {"msg", c_err_invalid_track_id_str}}} });
 			}
 
             track->setSolo(!track->getSolo());
 
-			return APIResponse(EKernelAPIStatus::eOk);
+            return json({ {"id", id} });
 		}
 
 		case eVolume:
 		{
 			if (!seq.hasNTokens(2))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
+                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
 			}
 
 			std::string id_str = seq.sliceNextToken();
@@ -255,25 +233,25 @@ namespace ClientAPI
 
 			if (volume > 100 || volume < 0)
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_arg_value);
+                return json({ {"error", { {"code", c_err_invalid_arg_value_code}, {"msg", c_err_invalid_arg_value_str}}} });
 			}
 
 			Track* track = ItemsManager::getTrack(id);
 			if (!track)
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
+                return json({ {"error", { {"code", c_err_invalid_track_id_code}, {"msg", c_err_invalid_track_id_str}}} });
 			}
 
             track->setLevel(volume);
 
-			return APIResponse(EKernelAPIStatus::eOk);
+            return json({ {"id", id} });
 		}
 
 		case eGain:
 		{
 			if (!seq.hasNTokens(2))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
+                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
 			}
 
 			std::string id_str = seq.sliceNextToken();
@@ -284,25 +262,25 @@ namespace ClientAPI
 
 			if (gain < 0)
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_arg_value);
+                return json({ {"error", { {"code", c_err_invalid_arg_value_code}, {"msg", c_err_invalid_arg_value_str}}} });
 			}
 
 			Track* track = ItemsManager::getTrack(id);
 			if (!track)
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
+                return json({ {"error", { {"code", c_err_invalid_track_id_code}, {"msg", c_err_invalid_track_id_str}}} });
 			}
 
             track->setGain(gain);
 
-			return APIResponse(EKernelAPIStatus::eOk);
+            return json({ {"id", id} });
 		}
 
 		case ePan:
 		{
 			if (!seq.hasNTokens(2))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
+                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
 			}
 
 			std::string id_str = seq.sliceNextToken();
@@ -314,25 +292,25 @@ namespace ClientAPI
 
 			if (pan < 100 || pan > 100)
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_arg_value);
+                return json({ {"error", { {"code", c_err_invalid_arg_value_code}, {"msg", c_err_invalid_arg_value_str}}} });
 			}
 
 			Track* track = ItemsManager::getTrack(id);
 			if (!track)
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
+                return json({ {"error", { {"code", c_err_invalid_track_id_code}, {"msg", c_err_invalid_track_id_str}}} });
 			}
 
             track->setPan(pan);
 
-			return APIResponse(EKernelAPIStatus::eOk);
+            return json({ {"id", id} });
 		}
 
         case eName:
         {
             if (!seq.hasNTokens(2))
             {
-                return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
+                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
             }
 
             std::string id_str = seq.sliceNextToken();
@@ -343,22 +321,22 @@ namespace ClientAPI
             
 			if (name_str.size() > 30)
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_arg_value);
+                return json({ {"error", { {"code", c_err_invalid_arg_value_code}, {"msg", c_err_invalid_arg_value_str}}} });
 			}
 
             Track* track = ItemsManager::getTrack(id);
             if (!track)
             {
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
+                return json({ {"error", { {"code", c_err_invalid_track_id_code}, {"msg", c_err_invalid_track_id_str}}} });
             }
 
             track->setName(name_str);
 
-			return APIResponse(EKernelAPIStatus::eOk);
+            return json({ {"id", id} });
         }
 
 		}
 
-		return APIResponse(EKernelAPIStatus::eErr, c_err_cannot_find_command);
+        return json({ {"error", { {"code", c_err_cannot_find_command_code}, {"msg", c_err_cannot_find_command_str}}} });
 	}
 }

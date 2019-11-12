@@ -12,13 +12,32 @@ static callback_t g_cmd_transmitter;
 
 namespace ClientAPI
 {
-	std::string c_err_invalid_id = "invalid id";
-	std::string c_err_invalid_args_number = "invalid args number";
-	std::string c_err_unimplemented_method = "unimplemented method";
-	std::string c_err_invalid_session = "invalid session";
-	std::string c_err_operation_failed = "operation failed";
-	std::string c_err_invalid_arg_value = "invalid arg value";
-	std::string c_err_cannot_find_command = "cannot find command";
+    const std::string c_err_invalid_fragment_id_str = "invalid fragment id";
+    const uint8_t c_err_invalid_fragment_id_code = 1;
+
+    const std::string c_err_invalid_audio_id_str = "invalid audio id";
+    const uint8_t c_err_invalid_audio_id_code = 2;
+
+    const std::string c_err_invalid_track_id_str = "invalid track id";
+    const uint8_t c_err_invalid_track_id_code = 3;
+
+    const std::string c_err_invalid_args_number_str = "invalid args number";
+    const uint8_t c_err_invalid_args_number_code = 4;
+
+    const std::string c_err_unimplemented_method_str = "unimplemented method";
+    const uint8_t c_err_unimplemented_method_code = 5;
+
+    const std::string c_err_invalid_session_str = "invalid session";
+    const uint8_t c_err_invalid_session_code = 6;
+
+    const std::string c_err_operation_failed_str = "operation failed";
+    const uint8_t c_err_operation_failed_code = 7;
+
+    const std::string c_err_invalid_arg_value_str = "invalid arg value";
+    const uint8_t c_err_invalid_arg_value_code = 8;
+
+    const std::string c_err_cannot_find_command_str = "cannot find command";
+    const uint8_t c_err_cannot_find_command_code = 9;
 
     static std::string cmdReceiver(std::string cmd);
 
@@ -72,34 +91,34 @@ namespace ClientAPI
 		switch (cmd)
 		{
 		case eCodec:
-			return cmdCodec(seq).data;
+			return cmdCodec(seq).dump();
 
 		case eEffect:
-			return cmdEffect(seq).data;
+			return cmdEffect(seq).dump();
 
 		case eFragment:
-			return cmdFragment(seq).data;
+			return cmdFragment(seq).dump();
 
 		case eAudio:
 			return cmdAudio(seq).dump();
 
 		case eTrack:
-			return cmdTrack(seq).data;
+			return cmdTrack(seq).dump();
 
 		case eSession:
-			return cmdSession(seq).data;
+			return cmdSession(seq).dump();
 
 		case ePlayback:
-			return cmdPlayback(seq).data;
+			return cmdPlayback(seq).dump();
 
 		case eRender:
-			return cmdRender(seq).data;
+			return cmdRender(seq).dump();
 
 		case eQuit:
 			g_working = false;
-            return APIResponse(EKernelAPIStatus::eOk).data;
+            return json({"status", "ok"}).dump();
 		}
 
-		return APIResponse(EKernelAPIStatus::eErr, "Cannot find such command").data;
+        return json({ {"error", { {"code", c_err_cannot_find_command_code}, {"msg", c_err_cannot_find_command_str}}} }).dump();
 	}
 }

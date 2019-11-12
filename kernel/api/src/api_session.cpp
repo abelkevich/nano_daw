@@ -3,7 +3,7 @@
 
 namespace ClientAPI
 {
-	APIResponse cmdSession(CommandSeq seq)
+    json cmdSession(CommandSeq seq)
 	{
 		enum EIdents { eLoad, eCreate, eSave, eLink, eNone };
         IdentsMap<EIdents> idents_map{ {"load", eLoad }, {"create", eCreate}, {"save", eSave}, {"link", eLink} };
@@ -18,19 +18,19 @@ namespace ClientAPI
 		{
 		case eLoad:
 		{
-            return APIResponse(EKernelAPIStatus::eErr, c_err_unimplemented_method);
+            return json({ {"error", { {"code", c_err_unimplemented_method_code}, {"msg", c_err_unimplemented_method_str}}} });
 		}
 
 		case eLink:
 		{
 			if (!seq.hasNTokens(1))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
+                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
 			}
 
 			if (!g_session)
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_session);
+                return json({ {"error", { {"code", c_err_invalid_session_code}, {"msg", c_err_invalid_session_str}}} });
 			}
 
 			std::string track_id_str = seq.sliceNextToken();
@@ -38,19 +38,19 @@ namespace ClientAPI
 
 			if (!ItemsManager::getTrack(track_id))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_id);
+                return json({ {"error", { {"code", c_err_invalid_track_id_code}, {"msg", c_err_invalid_track_id_str}}} });
 			}
 
 			g_session->linkTrack(track_id);
 
-			return APIResponse(EKernelAPIStatus::eOk);
+            return json({ {"name", g_session->getName()} });
 		}
 
 		case eCreate:
 		{
 			if (!seq.hasNTokens(3))
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_args_number);
+                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
 			}
 
 			std::string name = seq.sliceNextToken();
@@ -61,20 +61,20 @@ namespace ClientAPI
 
 			if (smp_rate != 48000)
 			{
-				return APIResponse(EKernelAPIStatus::eErr, c_err_invalid_arg_value);
+                return json({ {"error", { {"code", c_err_invalid_arg_value_code}, {"msg", c_err_invalid_arg_value_str}}} });
 			}
 
 			g_session = new Session(name, path, smp_rate);
 
-			return APIResponse(EKernelAPIStatus::eOk);
+            return json({ {"name", name} });
 		}
 
 		case eSave:
         {
-			return APIResponse(EKernelAPIStatus::eErr, c_err_unimplemented_method);
+            return json({ {"error", { {"code", c_err_unimplemented_method_code}, {"msg", c_err_unimplemented_method_str}}} });
         }
 		}
 
-		return APIResponse(EKernelAPIStatus::eErr, c_err_cannot_find_command);
+        return json({ {"error", { {"code", c_err_cannot_find_command_code}, {"msg", c_err_cannot_find_command_str}}} });
 	}
 }

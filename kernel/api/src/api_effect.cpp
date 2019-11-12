@@ -2,7 +2,7 @@
 
 namespace ClientAPI
 {
-	APIResponse cmdEffect(CommandSeq seq)
+    json cmdEffect(CommandSeq seq)
 	{
 		enum EIdents { eNone };
 		IdentsMap<EIdents> idents_map{};
@@ -11,6 +11,6 @@ namespace ClientAPI
 		EIdents cmd = idents_map.hasIdent(token) ?
 			idents_map.getIdent(token) : eNone;
 
-		return APIResponse(EKernelAPIStatus::eErr, c_err_cannot_find_command);
+        return json({ {"error", { {"code", c_err_cannot_find_command_code}, {"msg", c_err_cannot_find_command_str}}} });
 	}
 }

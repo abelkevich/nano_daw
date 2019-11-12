@@ -4,5 +4,5 @@
 
 namespace ClientAPI
 {
-	APIResponse cmdPlayback(CommandSeq seq);
+    json cmdPlayback(CommandSeq seq);
 }
