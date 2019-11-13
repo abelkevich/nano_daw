@@ -8,6 +8,8 @@
 #include "api_session.h"
 #include "api_track.h"
 
+#include <windows.h>
+
 static callback_t g_cmd_transmitter;
 
 namespace ClientAPI
@@ -70,9 +72,17 @@ namespace ClientAPI
 		return tokens.size() == n;
 	}
 
-	void initAPI()
+	void initAPI(std::string client_path)
 	{
-		spawnTerminal(cmdReceiver);
+        HINSTANCE hinstLib = LoadLibrary(TEXT(client_path.c_str()));
+
+        if (!hinstLib)
+        {
+            return;
+        }
+
+        spawnClient_t spawn_client = (spawnClient_t) GetProcAddress(hinstLib, "spawnClient");
+        spawn_client(cmdReceiver);
 	}
 
     std::string cmdReceiver(std::string user_cmd_line)

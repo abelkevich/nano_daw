@@ -34,9 +34,8 @@
     <ClInclude Include="..\..\..\kernel\include\common.h" />
     <ClInclude Include="..\..\..\kernel\include\items_manager.h" />
     <ClInclude Include="..\..\..\kernel\include\kernel.h" />
-    <ClInclude Include="..\..\..\kernel\include\kernel_api.h" />
+    <ClInclude Include="..\..\..\kernel\include\client_api.h" />
     <ClInclude Include="..\..\..\kernel\include\render.h" />
-    <ClInclude Include="..\..\..\kernel\include\terminal.h" />
     <ClInclude Include="..\..\..\kernel\items\include\audio.h" />
     <ClInclude Include="..\..\..\kernel\items\include\effect.h" />
     <ClInclude Include="..\..\..\kernel\items\include\fragment.h" />
@@ -63,9 +62,7 @@
     <ClCompile Include="..\..\..\kernel\src\codec_manager.cpp" />
     <ClCompile Include="..\..\..\kernel\src\items_manager.cpp" />
     <ClCompile Include="..\..\..\kernel\src\kernel.cpp" />
-    <ClCompile Include="..\..\..\kernel\src\kernel_api.cpp" />
     <ClCompile Include="..\..\..\kernel\src\render.cpp" />
-    <ClCompile Include="..\..\..\kernel\src\terminal.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

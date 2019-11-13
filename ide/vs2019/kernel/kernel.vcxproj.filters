@@ -33,9 +33,6 @@
     <ClInclude Include="..\..\..\kernel\include\render.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\kernel\include\terminal.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\kernel\include\codec_manager.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -43,9 +40,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\kernel\include\codec_file_info.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\kernel\include\kernel_api.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\kernel\include\kernel.h">
@@ -96,12 +90,12 @@
     <ClInclude Include="..\..\..\kernel\items\include\effect.h">
       <Filter>items\include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\kernel\include\client_api.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\kernel\src\kernel.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\kernel\src\terminal.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\kernel\src\codec_manager.cpp">
@@ -145,9 +139,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\kernel\api\src\api_codec.cpp">
       <Filter>api\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\kernel\src\kernel_api.cpp">
-      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\kernel\items\src\audio.cpp">
       <Filter>items\src</Filter>

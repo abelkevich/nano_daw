@@ -1,6 +1,6 @@
 #pragma once
 
-#include "kernel_api.h"
+#include "client_api.h"
 #include "kernel.h"
 #include "terminal.h"
 
@@ -76,5 +76,5 @@ namespace ClientAPI
 		}
 	};
 
-	void initAPI();
+	void initAPI(std::string client_path);
 }
