@@ -10,10 +10,10 @@
 
 #include <windows.h>
 
-static callback_t g_cmd_transmitter;
-
 namespace ClientAPI
 {
+    static std::string cmdReceiverWrapper(std::string cmd);
+    static json cmdReceiver(std::string cmd);
 
     static std::string fromErrCodeToString(EErrCodes err_code)
     {
@@ -46,8 +46,6 @@ namespace ClientAPI
     {
         return json({ {"error", { {"code", err_code}, {"msg", fromErrCodeToString(err_code)}}} });
     }
-
-    static std::string cmdReceiver(std::string cmd);
 
 	CommandSeq::CommandSeq(std::string cmd_line)
 	{
@@ -94,12 +92,29 @@ namespace ClientAPI
             return 2;
         }
 
-        spawn_client(cmdReceiver);
+        spawn_client(cmdReceiverWrapper);
 
         return 0;
 	}
 
-    std::string cmdReceiver(std::string user_cmd_line)
+    std::string cmdReceiverWrapper(std::string cmd)
+    {
+        json response = cmdReceiver(cmd);
+
+        if (response.find("error") != response.end())
+        {
+            return json({ {"status", 1}, {"error", response.at("error")}}).dump();
+        }
+
+        if (!response.is_null())
+        {
+            return json({ {"status", 0}, {"data", response} }).dump();
+        }
+
+        return json({ {"status", 0} }).dump();
+    }
+
+    json cmdReceiver(std::string user_cmd_line)
 	{
 		CommandSeq seq(user_cmd_line);
 
@@ -115,34 +130,34 @@ namespace ClientAPI
 		switch (cmd)
 		{
 		case eCodec:
-			return cmdCodec(seq).dump();
+            return cmdCodec(seq);
 
 		case eEffect:
-			return cmdEffect(seq).dump();
+            return cmdEffect(seq);
 
 		case eFragment:
-			return cmdFragment(seq).dump();
+            return cmdFragment(seq);
 
 		case eAudio:
-			return cmdAudio(seq).dump();
+            return cmdAudio(seq);
 
 		case eTrack:
-			return cmdTrack(seq).dump();
+            return cmdTrack(seq);
 
 		case eSession:
-			return cmdSession(seq).dump();
+            return cmdSession(seq);
 
 		case ePlayback:
-			return cmdPlayback(seq).dump();
+            return cmdPlayback(seq);
 
 		case eRender:
-			return cmdRender(seq).dump();
+            return cmdRender(seq);
 
 		case eQuit:
 			g_working = false;
-            return json({"status", "ok"}).dump();
+            return json();
 		}
 
-        return jsonErrResponse(EErrCodes::eCommandNotFound).dump();
+        return jsonErrResponse(EErrCodes::eCommandNotFound);
 	}
 }

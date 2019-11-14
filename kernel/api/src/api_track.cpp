@@ -102,7 +102,7 @@ namespace ClientAPI
                 return jsonErrResponse(EErrCodes::eOperationFailed);
 			}
 
-            return json({ {"id", id} });
+            return json();
 		}
 
 		case eLink:
@@ -135,7 +135,7 @@ namespace ClientAPI
                 return jsonErrResponse(EErrCodes::eOperationFailed);
 			}
 
-            return json({ {"id", track_id_str} });
+            return json();
 		}
 
         case eUnlink:
@@ -168,7 +168,7 @@ namespace ClientAPI
                 return jsonErrResponse(EErrCodes::eOperationFailed);
             }
 
-            return json({ {"id", track_id_str} });
+            return json();
         }
 
 		case eMute:
@@ -191,7 +191,7 @@ namespace ClientAPI
 
             track->setMute(!track->getMute());
 
-            return json({ {"id", id} });
+            return json();
 		}
 
 		case eSolo:
@@ -214,7 +214,7 @@ namespace ClientAPI
 
             track->setSolo(!track->getSolo());
 
-            return json({ {"id", id} });
+            return json();
 		}
 
 		case eVolume:
@@ -244,7 +244,7 @@ namespace ClientAPI
 
             track->setLevel(volume);
 
-            return json({ {"id", id} });
+            return json();
 		}
 
 		case eGain:
@@ -273,7 +273,7 @@ namespace ClientAPI
 
             track->setGain(gain);
 
-            return json({ {"id", id} });
+            return json();
 		}
 
 		case ePan:
@@ -303,7 +303,7 @@ namespace ClientAPI
 
             track->setPan(pan);
 
-            return json({ {"id", id} });
+            return json();
 		}
 
         case eName:
@@ -332,7 +332,7 @@ namespace ClientAPI
 
             track->setName(name_str);
 
-            return json({ {"id", id} });
+            return json();
         }
 
 		}

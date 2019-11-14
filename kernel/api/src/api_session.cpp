@@ -55,7 +55,7 @@ namespace ClientAPI
 
 			g_session->linkTrack(track_id);
 
-            return json({ {"name", g_session->getName()} });
+            return json();
 		}
 
 		case eCreate:
@@ -78,7 +78,7 @@ namespace ClientAPI
 
 			g_session = new Session(name, path, smp_rate);
 
-            return json({ {"name", name} });
+            return json();
 		}
 
 		case eSave:

@@ -22,7 +22,7 @@ namespace ClientAPI
                 return jsonErrResponse(EErrCodes::eOperationFailed);
             }
 
-            return json({ {"status", "ok"} });
+            return json();
         }
         case eList:
         {

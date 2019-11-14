@@ -104,7 +104,7 @@ namespace ClientAPI
                 return jsonErrResponse(EErrCodes::eOperationFailed);
             }
 
-            return json({ {"id", id} });
+            return json();
         }
 
 		case eCrop:
@@ -139,7 +139,7 @@ namespace ClientAPI
 				fragment->crop(crop_from, crop_to);
 			}
 
-            return json({ {"id", id} });
+            return json();
 		}
 
         case eOffset:
@@ -171,7 +171,7 @@ namespace ClientAPI
                 fragment->setTimeOffset(offset);
             }
 
-            return json({ {"id", id} });
+            return json();
         }
 
         }

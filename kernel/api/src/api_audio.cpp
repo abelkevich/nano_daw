@@ -32,7 +32,7 @@ namespace ClientAPI
                 return jsonErrResponse(EErrCodes::eInvalidAudio);
             }
 
-            return json({ {"path", audio->getPath()}, {"size", audio->getBufferLength()} });
+            return json({{"path", audio->getPath()}, {"size", audio->getBufferLength()}});
         }
 
         case eList:
@@ -100,7 +100,7 @@ namespace ClientAPI
                 return jsonErrResponse(EErrCodes::eOperationFailed);
             }
 
-            return json({});
+            return json();
         }
 
         }

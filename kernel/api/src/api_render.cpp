@@ -33,10 +33,8 @@ namespace ClientAPI
                 return jsonErrResponse(EErrCodes::eOperationFailed);
 			}
 
-            return json({ {"path", mix_path} });
+            return json();
 		}
-		default:
-			break;
 		}
 
         return jsonErrResponse(EErrCodes::eCommandNotFound);
