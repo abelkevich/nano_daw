@@ -8,38 +8,44 @@
 #include "api_session.h"
 #include "api_track.h"
 
-static callback_t g_cmd_transmitter;
+#include <windows.h>
 
 namespace ClientAPI
 {
-    const std::string c_err_invalid_fragment_id_str = "invalid fragment id";
-    const uint8_t c_err_invalid_fragment_id_code = 1;
+    static std::string cmdReceiverWrapper(std::string cmd);
+    static json cmdReceiver(std::string cmd);
 
-    const std::string c_err_invalid_audio_id_str = "invalid audio id";
-    const uint8_t c_err_invalid_audio_id_code = 2;
+    static std::string fromErrCodeToString(EErrCodes err_code)
+    {
+        switch (err_code)
+        {
+        case EErrCodes::eInvalidFragment:
+            return "invalid fragment id";
+        case EErrCodes::eInvalidAudio:
+            return "invalid audio id";
+        case EErrCodes::eInvalidTrack:
+            return "invalid track id";
+        case EErrCodes::eInvalidArgsNum:
+            return "invalid args number";
+        case EErrCodes::eUnimplementedMethod:
+            return "unimplemented method";
+        case EErrCodes::eInvalidSession:
+            return "invalid session";
+        case EErrCodes::eOperationFailed:
+            return "operation failed";
+        case EErrCodes::eInvalidArgValue:
+            return "invalid arg value";
+        case EErrCodes::eCommandNotFound:
+            return "cannot find command";
+        }
 
-    const std::string c_err_invalid_track_id_str = "invalid track id";
-    const uint8_t c_err_invalid_track_id_code = 3;
+        return "cannot parse err code";
+    }
 
-    const std::string c_err_invalid_args_number_str = "invalid args number";
-    const uint8_t c_err_invalid_args_number_code = 4;
-
-    const std::string c_err_unimplemented_method_str = "unimplemented method";
-    const uint8_t c_err_unimplemented_method_code = 5;
-
-    const std::string c_err_invalid_session_str = "invalid session";
-    const uint8_t c_err_invalid_session_code = 6;
-
-    const std::string c_err_operation_failed_str = "operation failed";
-    const uint8_t c_err_operation_failed_code = 7;
-
-    const std::string c_err_invalid_arg_value_str = "invalid arg value";
-    const uint8_t c_err_invalid_arg_value_code = 8;
-
-    const std::string c_err_cannot_find_command_str = "cannot find command";
-    const uint8_t c_err_cannot_find_command_code = 9;
-
-    static std::string cmdReceiver(std::string cmd);
+    json jsonErrResponse(EErrCodes err_code)
+    {
+        return json({ {"error", { {"code", err_code}, {"msg", fromErrCodeToString(err_code)}}} });
+    }
 
 	CommandSeq::CommandSeq(std::string cmd_line)
 	{
@@ -70,12 +76,45 @@ namespace ClientAPI
 		return tokens.size() == n;
 	}
 
-	void initAPI()
+	status_t initAPI(std::string client_path)
 	{
-		spawnTerminal(cmdReceiver);
+        HINSTANCE hinstLib = LoadLibrary(TEXT(client_path.c_str()));
+
+        if (!hinstLib)
+        {
+            return 1;
+        }
+
+        spawnClient_t spawn_client = (spawnClient_t) GetProcAddress(hinstLib, "spawnClient");
+
+        if (!spawn_client)
+        {
+            return 2;
+        }
+
+        spawn_client(cmdReceiverWrapper);
+
+        return 0;
 	}
 
-    std::string cmdReceiver(std::string user_cmd_line)
+    std::string cmdReceiverWrapper(std::string cmd)
+    {
+        json response = cmdReceiver(cmd);
+
+        if (response.find("error") != response.end())
+        {
+            return json({ {"status", 1}, {"error", response.at("error")}}).dump();
+        }
+
+        if (!response.is_null())
+        {
+            return json({ {"status", 0}, {"data", response} }).dump();
+        }
+
+        return json({ {"status", 0} }).dump();
+    }
+
+    json cmdReceiver(std::string user_cmd_line)
 	{
 		CommandSeq seq(user_cmd_line);
 
@@ -91,34 +130,34 @@ namespace ClientAPI
 		switch (cmd)
 		{
 		case eCodec:
-			return cmdCodec(seq).dump();
+            return cmdCodec(seq);
 
 		case eEffect:
-			return cmdEffect(seq).dump();
+            return cmdEffect(seq);
 
 		case eFragment:
-			return cmdFragment(seq).dump();
+            return cmdFragment(seq);
 
 		case eAudio:
-			return cmdAudio(seq).dump();
+            return cmdAudio(seq);
 
 		case eTrack:
-			return cmdTrack(seq).dump();
+            return cmdTrack(seq);
 
 		case eSession:
-			return cmdSession(seq).dump();
+            return cmdSession(seq);
 
 		case ePlayback:
-			return cmdPlayback(seq).dump();
+            return cmdPlayback(seq);
 
 		case eRender:
-			return cmdRender(seq).dump();
+            return cmdRender(seq);
 
 		case eQuit:
 			g_working = false;
-            return json({"status", "ok"}).dump();
+            return json();
 		}
 
-        return json({ {"error", { {"code", c_err_cannot_find_command_code}, {"msg", c_err_cannot_find_command_str}}} }).dump();
+        return jsonErrResponse(EErrCodes::eCommandNotFound);
 	}
 }
