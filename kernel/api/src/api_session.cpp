@@ -5,8 +5,9 @@ namespace ClientAPI
 {
     json cmdSession(CommandSeq seq)
 	{
-		enum EIdents { eLoad, eCreate, eSave, eLink, eNone };
-        IdentsMap<EIdents> idents_map{ {"load", eLoad }, {"create", eCreate}, {"save", eSave}, {"link", eLink} };
+		enum EIdents { eLoad, eCreate, eSave, eLink, eInfo, eNone };
+        IdentsMap<EIdents> idents_map{ {"load", eLoad }, {"create", eCreate}, {"save", eSave},
+                                       {"link", eLink}, {"info", eInfo} };
 
 		std::string token = seq.sliceNextToken();
 
@@ -16,6 +17,17 @@ namespace ClientAPI
 
 		switch (cmd)
 		{
+        case eInfo:
+        {
+            if (!g_session)
+            {
+                return json({ {"error", { {"code", c_err_invalid_session_code}, {"msg", c_err_invalid_session_str}}} });
+            }
+
+            return json({ {"name", g_session->getName()}, {"path", g_session->getPath()}, {"sample rate", g_session->getSampleRate()}
+                        , {"tracks", g_session->getTracks()}});
+        }
+
 		case eLoad:
 		{
             return json({ {"error", { {"code", c_err_unimplemented_method_code}, {"msg", c_err_unimplemented_method_str}}} });
