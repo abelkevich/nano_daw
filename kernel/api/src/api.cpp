@@ -9,9 +9,11 @@
 #include "api_track.h"
 
 #include <windows.h>
+#include <thread>
 
 namespace ClientAPI
 {
+    static std::thread g_client_thread;
     static std::string cmdReceiverWrapper(std::string cmd);
     static json cmdReceiver(std::string cmd);
 
@@ -92,7 +94,7 @@ namespace ClientAPI
             return 2;
         }
 
-        spawn_client(cmdReceiverWrapper);
+        g_client_thread = std::thread(spawn_client, cmdReceiverWrapper);
 
         return 0;
 	}
@@ -118,9 +120,9 @@ namespace ClientAPI
 	{
 		CommandSeq seq(user_cmd_line);
 
-		enum EIdents { eCodec, eEffect, eAudio, eFragment, eTrack, eSession, eQuit, ePlayback, eRender, eNone };
+		enum EIdents { eCodec, eEffect, eAudio, eFragment, eTrack, eSession, ePlayback, eRender, eNone };
 		IdentsMap<EIdents> idents_map{ {"codec", eCodec }, {"effect", eEffect}, {"audio", eAudio}, {"fragment", eFragment}, {"track", eTrack},
-									   {"session", eSession}, {"quit", eQuit}, {"playback", ePlayback}, {"render", eRender} };
+									   {"session", eSession}, {"playback", ePlayback}, {"render", eRender} };
 
 		std::string token = seq.sliceNextToken();
 
@@ -152,10 +154,6 @@ namespace ClientAPI
 
 		case eRender:
             return cmdRender(seq);
-
-		case eQuit:
-			g_working = false;
-            return json();
 		}
 
         return jsonErrResponse(EErrCodes::eCommandNotFound);
