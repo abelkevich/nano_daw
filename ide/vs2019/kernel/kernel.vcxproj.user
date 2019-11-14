@@ -8,7 +8,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LocalDebuggerCommand>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\$(TargetName)$(TargetExt)</LocalDebuggerCommand>
-    <LocalDebuggerWorkingDirectory>$(SolutionDir)..\..</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommandArguments>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\clients\terminal.dll</LocalDebuggerCommandArguments>
   </PropertyGroup>

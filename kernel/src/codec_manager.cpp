@@ -27,7 +27,7 @@ namespace CodecManager
 
     status_t initCodecs()
     {
-        std::list <std::string> path_to_dll = recursiveDLLSearch(".\\", ".dll");
+        std::list <std::string> path_to_dll = recursiveDLLSearch(".\\codecs\\", ".dll");
 
         for (std::string dll_file : path_to_dll) {
 
