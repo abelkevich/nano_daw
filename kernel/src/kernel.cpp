@@ -13,7 +13,10 @@ int main(int argc, char **argv)
         return 1;
     }
 
-	ClientAPI::initAPI(argv[1]);
+    if (ClientAPI::initAPI(argv[1]) != 0)
+    {
+        return 2;
+    }
 
     while (g_working)
     {

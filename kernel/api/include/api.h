@@ -76,5 +76,5 @@ namespace ClientAPI
 		}
 	};
 
-	void initAPI(std::string client_path);
+	status_t initAPI(std::string client_path);
 }

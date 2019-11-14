@@ -72,17 +72,25 @@ namespace ClientAPI
 		return tokens.size() == n;
 	}
 
-	void initAPI(std::string client_path)
+	status_t initAPI(std::string client_path)
 	{
         HINSTANCE hinstLib = LoadLibrary(TEXT(client_path.c_str()));
 
         if (!hinstLib)
         {
-            return;
+            return 1;
         }
 
         spawnClient_t spawn_client = (spawnClient_t) GetProcAddress(hinstLib, "spawnClient");
+
+        if (!spawn_client)
+        {
+            return 2;
+        }
+
         spawn_client(cmdReceiver);
+
+        return 0;
 	}
 
     std::string cmdReceiver(std::string user_cmd_line)
