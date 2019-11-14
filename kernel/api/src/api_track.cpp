@@ -24,7 +24,7 @@ namespace ClientAPI
         {
             if (!seq.hasNTokens(1))
             {
-                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidArgsNum);
             }
 
             std::string id_str = seq.sliceNextToken();
@@ -33,7 +33,7 @@ namespace ClientAPI
             Track* track = ItemsManager::getTrack(id);
             if (!track)
             {
-                return json({ {"error", { {"code", c_err_invalid_track_id_code}, {"msg", c_err_invalid_track_id_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidTrack);
             }
 
 			return json({ {"name", track->getName()}, {"solo", track->getSolo()}, {"mute", track->getMute()}
@@ -52,7 +52,7 @@ namespace ClientAPI
 
 				if (!track)
 				{
-                    return json({ {"error", { {"code", c_err_operation_failed_code}, {"msg", c_err_operation_failed_str}}} });
+                    return jsonErrResponse(EErrCodes::eOperationFailed);
 				}
 
                 json arr_elem({ {"id", id}, {"name", track->getName()} });
@@ -66,7 +66,7 @@ namespace ClientAPI
 		{
 			if (!seq.hasNTokens(1))
 			{
-                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidArgsNum);
 			}
 
 			std::string name = seq.sliceNextToken();
@@ -75,7 +75,7 @@ namespace ClientAPI
 
 			if (!id)
 			{
-                return json({ {"error", { {"code", c_err_operation_failed_code}, {"msg", c_err_operation_failed_str}}} });
+                return jsonErrResponse(EErrCodes::eOperationFailed);
 			}
 
             return json({ {"id", id} });
@@ -85,7 +85,7 @@ namespace ClientAPI
 		{
 			if (!seq.hasNTokens(1))
 			{
-                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidArgsNum);
 			}
 
 			std::string id_str = seq.sliceNextToken();
@@ -94,12 +94,12 @@ namespace ClientAPI
 
 			if (!ItemsManager::getTrack(id))
 			{
-                return json({ {"error", { {"code", c_err_invalid_track_id_code}, {"msg", c_err_invalid_track_id_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidTrack);
 			}
 
 			if (!ItemsManager::removeTrack(id))
 			{
-                return json({ {"error", { {"code", c_err_operation_failed_code}, {"msg", c_err_operation_failed_str}}} });
+                return jsonErrResponse(EErrCodes::eOperationFailed);
 			}
 
             return json({ {"id", id} });
@@ -109,7 +109,7 @@ namespace ClientAPI
 		{
 			if (!seq.hasNTokens(2))
 			{
-                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidArgsNum);
 			}
 
 			std::string track_id_str = seq.sliceNextToken();
@@ -122,17 +122,17 @@ namespace ClientAPI
 
 			if (!track)
 			{
-                return json({ {"error", { {"code", c_err_invalid_track_id_code}, {"msg", c_err_invalid_track_id_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidTrack);
 			}
 
 			if (!ItemsManager::getFragment(fragment_id))
 			{
-                return json({ {"error", { {"code", c_err_invalid_fragment_id_code}, {"msg", c_err_invalid_fragment_id_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidFragment);
 			}
 
 			if (track->linkFragment(fragment_id))
 			{
-                return json({ {"error", { {"code", c_err_operation_failed_code}, {"msg", c_err_operation_failed_str}}} });
+                return jsonErrResponse(EErrCodes::eOperationFailed);
 			}
 
             return json({ {"id", track_id_str} });
@@ -142,7 +142,7 @@ namespace ClientAPI
         {
             if (!seq.hasNTokens(2))
             {
-                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidArgsNum);
             }
 
             std::string track_id_str = seq.sliceNextToken();
@@ -155,17 +155,17 @@ namespace ClientAPI
 
 			if (!track)
 			{
-                return json({ {"error", { {"code", c_err_invalid_track_id_code}, {"msg", c_err_invalid_track_id_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidTrack);
 			}
 
 			if (!ItemsManager::getFragment(fragment_id))
 			{
-                return json({ {"error", { {"code", c_err_invalid_fragment_id_code}, {"msg", c_err_invalid_fragment_id_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidFragment);
 			}
 
             if (track->unlinkFragment(fragment_id))
             {
-                return json({ {"error", { {"code", c_err_operation_failed_code}, {"msg", c_err_operation_failed_str}}} });
+                return jsonErrResponse(EErrCodes::eOperationFailed);
             }
 
             return json({ {"id", track_id_str} });
@@ -175,7 +175,7 @@ namespace ClientAPI
 		{
 			if (!seq.hasNTokens(1))
 			{
-                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidArgsNum);
 			}
 
 			std::string id_str = seq.sliceNextToken();
@@ -186,7 +186,7 @@ namespace ClientAPI
 
 			if (!track)
 			{
-                return json({ {"error", { {"code", c_err_invalid_track_id_code}, {"msg", c_err_invalid_track_id_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidTrack);
 			}
 
             track->setMute(!track->getMute());
@@ -198,7 +198,7 @@ namespace ClientAPI
 		{
 			if (!seq.hasNTokens(1))
 			{
-                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidArgsNum);
 			}
 
 			std::string id_str = seq.sliceNextToken();
@@ -209,7 +209,7 @@ namespace ClientAPI
 
 			if (!track)
 			{
-                return json({ {"error", { {"code", c_err_invalid_track_id_code}, {"msg", c_err_invalid_track_id_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidTrack);
 			}
 
             track->setSolo(!track->getSolo());
@@ -221,7 +221,7 @@ namespace ClientAPI
 		{
 			if (!seq.hasNTokens(2))
 			{
-                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidArgsNum);
 			}
 
 			std::string id_str = seq.sliceNextToken();
@@ -233,13 +233,13 @@ namespace ClientAPI
 
 			if (volume > 100 || volume < 0)
 			{
-                return json({ {"error", { {"code", c_err_invalid_arg_value_code}, {"msg", c_err_invalid_arg_value_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidArgValue);
 			}
 
 			Track* track = ItemsManager::getTrack(id);
 			if (!track)
 			{
-                return json({ {"error", { {"code", c_err_invalid_track_id_code}, {"msg", c_err_invalid_track_id_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidTrack);
 			}
 
             track->setLevel(volume);
@@ -251,7 +251,7 @@ namespace ClientAPI
 		{
 			if (!seq.hasNTokens(2))
 			{
-                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidArgsNum);
 			}
 
 			std::string id_str = seq.sliceNextToken();
@@ -262,13 +262,13 @@ namespace ClientAPI
 
 			if (gain < 0)
 			{
-                return json({ {"error", { {"code", c_err_invalid_arg_value_code}, {"msg", c_err_invalid_arg_value_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidArgValue);
 			}
 
 			Track* track = ItemsManager::getTrack(id);
 			if (!track)
 			{
-                return json({ {"error", { {"code", c_err_invalid_track_id_code}, {"msg", c_err_invalid_track_id_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidTrack);
 			}
 
             track->setGain(gain);
@@ -280,7 +280,7 @@ namespace ClientAPI
 		{
 			if (!seq.hasNTokens(2))
 			{
-                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidArgsNum);
 			}
 
 			std::string id_str = seq.sliceNextToken();
@@ -292,13 +292,13 @@ namespace ClientAPI
 
 			if (pan < 100 || pan > 100)
 			{
-                return json({ {"error", { {"code", c_err_invalid_arg_value_code}, {"msg", c_err_invalid_arg_value_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidArgValue);
 			}
 
 			Track* track = ItemsManager::getTrack(id);
 			if (!track)
 			{
-                return json({ {"error", { {"code", c_err_invalid_track_id_code}, {"msg", c_err_invalid_track_id_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidTrack);
 			}
 
             track->setPan(pan);
@@ -310,7 +310,7 @@ namespace ClientAPI
         {
             if (!seq.hasNTokens(2))
             {
-                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidArgsNum);
             }
 
             std::string id_str = seq.sliceNextToken();
@@ -321,13 +321,13 @@ namespace ClientAPI
             
 			if (name_str.size() > 30)
 			{
-                return json({ {"error", { {"code", c_err_invalid_arg_value_code}, {"msg", c_err_invalid_arg_value_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidArgValue);
 			}
 
             Track* track = ItemsManager::getTrack(id);
             if (!track)
             {
-                return json({ {"error", { {"code", c_err_invalid_track_id_code}, {"msg", c_err_invalid_track_id_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidTrack);
             }
 
             track->setName(name_str);
@@ -337,6 +337,6 @@ namespace ClientAPI
 
 		}
 
-        return json({ {"error", { {"code", c_err_cannot_find_command_code}, {"msg", c_err_cannot_find_command_str}}} });
+        return jsonErrResponse(EErrCodes::eCommandNotFound);
 	}
 }

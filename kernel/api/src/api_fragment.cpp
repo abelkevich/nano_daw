@@ -21,7 +21,7 @@ namespace ClientAPI
         {
             if (!seq.hasNTokens(1))
             {
-                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidArgsNum);
             }
 
             std::string id_str = seq.sliceNextToken();
@@ -30,7 +30,7 @@ namespace ClientAPI
             Fragment* fragment = ItemsManager::getFragment(id);
             if (!fragment)
             {
-                return json({ {"error", { {"code", c_err_invalid_fragment_id_code}, {"msg", c_err_invalid_fragment_id_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidFragment);
             }
 
             return json({ {"audio", fragment->getAudio()}, {"crop_from", fragment->getCropFrom()}, {"crop_to", fragment->getCropTo()}
@@ -48,7 +48,7 @@ namespace ClientAPI
 
                 if (!fragment)
                 {
-                    return json({ {"error", { {"code", c_err_operation_failed_code}, {"msg", c_err_operation_failed_str}}} });
+                    return jsonErrResponse(EErrCodes::eOperationFailed);
                 }
 
                 json arr_elem({ {"id", id}, {"audio", fragment->getAudio()} });
@@ -62,7 +62,7 @@ namespace ClientAPI
         {
             if (!seq.hasNTokens(1))
             {
-                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidArgsNum);
             }
 
             std::string audio_id_str = seq.sliceNextToken();
@@ -70,14 +70,14 @@ namespace ClientAPI
 
 			if (!ItemsManager::getAudio(audio_id))
 			{
-                return json({ {"error", { {"code", c_err_invalid_audio_id_code}, {"msg", c_err_invalid_audio_id_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidAudio);
 			}
 
             id_t id = ItemsManager::createFragment(audio_id);
 
 			if (!id)
 			{
-                return json({ {"error", { {"code", c_err_operation_failed_code}, {"msg", c_err_operation_failed_str}}} });
+                return jsonErrResponse(EErrCodes::eOperationFailed);
 			}
 
             return json({ {"id", id} });
@@ -87,7 +87,7 @@ namespace ClientAPI
         {
             if (!seq.hasNTokens(1))
             {
-                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidArgsNum);
             }
 
             std::string id_str = seq.sliceNextToken();
@@ -96,12 +96,12 @@ namespace ClientAPI
 
 			if (!ItemsManager::getFragment(id))
 			{
-                return json({ {"error", { {"code", c_err_invalid_fragment_id_code}, {"msg", c_err_invalid_fragment_id_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidFragment);
 			}
 
             if (!ItemsManager::removeFragment(id))
             {
-                return json({ {"error", { {"code", c_err_operation_failed_code}, {"msg", c_err_operation_failed_str}}} });
+                return jsonErrResponse(EErrCodes::eOperationFailed);
             }
 
             return json({ {"id", id} });
@@ -111,7 +111,7 @@ namespace ClientAPI
 		{
 			if (!seq.hasNTokens(3))
 			{
-                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidArgsNum);
 			}
 
 			std::string id_str = seq.sliceNextToken();
@@ -121,7 +121,7 @@ namespace ClientAPI
 
 			if (!fragment)
 			{
-                return json({ {"error", { {"code", c_err_invalid_fragment_id_code}, {"msg", c_err_invalid_fragment_id_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidFragment);
 			}
 
 			{
@@ -133,7 +133,7 @@ namespace ClientAPI
 
 				if (crop_from < 0 || crop_to < 0 || crop_to <= crop_from)
 				{
-                    return json({ {"error", { {"code", c_err_invalid_arg_value_code}, {"msg", c_err_invalid_arg_value_str}}} });
+                    return jsonErrResponse(EErrCodes::eInvalidArgValue);
 				}
 
 				fragment->crop(crop_from, crop_to);
@@ -146,7 +146,7 @@ namespace ClientAPI
         {
             if (!seq.hasNTokens(2))
             {
-                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidArgsNum);
             }
 
             std::string id_str = seq.sliceNextToken();
@@ -156,7 +156,7 @@ namespace ClientAPI
 
             if (!fragment)
             {
-                return json({ {"error", { {"code", c_err_invalid_fragment_id_code}, {"msg", c_err_invalid_fragment_id_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidFragment);
             }
 
             {
@@ -165,7 +165,7 @@ namespace ClientAPI
 
 				if (offset < 0)
 				{
-                    return json({ {"error", { {"code", c_err_invalid_arg_value_code}, {"msg", c_err_invalid_arg_value_str}}} });
+                    return jsonErrResponse(EErrCodes::eInvalidArgValue);
 				}
 
                 fragment->setTimeOffset(offset);
@@ -176,6 +176,6 @@ namespace ClientAPI
 
         }
 
-        return json({ {"error", { {"code", c_err_cannot_find_command_code}, {"msg", c_err_cannot_find_command_str}}} });
+        return jsonErrResponse(EErrCodes::eCommandNotFound);
     }
 }

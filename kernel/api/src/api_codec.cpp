@@ -19,7 +19,7 @@ namespace ClientAPI
         {
             if (CodecManager::initCodecs() != 0)
             {
-                return json({ {"error", { {"code", c_err_operation_failed_code}, {"msg", c_err_operation_failed_str}}} });
+                return jsonErrResponse(EErrCodes::eOperationFailed);
             }
 
             return json({ {"status", "ok"} });
@@ -40,6 +40,6 @@ namespace ClientAPI
         }
         }
 
-        return json({ {"error", { {"code", c_err_cannot_find_command_code}, {"msg", c_err_cannot_find_command_str}}} });
+        return jsonErrResponse(EErrCodes::eCommandNotFound);
 	}
 }

@@ -18,19 +18,19 @@ namespace ClientAPI
 		{
 			if (!seq.hasNTokens(1))
 			{
-                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidArgsNum);
 			}
 
 			if (!g_session)
 			{
-                return json({ {"error", { {"code", c_err_invalid_session_code}, {"msg", c_err_invalid_session_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidSession);
 			}
 
 			std::string mix_path = seq.sliceNextToken();
 
 			if (render(mix_path) != 0)
 			{
-                return json({ {"error", { {"code", c_err_operation_failed_code}, {"msg", c_err_operation_failed_str}}} });
+                return jsonErrResponse(EErrCodes::eOperationFailed);
 			}
 
             return json({ {"path", mix_path} });
@@ -39,6 +39,6 @@ namespace ClientAPI
 			break;
 		}
 
-        return json({ {"error", { {"code", c_err_cannot_find_command_code}, {"msg", c_err_cannot_find_command_str}}} });
+        return jsonErrResponse(EErrCodes::eCommandNotFound);
 	}
 }

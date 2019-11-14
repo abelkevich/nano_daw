@@ -11,6 +11,6 @@ namespace ClientAPI
 		EIdents cmd = idents_map.hasIdent(token) ?
 					  idents_map.getIdent(token) : eNone;
 
-        return json({ {"error", { {"code", c_err_cannot_find_command_code}, {"msg", c_err_cannot_find_command_str}}} });
+        return jsonErrResponse(EErrCodes::eCommandNotFound);
 	}
 }

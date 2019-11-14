@@ -21,7 +21,7 @@ namespace ClientAPI
         {
             if (!g_session)
             {
-                return json({ {"error", { {"code", c_err_invalid_session_code}, {"msg", c_err_invalid_session_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidSession);
             }
 
             return json({ {"name", g_session->getName()}, {"path", g_session->getPath()}, {"sample rate", g_session->getSampleRate()}
@@ -30,19 +30,19 @@ namespace ClientAPI
 
 		case eLoad:
 		{
-            return json({ {"error", { {"code", c_err_unimplemented_method_code}, {"msg", c_err_unimplemented_method_str}}} });
+            return jsonErrResponse(EErrCodes::eUnimplementedMethod);
 		}
 
 		case eLink:
 		{
 			if (!seq.hasNTokens(1))
 			{
-                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidArgsNum);
 			}
 
 			if (!g_session)
 			{
-                return json({ {"error", { {"code", c_err_invalid_session_code}, {"msg", c_err_invalid_session_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidSession);
 			}
 
 			std::string track_id_str = seq.sliceNextToken();
@@ -50,7 +50,7 @@ namespace ClientAPI
 
 			if (!ItemsManager::getTrack(track_id))
 			{
-                return json({ {"error", { {"code", c_err_invalid_track_id_code}, {"msg", c_err_invalid_track_id_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidTrack);
 			}
 
 			g_session->linkTrack(track_id);
@@ -62,7 +62,7 @@ namespace ClientAPI
 		{
 			if (!seq.hasNTokens(3))
 			{
-                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidArgsNum);
 			}
 
 			std::string name = seq.sliceNextToken();
@@ -73,7 +73,7 @@ namespace ClientAPI
 
 			if (smp_rate != 48000)
 			{
-                return json({ {"error", { {"code", c_err_invalid_arg_value_code}, {"msg", c_err_invalid_arg_value_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidArgValue);
 			}
 
 			g_session = new Session(name, path, smp_rate);
@@ -83,10 +83,10 @@ namespace ClientAPI
 
 		case eSave:
         {
-            return json({ {"error", { {"code", c_err_unimplemented_method_code}, {"msg", c_err_unimplemented_method_str}}} });
+            return jsonErrResponse(EErrCodes::eUnimplementedMethod);
         }
 		}
 
-        return json({ {"error", { {"code", c_err_cannot_find_command_code}, {"msg", c_err_cannot_find_command_str}}} });
+        return jsonErrResponse(EErrCodes::eCommandNotFound);
 	}
 }

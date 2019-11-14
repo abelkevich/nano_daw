@@ -20,7 +20,7 @@ namespace ClientAPI
         {
             if (!seq.hasNTokens(1))
             {
-                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidArgsNum);
             }
 
             std::string id_str = seq.sliceNextToken();
@@ -29,7 +29,7 @@ namespace ClientAPI
             Audio* audio = ItemsManager::getAudio(id);
             if (!audio)
             {
-                return json({ {"error", { {"code", c_err_invalid_audio_id_code}, {"msg", c_err_invalid_audio_id_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidAudio);
             }
 
             return json({ {"path", audio->getPath()}, {"size", audio->getBufferLength()} });
@@ -48,7 +48,7 @@ namespace ClientAPI
 
                 if (!audio)
                 {
-                    return json({ {"error", { {"code", c_err_invalid_audio_id_code}, {"msg", c_err_invalid_audio_id_str}}} });
+                    return jsonErrResponse(EErrCodes::eInvalidAudio);
                 }
 
                 
@@ -64,7 +64,7 @@ namespace ClientAPI
         {
             if (!seq.hasNTokens(1))
             {
-                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidArgsNum);
             }
 
             std::string path = seq.sliceNextToken();
@@ -73,7 +73,7 @@ namespace ClientAPI
 
             if (!id)
             {
-                return json({ {"error", { {"code", c_err_operation_failed_code}, {"msg", c_err_operation_failed_str}}} });
+                return jsonErrResponse(EErrCodes::eOperationFailed);
             }
 
             return json({ {"id", id} });
@@ -83,7 +83,7 @@ namespace ClientAPI
         {
             if (!seq.hasNTokens(1))
             {
-                return json({ {"error", { {"code", c_err_invalid_args_number_code}, {"msg", c_err_invalid_args_number_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidArgsNum);
             }
 
             std::string id_str = seq.sliceNextToken();
@@ -92,12 +92,12 @@ namespace ClientAPI
 
 			if (!ItemsManager::getAudio(id))
 			{
-                return json({ {"error", { {"code", c_err_invalid_audio_id_code}, {"msg", c_err_invalid_audio_id_str}}} });
+                return jsonErrResponse(EErrCodes::eInvalidAudio);
 			}
 
             if (!ItemsManager::removeAudio(id))
             {
-                return json({ {"err_msg", c_err_operation_failed_str} });
+                return jsonErrResponse(EErrCodes::eOperationFailed);
             }
 
             return json({});
@@ -105,6 +105,6 @@ namespace ClientAPI
 
         }
 
-        return json({ {"error", { {"code", c_err_cannot_find_command_code}, {"msg", c_err_cannot_find_command_str}}} });
+        return jsonErrResponse(EErrCodes::eCommandNotFound);
     }
 }
