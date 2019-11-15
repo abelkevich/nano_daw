@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.29123.88
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kernel", "kernel\kernel.vcxproj", "{A554C2C7-E782-4524-9CF8-B98D3FE011AC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{65C3C1D6-096F-4D5A-928D-14E32A37E3C4} = {65C3C1D6-096F-4D5A-928D-14E32A37E3C4}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pure_wave", "codecs\pure_wave\pure_wave.vcxproj", "{B7F4CB64-9537-49AE-A653-FFD892957145}"
 EndProject
@@ -17,6 +20,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "terminal", "clients\terminal\terminal.vcxproj", "{65C3C1D6-096F-4D5A-928D-14E32A37E3C4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "clients", "clients", "{C065FAD4-9707-47AF-8CF4-C82BE3149ACC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "autotest", "clients\autotest\autotest.vcxproj", "{E6039850-845A-405B-BB7B-B7068BFB6C7F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,6 +63,14 @@ Global
 		{65C3C1D6-096F-4D5A-928D-14E32A37E3C4}.Release|x64.Build.0 = Release|x64
 		{65C3C1D6-096F-4D5A-928D-14E32A37E3C4}.Release|x86.ActiveCfg = Release|Win32
 		{65C3C1D6-096F-4D5A-928D-14E32A37E3C4}.Release|x86.Build.0 = Release|Win32
+		{E6039850-845A-405B-BB7B-B7068BFB6C7F}.Debug|x64.ActiveCfg = Debug|x64
+		{E6039850-845A-405B-BB7B-B7068BFB6C7F}.Debug|x64.Build.0 = Debug|x64
+		{E6039850-845A-405B-BB7B-B7068BFB6C7F}.Debug|x86.ActiveCfg = Debug|Win32
+		{E6039850-845A-405B-BB7B-B7068BFB6C7F}.Debug|x86.Build.0 = Debug|Win32
+		{E6039850-845A-405B-BB7B-B7068BFB6C7F}.Release|x64.ActiveCfg = Release|x64
+		{E6039850-845A-405B-BB7B-B7068BFB6C7F}.Release|x64.Build.0 = Release|x64
+		{E6039850-845A-405B-BB7B-B7068BFB6C7F}.Release|x86.ActiveCfg = Release|Win32
+		{E6039850-845A-405B-BB7B-B7068BFB6C7F}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -66,6 +79,7 @@ Global
 		{B7F4CB64-9537-49AE-A653-FFD892957145} = {CEE59034-1EE8-4920-AF6C-22C93EA58D5F}
 		{5473285C-0068-465C-806E-B058AF6AD10A} = {CEE59034-1EE8-4920-AF6C-22C93EA58D5F}
 		{65C3C1D6-096F-4D5A-928D-14E32A37E3C4} = {C065FAD4-9707-47AF-8CF4-C82BE3149ACC}
+		{E6039850-845A-405B-BB7B-B7068BFB6C7F} = {C065FAD4-9707-47AF-8CF4-C82BE3149ACC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4CE8C4DE-116F-44E6-9946-4A9A6D22D3D1}
