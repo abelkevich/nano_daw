@@ -32,7 +32,10 @@ namespace ClientAPI
 
             for (auto c: codecs)
             {
-                json arr_elem({ {"name", c.lib_name} });
+                std::string name(c->getName());
+                std::string ext(c->getExtensions());
+
+                json arr_elem({ {"name", name}, {"extensions", ext } });
                 response.push_back(arr_elem);
             }
 

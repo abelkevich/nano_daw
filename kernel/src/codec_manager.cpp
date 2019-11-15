@@ -1,6 +1,5 @@
 #include "codec_manager.h"
 #include <vector>
-#include <windows.h> 
 #include <iostream>
 #include <filesystem>
 #include <list>
@@ -8,68 +7,95 @@
 
 namespace CodecManager
 {
-    static std::vector<CodecInfo> g_codecs;
+    static std::vector<Codec> g_codecs;
 
     std::list <std::string> recursiveDLLSearch(const std::string& search_path, const std::string& extension);
 
-    CodecInfo::CodecInfo(std::string _lib_name, LoadFileProc_t _load_file_proc, SaveFileProc_t _save_file_proc)
-        : lib_name(_lib_name)
-        , load_file_proc(_load_file_proc)
-        , save_file_proc(_save_file_proc)
+    Codec::Codec(LoadFileProc_t _loadFile, SaveFileProc_t _saveFile, GetName_t _getName, GetExtensions_t _getExtensions, HINSTANCE _h_instance)
+               : loadFile(_loadFile)
+               , saveFile(_saveFile)
+               , getName(_getName)
+               , getExtensions(_getExtensions)
+               , h_instance(_h_instance)
     {
     }
 
-    CodecInfo::CodecInfo()
-        : load_file_proc(nullptr)
-        , save_file_proc(nullptr)
+    status_t addCodec(std::string path)
     {
+        HINSTANCE h_instance = LoadLibrary(TEXT(path.c_str()));
+
+        if (!h_instance)
+        {
+            return 1;
+        }
+
+        LoadFileProc_t load_file_proc = (LoadFileProc_t)GetProcAddress(h_instance, "loadFile");
+        SaveFileProc_t save_file_proc = (SaveFileProc_t)GetProcAddress(h_instance, "saveFile");
+        GetName_t get_name_proc = (GetName_t)GetProcAddress(h_instance, "getName");
+        GetExtensions_t get_ext_proc = (GetExtensions_t)GetProcAddress(h_instance, "getExtensions");
+
+        if (!load_file_proc || !save_file_proc || !get_name_proc || !get_ext_proc)
+        {
+            return 2;
+        }
+
+        Codec codec(load_file_proc, save_file_proc, get_name_proc, get_ext_proc, h_instance);
+
+        g_codecs.push_back(codec);
     }
 
     status_t initCodecs()
     {
-        std::list <std::string> path_to_dll = recursiveDLLSearch(".\\codecs\\", ".dll");
+        std::list <std::string> paths_to_dlls = recursiveDLLSearch(".\\codecs\\", ".dll");
 
-        for (std::string dll_file : path_to_dll) {
-
-            HINSTANCE hinstLib = LoadLibrary(TEXT(dll_file.c_str()));
-
-            if (!hinstLib)
+        for (std::string dll_file : paths_to_dlls) 
+        {
+            if (addCodec(dll_file) != 0)
             {
-                return 1;
+                // need to log
+                continue;
             }
-
-            LoadFileProc_t load_file_proc = (LoadFileProc_t)GetProcAddress(hinstLib, "loadFile");
-            SaveFileProc_t save_file_proc = (SaveFileProc_t)GetProcAddress(hinstLib, "saveFile");
-
-            if (!load_file_proc || !save_file_proc)
-            {
-                return 2;
-            }
-
-            g_codecs.push_back(CodecInfo("pure_wave.dll", load_file_proc, save_file_proc));
         }
-
 
         return 0;
     }
 
-    std::vector<CodecInfo> getInitedCodecs()
+    const Codec* findCodecByFileExt(std::string ext)
     {
-        return g_codecs;
-    }
-
-    status_t getCodec(std::string name, CodecInfo& codec_info)
-    {
-        for (auto codec : g_codecs)
+        for (Codec& codec : g_codecs)
         {
-            if (codec.lib_name == name)
+            if (ext == codec.getExtensions())
             {
-                codec_info = codec;
-                return 0;
+                return &codec;
             }
         }
 
-        return 1;
+        return nullptr;
+    }
+
+    std::vector<const Codec*> getInitedCodecs()
+    {
+        std::vector<const Codec*> ret_codecs;
+
+        for (Codec& codec : g_codecs)
+        {
+            ret_codecs.push_back(&codec);
+        }
+
+        return ret_codecs;
+    }
+
+    const Codec* getCodecByName(std::string name)
+    {
+        for (Codec& codec : g_codecs)
+        {
+            if (codec.getName() == name)
+            {
+                return &codec;
+            }
+        }
+
+        return nullptr;
     }
 
     //fun what search files whith need extension

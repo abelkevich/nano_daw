@@ -217,3 +217,13 @@ status_t saveFile(CodecFileInfo codec_file_info, uint8_t bytes_per_sample)
 
     return 0;
 }
+
+const char* getName()
+{
+    return "pure_wave";
+}
+
+const char* getExtensions()
+{
+    return "wav";
+}

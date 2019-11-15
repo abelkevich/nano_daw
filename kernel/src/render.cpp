@@ -148,16 +148,17 @@ status_t render(std::string mix_path)
         }
     }
 
-	CodecManager::CodecInfo codec_info;
-	if (CodecManager::getCodec("pure_wave.dll", codec_info) != 0)
-	{
-		return 1;
-	}
+    auto codec_info = CodecManager::findCodecByFileExt("wav");
+
+    if (!codec_info)
+    {
+        return 0;
+    }
 
 	float* arr[2] = { left_buf, right_buf };
     CodecFileInfo file_info(mix_path, arr, ses_len_smp, 1, g_session->getSampleRate());
     
-    codec_info.save_file_proc(file_info, 2);
+    codec_info->saveFile(file_info, 2);
 
     delete[] left_buf;
     delete[] right_buf;

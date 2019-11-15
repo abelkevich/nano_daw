@@ -1,22 +1,30 @@
 #pragma once
 #include "common.h"
 #include "codec_file_info.h"
+#include <windows.h> 
+
 namespace CodecManager
 {
     typedef status_t(__cdecl* LoadFileProc_t)(CodecFileInfo& codec_file_info, std::string path);
     typedef status_t(__cdecl* SaveFileProc_t)(CodecFileInfo codec_file_info, uint8_t bytes_per_sample);
+    typedef const char*(__cdecl* GetName_t)();
+    typedef const char* (__cdecl* GetExtensions_t)();
 
-    struct CodecInfo
+    struct Codec
     {
-        std::string lib_name;
-        LoadFileProc_t load_file_proc;
-        SaveFileProc_t save_file_proc;
+        LoadFileProc_t loadFile;
+        SaveFileProc_t saveFile;
+        GetName_t getName;
+        GetExtensions_t getExtensions;
 
-        CodecInfo(std::string _lib_name, LoadFileProc_t _load_file_proc, SaveFileProc_t _save_file_proc);
-        CodecInfo();
+        HINSTANCE h_instance;
+
+        Codec(LoadFileProc_t _loadFile, SaveFileProc_t _saveFile, GetName_t _getName, GetExtensions_t _getExtensions, HINSTANCE _h_instance);
     };
 
+
     status_t initCodecs();
-    std::vector<CodecInfo> getInitedCodecs();
-    status_t getCodec(std::string name, CodecInfo& codec_info);
+    std::vector<const Codec*> getInitedCodecs();
+    const Codec* getCodecByName(std::string name);
+    const Codec* findCodecByFileExt(std::string ext);
 }
