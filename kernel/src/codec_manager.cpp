@@ -1,4 +1,6 @@
 #include "codec_manager.h"
+#include "kernel.h"
+
 #include <vector>
 #include <windows.h> 
 #include <iostream>
@@ -27,14 +29,19 @@ namespace CodecManager
 
     status_t initCodecs()
     {
+        LOG_F(INFO, "Starting codecs init");
+
         std::list <std::string> path_to_dll = recursiveDLLSearch(".\\codecs\\", ".dll");
 
         for (std::string dll_file : path_to_dll) {
+
+            LOG_F(INFO, "Got file %s", dll_file.c_str());
 
             HINSTANCE hinstLib = LoadLibrary(TEXT(dll_file.c_str()));
 
             if (!hinstLib)
             {
+                LOG_F(ERROR, "Cannot load codec .dll %s", dll_file.c_str());
                 return 1;
             }
 
@@ -43,9 +50,11 @@ namespace CodecManager
 
             if (!load_file_proc || !save_file_proc)
             {
+                LOG_F(ERROR, "Cannot locate load or save procedures in loaded .dll %s", dll_file.c_str());
                 return 2;
             }
 
+            LOG_F(INFO, "Adding codec .dll %s to manager list", dll_file.c_str());
             g_codecs.push_back(CodecInfo("pure_wave.dll", load_file_proc, save_file_proc));
         }
 

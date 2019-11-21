@@ -9,7 +9,7 @@ Session *g_session = nullptr;
 int main(int argc, char **argv)
 {
     loguru::g_stderr_verbosity = loguru::Verbosity_OFF;
-    loguru::add_file("nano_daw.log", loguru::Append, loguru::Verbosity_MAX);
+    loguru::add_file("nano_daw.log", loguru::Truncate, loguru::Verbosity_MAX);
 
     if (argc != 2)
     {
