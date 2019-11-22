@@ -1,3 +1,6 @@
 [submodule "3rd_party/loguru"]
 	path = 3rd_party/loguru
 	url = https://github.com/emilk/loguru
+[submodule "3rd_party/portaudio"]
+	path = 3rd_party/portaudio
+	url = https://git.assembla.com/portaudio.git
