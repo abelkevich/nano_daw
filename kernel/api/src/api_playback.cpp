@@ -1,16 +1,26 @@
 #include "api_render.h"
+#include "rt_output.h"
 
 namespace ClientAPI
 {
     json cmdPlayback(CommandSeq seq)
 	{
-		enum EIdents { eNone };
-		IdentsMap<EIdents> idents_map{};
-		std::string token = seq.sliceNextToken();
+        enum EIdents { eSession, eNone };
+        IdentsMap<EIdents> idents_map{ {"session", eSession}};
 
-		EIdents cmd = idents_map.hasIdent(token) ?
-					  idents_map.getIdent(token) : eNone;
+        std::string token = seq.sliceNextToken();
 
+        EIdents cmd = idents_map.hasIdent(token) ?
+            idents_map.getIdent(token) : eNone;
+
+        switch (cmd)
+        {
+        case eSession:
+        {
+            play_session();
+            return json();
+        }
+        }
         return jsonErrResponse(EErrCodes::eCommandNotFound);
 	}
 }
