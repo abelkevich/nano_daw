@@ -6,6 +6,9 @@
 #include "items_manager.h"
 #include "rt_output.h"
 #include "portaudio.h"
+ 
+namespace Playback
+{
 
 struct paRenderData
 {
@@ -14,23 +17,27 @@ struct paRenderData
     uint32_t samples_left;
 };
 
-static int patestCallback(const void* inputBuffer, void* outputBuffer, unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* userData)
+static paRenderData g_data = { nullptr, nullptr, 0 };
+static PaStream* g_stream = nullptr;
+static PaStreamParameters g_parameters;
+
+static int paCallback(const void* inputBuffer, void* outputBuffer, unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* userData)
 {
-    paRenderData* data = (paRenderData*) userData;
-    float* out = (float*) outputBuffer;
+    paRenderData* data = (paRenderData*)userData;
+    float* out = (float*)outputBuffer;
 
 
     if (data->samples_left < framesPerBuffer)
     {
         return paComplete;
     }
-    
+
     for (int i = 0; i < framesPerBuffer; i++)
     {
         *out++ = *data->left_buf++;
         *out++ = *data->right_buf++;
     }
-    
+
     return paContinue;
 }
 
@@ -125,7 +132,7 @@ static std::set<id_t> getTracksWithSolo()
     return solo_tracks_id;
 }
 
-static status_t render(paRenderData *data)
+static status_t render(paRenderData* data)
 {
     LOG_F(INFO, "Starting rendering session");
 
@@ -158,7 +165,7 @@ static status_t render(paRenderData *data)
     std::set<id_t> tracks_to_mix = !solo_tracks.empty() ? solo_tracks : g_session->getTracks();
 
     LOG_F(INFO, solo_tracks.empty() ? "There are some solo tracks, mixing only them" :
-                                       "Mixing all available tracks");
+        "Mixing all available tracks");
 
     // mix right and left channels
     for (auto track_id : tracks_to_mix)
@@ -209,39 +216,69 @@ static status_t render(paRenderData *data)
     return 0;
 }
 
-status_t play_session()
+status_t render_selection(uint32_t from_ms, uint32_t to_ms)
 {
-    paRenderData data;
-    if (render(&data) != 0)
+    if (render(&g_data) != 0)
     {
+        g_data.samples_left = 0;
         return 1;
     }
 
+    return 0;
+}
+
+status_t init()
+{
     if (Pa_Initialize() != paNoError)
     {
         Pa_Terminate();
         return 1;
     }
 
-    PaStreamParameters  outputParameters;
+    g_parameters.device = Pa_GetDefaultOutputDevice();
 
-    outputParameters.device = Pa_GetDefaultOutputDevice();
-
-    if (outputParameters.device == paNoDevice)
+    if (g_parameters.device == paNoDevice)
     {
         fprintf(stderr, "Error: No default output device.\n");
         Pa_Terminate();
         return 1;
     }
-    
-    outputParameters.channelCount = 2;
-    outputParameters.sampleFormat = paFloat32;
-    outputParameters.suggestedLatency = Pa_GetDeviceInfo(outputParameters.device)->defaultLowOutputLatency;
-    outputParameters.hostApiSpecificStreamInfo = NULL;
 
-    PaStream* stream;
-    PaError err = Pa_OpenStream(&stream, NULL, &outputParameters, g_session->getSampleRate(), 
-                                256, paClipOff, patestCallback, &data);
+    g_parameters.channelCount = 2;
+    g_parameters.sampleFormat = paFloat32;
+    g_parameters.suggestedLatency = Pa_GetDeviceInfo(g_parameters.device)->defaultLowOutputLatency;
+    g_parameters.hostApiSpecificStreamInfo = NULL;
+
+    return 0;
+}
+
+status_t pause()
+{
+    if (Pa_StopStream(g_stream) != paNoError)
+    {
+        Pa_Terminate();
+        return 1;
+    }
+
+    return 0;
+}
+
+status_t stop()
+{
+    if (Pa_CloseStream(g_stream) != paNoError)
+    {
+        Pa_Terminate();
+        g_data.samples_left = 0;
+        return 1;
+    }
+
+    return 0;
+}
+
+status_t play()
+{
+    PaError err = Pa_OpenStream(&g_stream, NULL, &g_parameters, g_session->getSampleRate(),
+        256, paClipOff, paCallback, &g_data);
 
     if (err != paNoError)
     {
@@ -249,22 +286,13 @@ status_t play_session()
         return 1;
     }
 
-    if (Pa_StartStream(stream) != paNoError) 
-    {
-        Pa_Terminate();
-        return 1;
-    }
-
-    while (Pa_IsStreamActive(stream))
-    {
-        Pa_Sleep(100);
-    }
-
-    if (Pa_CloseStream(stream) != paNoError)
+    if (Pa_StartStream(g_stream) != paNoError)
     {
         Pa_Terminate();
         return 1;
     }
 
     return 0;
+}
+
 }
