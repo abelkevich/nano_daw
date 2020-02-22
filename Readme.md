@@ -1,14 +1,25 @@
 # nano_daw
 
-## Build guide:
+## What is it?
 
-#### Windows and Visual Studio 2019 (Community):
+nano_daw is a DAW (digital audio workstation) that support external plugins (codecs, effects), real-time audio processing (via PortAudio) and REST-like API to control user workflow.
 
--	Open solution at `ide\vs2019\nano_daw.sln`
--	Run `Build` -> `Build Solution`
+## History
 
-------------
+This software was developed by students as a demo project at open C/C++ lectures (KPI, Ukraine). Some design concepts were simplified for better readability and dev. time saving. 
 
-## Run kernel:
-- 	Navigate to the nano_daw root dir, open terminal and run `bin\x64\Debug\kernel.exe`, where `x64` and `Debug` are current platform and build configuration.
-- 	Alternatively you can create shortcut for `bin\x64\Debug\kernel.exe` and change "Start in" dir in properties menu to your nano_daw root dir.
+## Community
+
+We have telegram group [@nano_daw](t.me/nano_daw). Feel free to ask any help or chat with contributors.
+
+## Releases
+
+All compiled binaries are stored as an assests on this github repo.
+
+## Contributors
+
+All involved people you can find at our telegram group.
+
+Here are people that successfully implemented their features that now are in nano_daw releases:
+  - [YourFrieng](https://github.com/YourFrieng)
+  

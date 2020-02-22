@@ -80,19 +80,27 @@ namespace ClientAPI
 
 	status_t initAPI(std::string client_path)
 	{
+        LOG_F(INFO, "Got lib: %s", client_path.c_str());
+
         HINSTANCE hinstLib = LoadLibrary(TEXT(client_path.c_str()));
 
         if (!hinstLib)
         {
+            LOG_F(ERROR, "Cannot load library");
             return 1;
         }
+
+        LOG_F(INFO, "Library loaded");
 
         spawnClient_t spawn_client = (spawnClient_t) GetProcAddress(hinstLib, "spawnClient");
 
         if (!spawn_client)
         {
+            LOG_F(ERROR, "Cannot find \"spawnClient\" procedure lib");
             return 2;
         }
+
+        LOG_F(INFO, "Found \"spawnClient\", now registering client callbacks and creating thread");
 
         g_client_thread = std::thread(spawn_client, cmdReceiverWrapper);
 

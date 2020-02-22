@@ -95,13 +95,22 @@ static std::set<id_t> getTracksWithSolo()
 
 status_t render(std::string mix_path)
 {
+
+    LOG_F(INFO, "Starting rendering session");
     if (!g_session)
     {
+
+        LOG_F(ERROR, "No session loaded");
         return 1;
     }
 
     // calc session length in samples
-    uint32_t ses_len_smp = g_session->msToSamples(calcSessionLength());
+    uint32_t ses_len_ms = calcSessionLength();
+    uint32_t ses_len_smp = g_session->msToSamples(ses_len_ms);
+
+    LOG_F(INFO, "Total sessiong length in ms: %d", ses_len_ms);
+
+    LOG_F(INFO, "Allocating intermediate buffers and zeroing them");
     
     // allocate intermediate buffs
     float* left_buf = new float[ses_len_smp];
@@ -114,7 +123,11 @@ status_t render(std::string mix_path)
     }
 
     std::set<id_t> solo_tracks = getTracksWithSolo();
+
     std::set<id_t> tracks_to_mix = !solo_tracks.empty() ? solo_tracks : g_session->getTracks();
+
+    LOG_F(INFO, solo_tracks.empty() ? "There are some solo tracks, mixing only them" :
+                                      "Mixing all available tracks");
 
     // mix right and left channels
     for (auto track_id: tracks_to_mix)
@@ -123,11 +136,15 @@ status_t render(std::string mix_path)
 
 		if (!track)
 		{
+            LOG_F(ERROR, "Failed to get track with id %d", track_id);
 			return 2;
 		}
 
+        LOG_F(INFO, "Got track %d: %s in mix", track_id, track->getName().c_str());
+
         if (track->getMute())
         {
+            LOG_F(INFO, "Track is muted, skipping");
             continue;
         }
 
@@ -137,12 +154,17 @@ status_t render(std::string mix_path)
 
 			if (!fragment)
 			{
+                LOG_F(ERROR, "Failed to get fragment with id %d", fragment_id);
 				return 3;
 			}
+
+            LOG_F(INFO, "Got fragment %d with linked audio %d", fragment_id, fragment->getAudio());
+            LOG_F(INFO, "Adding linked audio to intermediate buffers");
 
 			if (mixAudioToOutBuffer(fragment, left_buf, track->getGain(), track->getLevel()) != 0 ||
 				mixAudioToOutBuffer(fragment, right_buf, track->getGain(), track->getLevel()) != 0)
 			{
+                LOG_F(ERROR, "Error occured while mixing");
 				return 4;
 			}
         }
