@@ -10,32 +10,49 @@
 namespace Playback
 {
 
+enum class EOutputState
+{
+    eNonInited,
+    eStop,
+    ePlay,
+    ePause
+};
+
 struct paRenderData
 {
     float* left_buf;
     float* right_buf;
-    uint32_t samples_left;
+    uint32_t samples_n;
+    uint32_t samples_counter;
 };
 
-static paRenderData g_data = { nullptr, nullptr, 0 };
+static paRenderData* g_data = nullptr;
 static PaStream* g_stream = nullptr;
 static PaStreamParameters g_parameters;
+static EOutputState g_state = EOutputState::eNonInited;
 
 static int paCallback(const void* inputBuffer, void* outputBuffer, unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* userData)
 {
-    paRenderData* data = (paRenderData*)userData;
-    float* out = (float*)outputBuffer;
+    float* out = (float*) outputBuffer;
 
-
-    if (data->samples_left < framesPerBuffer)
+    if (!g_data)
     {
         return paComplete;
+        g_state = EOutputState::eStop;
+    }
+
+    if ((g_data->samples_n - g_data->samples_counter) < framesPerBuffer)
+    {
+        return paComplete;
+        g_state = EOutputState::eStop;
     }
 
     for (int i = 0; i < framesPerBuffer; i++)
     {
-        *out++ = *data->left_buf++;
-        *out++ = *data->right_buf++;
+        *out++ = g_data->left_buf[g_data->samples_counter];
+        *out++ = g_data->right_buf[g_data->samples_counter];
+
+        g_data->samples_counter++;
     }
 
     return paContinue;
@@ -132,9 +149,9 @@ static std::set<id_t> getTracksWithSolo()
     return solo_tracks_id;
 }
 
-static status_t render(paRenderData* data)
+static status_t render_selection(uint32_t from_ms, uint32_t to_ms)
 {
-    LOG_F(INFO, "Starting rendering session");
+    LOG_F(INFO, "Starting rendering session from %d to %d", from_ms, to_ms);
 
     if (!g_session)
     {
@@ -208,21 +225,19 @@ static status_t render(paRenderData* data)
         }
     }
 
-
-    data->right_buf = right_buf;
-    data->left_buf = left_buf;
-    data->samples_left = ses_len_smp;
-
-    return 0;
-}
-
-status_t render_selection(uint32_t from_ms, uint32_t to_ms)
-{
-    if (render(&g_data) != 0)
+    if (g_data)
     {
-        g_data.samples_left = 0;
-        return 1;
+        delete[] g_data->left_buf;
+        delete[] g_data->right_buf;
+        delete g_data;
     }
+
+    g_data = new paRenderData();
+
+    g_data->right_buf = right_buf;
+    g_data->left_buf = left_buf;
+    g_data->samples_n = ses_len_smp;
+    g_data->samples_counter = 0;
 
     return 0;
 }
@@ -249,36 +264,64 @@ status_t init()
     g_parameters.suggestedLatency = Pa_GetDeviceInfo(g_parameters.device)->defaultLowOutputLatency;
     g_parameters.hostApiSpecificStreamInfo = NULL;
 
+    g_state = EOutputState::eStop;
+
     return 0;
 }
 
 status_t pause()
 {
+    if (g_state != EOutputState::ePlay)
+    {
+        return 1;
+    }
+
     if (Pa_StopStream(g_stream) != paNoError)
     {
         Pa_Terminate();
         return 1;
     }
 
+    g_state = EOutputState::ePause;
+
     return 0;
 }
 
 status_t stop()
 {
+    if (g_state != EOutputState::ePause && g_state != EOutputState::ePlay)
+    {
+        return 1;
+    }
+
     if (Pa_CloseStream(g_stream) != paNoError)
     {
         Pa_Terminate();
-        g_data.samples_left = 0;
         return 1;
     }
+
+    g_state = EOutputState::eStop;
 
     return 0;
 }
 
-status_t play()
+status_t play(uint32_t from_ms, uint32_t to_ms)
 {
-    PaError err = Pa_OpenStream(&g_stream, NULL, &g_parameters, g_session->getSampleRate(),
-        256, paClipOff, paCallback, &g_data);
+    if (g_state == EOutputState::eNonInited)
+    {
+        init();
+    }
+
+    if (g_state == EOutputState::eStop)
+    {
+        if (render_selection(from_ms, to_ms) != 0)
+        {
+            return 1;
+        }
+    }
+
+    PaError err = Pa_OpenStream(&g_stream, nullptr, &g_parameters, g_session->getSampleRate(),
+                                256, paClipOff, paCallback, nullptr);
 
     if (err != paNoError)
     {
@@ -291,6 +334,8 @@ status_t play()
         Pa_Terminate();
         return 1;
     }
+
+    g_state = EOutputState::ePlay;
 
     return 0;
 }

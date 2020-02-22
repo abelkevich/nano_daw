@@ -18,7 +18,15 @@ namespace ClientAPI
         {
         case ePlay:
         {
-            if (Playback::play() != 0)
+            if (!seq.hasNTokens(2))
+            {
+                return jsonErrResponse(EErrCodes::eInvalidArgsNum);
+            }
+
+            uint32_t from_ms = stoi(seq.sliceNextToken());
+            uint32_t to_ms = stoi(seq.sliceNextToken());
+
+            if (Playback::play(from_ms, to_ms) != 0)
             {
                 return jsonErrResponse(EErrCodes::eOperationFailed);
             }
@@ -37,24 +45,6 @@ namespace ClientAPI
         case eStop:
         {
             if (Playback::stop() != 0)
-            {
-                return jsonErrResponse(EErrCodes::eOperationFailed);
-            }
-
-            return json();
-        }
-        case eInit:
-        {
-            if (Playback::init() != 0)
-            {
-                return jsonErrResponse(EErrCodes::eOperationFailed);
-            }
-
-            return json();
-        }
-        case eRender:
-        {
-            if (Playback::render_selection(0, 0) != 0)
             {
                 return jsonErrResponse(EErrCodes::eOperationFailed);
             }
