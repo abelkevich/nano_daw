@@ -41,7 +41,7 @@ namespace ItemsManager
         }
 
         CodecFileInfo codec_file_info;
-        if (codec_info.load_file_proc(codec_file_info, path) != 0)
+        if (codec_info->loadFile(codec_file_info, path) != 0)
         {
             LOG_F(ERROR, "Cannot load file content");
             return 0;
