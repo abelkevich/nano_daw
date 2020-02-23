@@ -44,21 +44,21 @@ namespace CodecManager
         Codec codec(load_file_proc, save_file_proc, get_name_proc, get_ext_proc, h_instance);
 
         g_codecs.push_back(codec);
+
+        return 0;
     }
 
     status_t initCodecs()
     {
         LOG_F(INFO, "Starting codecs init");
 
-        std::list <std::string> path_to_dll = recursiveDLLSearch(".\\codecs\\", ".dll");
+        std::list <std::string> path_to_dll = recursiveDLLSearch("codecs\\", ".dll");
 
         for (std::string dll_file : path_to_dll) {
 
             LOG_F(INFO, "Got file %s", dll_file.c_str());
 
-            HINSTANCE hinstLib = LoadLibrary(TEXT(dll_file.c_str()));
-
-            if (!hinstLib)
+            if (addCodec(dll_file))
             {
                 LOG_F(ERROR, "Cannot load codec .dll %s", dll_file.c_str());
                 return 1;
@@ -74,12 +74,9 @@ namespace CodecManager
         {
             if (ext == codec.getExtensions())
             {
-                LOG_F(ERROR, "Cannot locate load or save procedures in loaded .dll %s", dll_file.c_str());
-                return 2;
+                LOG_F(ERROR, "Cannot find codec with ext: %s", ext.c_str());
+                return &codec;
             }
-
-            LOG_F(INFO, "Adding codec .dll %s to manager list", dll_file.c_str());
-            g_codecs.push_back(CodecInfo("pure_wave.dll", load_file_proc, save_file_proc));
         }
 
         return nullptr;

@@ -33,15 +33,16 @@ namespace ItemsManager
 	{
         LOG_F(INFO, "Loading audio from path: %s", path.c_str());
 
-        CodecManager::CodecInfo codec_info;
-        if (CodecManager::getCodec("pure_wave.dll", codec_info) != 0)
+		const CodecManager::Codec* codec = CodecManager::findCodecByFileExt("wav");
+
+        if (codec != 0)
         {
             LOG_F(ERROR, "Cannot load codec 'pure_wave.dll'");
             return 0;
         }
 
         CodecFileInfo codec_file_info;
-        if (codec_info->loadFile(codec_file_info, path) != 0)
+        if (codec->loadFile(codec_file_info, path) != 0)
         {
             LOG_F(ERROR, "Cannot load file content");
             return 0;
