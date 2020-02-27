@@ -12,7 +12,42 @@ namespace CodecManager
     static std::vector<Codec> g_codecs;
 
     std::list <std::string> recursiveDLLSearch(const std::string& search_path, const std::string& extension);
+#ifdef __linux__
+        Codec::Codec(LoadFileProc_t _loadFile, SaveFileProc_t _saveFile, GetName_t _getName, GetExtensions_t _getExtensions, void* _h_instance)
+               : loadFile(_loadFile)
+               , saveFile(_saveFile)
+               , getName(_getName)
+               , getExtensions(_getExtensions)
+               , h_instance(_h_instance)
+    {
+    }
 
+    status_t addCodec(std::string path)
+    {
+        void* h_instance = dlopen(path.c_str(), RTLD_LAZY);
+
+        if (!h_instance)
+        {
+            return 1;
+        }
+
+        LoadFileProc_t load_file_proc = (LoadFileProc_t)dlsym(h_instance, "loadFile");
+        SaveFileProc_t save_file_proc = (SaveFileProc_t)dlsym(h_instance, "saveFile");
+        GetName_t get_name_proc = (GetName_t)dlsym(h_instance, "getName");
+        GetExtensions_t get_ext_proc = (GetExtensions_t)dlsym(h_instance, "getExtensions");
+
+        if (!load_file_proc || !save_file_proc || !get_name_proc || !get_ext_proc)
+        {
+            return 2;
+        }
+
+        Codec codec(load_file_proc, save_file_proc, get_name_proc, get_ext_proc, h_instance);
+
+        g_codecs.push_back(codec);
+
+        return 0;
+    }
+#elif __WIN32
     Codec::Codec(LoadFileProc_t _loadFile, SaveFileProc_t _saveFile, GetName_t _getName, GetExtensions_t _getExtensions, HINSTANCE _h_instance)
                : loadFile(_loadFile)
                , saveFile(_saveFile)
@@ -47,13 +82,15 @@ namespace CodecManager
 
         return 0;
     }
-
+#endif
     status_t initCodecs()
     {
         LOG_F(INFO, "Starting codecs init");
-
+#ifdef __linux__
+        std::list <std::string> path_to_dll = recursiveDLLSearch("codecs\\", ".so");
+#elif __WIN32
         std::list <std::string> path_to_dll = recursiveDLLSearch("codecs\\", ".dll");
-
+#endif
         for (std::string dll_file : path_to_dll) {
 
             LOG_F(INFO, "Got file %s", dll_file.c_str());

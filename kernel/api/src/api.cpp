@@ -7,8 +7,11 @@
 #include "api_render.h"
 #include "api_session.h"
 #include "api_track.h"
-
+#ifdef __linux__
+#include <dlfcn.h>
+#elif _WIN32
 #include <windows.h>
+#endif
 #include <thread>
 
 namespace ClientAPI
@@ -81,8 +84,11 @@ namespace ClientAPI
 	status_t initAPI(std::string client_path)
 	{
         LOG_F(INFO, "Got lib: %s", client_path.c_str());
-
+#ifdef __linux__
+        void* hinstLib = dlopen(client_path.c_str(), RTLD_LAZY);
+#elif _WIN32
         HINSTANCE hinstLib = LoadLibrary(TEXT(client_path.c_str()));
+#endif
 
         if (!hinstLib)
         {
@@ -91,9 +97,11 @@ namespace ClientAPI
         }
 
         LOG_F(INFO, "Library loaded");
-
+#ifdef __linux__
+        spawnClient_t spawn_client = (spawnClient_t) dlsym(hinstLib, "spawnClient");
+#elif _WIN32
         spawnClient_t spawn_client = (spawnClient_t) GetProcAddress(hinstLib, "spawnClient");
-
+#endif
         if (!spawn_client)
         {
             LOG_F(ERROR, "Cannot find \"spawnClient\" procedure lib");
@@ -106,7 +114,7 @@ namespace ClientAPI
 
         return 0;
 	}
-
+    
     std::string cmdReceiverWrapper(std::string cmd)
     {
         json response = cmdReceiver(cmd);

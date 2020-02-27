@@ -2,6 +2,8 @@
 #include <cmath>
 #include <cstdio>
 #include "pure_wave.h"
+#include <cstring>//gcc didn`t compile memcpy without this lib
+
 
 
 static status_t readHeader(FILE* f, WavHeader& header)

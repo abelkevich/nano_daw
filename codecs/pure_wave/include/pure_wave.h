@@ -47,11 +47,11 @@
     };
 #pragma pack(pop)
 
-    uint8_t readHeader(FILE* f, WavHeader& header);
-    uint8_t readData(FILE* f, const WavHeader& header, uint8_t* buffer);
-    uint8_t writeHeader(FILE* f, const WavHeader& header);
-    uint8_t writeData(FILE* f, const WavHeader& header, const uint8_t* buffer);
-    uint8_t allocBuffer(const WavHeader& header, uint8_t** buffer);
-    void freeBuffer(uint8_t* buffer);
+    static uint8_t readHeader(FILE* f, WavHeader& header);
+    static uint8_t readData(FILE* f, const WavHeader& header, uint8_t* buffer);
+    static uint8_t writeHeader(FILE* f, const WavHeader& header);
+    static uint8_t writeData(FILE* f, const WavHeader& header, const uint8_t* buffer);
+    static uint8_t allocBuffer(const WavHeader& header, uint8_t** buffer);
+    static void freeBuffer(uint8_t* buffer);
     EXPORTED int32_t getBytes(uint8_t* buffer, uint8_t n);
     EXPORTED void setBytes(uint8_t* buffer, uint8_t n, int32_t val);
