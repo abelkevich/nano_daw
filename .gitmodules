@@ -4,3 +4,6 @@
 [submodule "3rd_party/portaudio"]
 	path = 3rd_party/portaudio
 	url = https://git.assembla.com/portaudio.git
+[submodule "3rd_party/json"]
+	path = 3rd_party/json
+	url = https://github.com/nlohmann/json
