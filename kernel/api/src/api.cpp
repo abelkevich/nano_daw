@@ -9,7 +9,7 @@
 #include "api_track.h"
 #ifdef __linux__
 #include <dlfcn.h>
-#elif _WIN32
+#else
 #include <windows.h>
 #endif
 #include <thread>
@@ -86,7 +86,7 @@ namespace ClientAPI
         LOG_F(INFO, "Got lib: %s", client_path.c_str());
 #ifdef __linux__
         void* hinstLib = dlopen(client_path.c_str(), RTLD_LAZY);
-#elif _WIN32
+#else
         HINSTANCE hinstLib = LoadLibrary(TEXT(client_path.c_str()));
 #endif
 
@@ -99,7 +99,7 @@ namespace ClientAPI
         LOG_F(INFO, "Library loaded");
 #ifdef __linux__
         spawnClient_t spawn_client = (spawnClient_t) dlsym(hinstLib, "spawnClient");
-#elif _WIN32
+#else
         spawnClient_t spawn_client = (spawnClient_t) GetProcAddress(hinstLib, "spawnClient");
 #endif
         if (!spawn_client)
