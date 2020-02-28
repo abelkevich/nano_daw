@@ -3,7 +3,7 @@
 #include "codec_file_info.h"
 #ifdef __linux__
 #include <dlfcn.h>
-#elif _WIN32
+#else
 #include <windows.h>
 #endif
 
@@ -26,7 +26,7 @@ namespace CodecManager
 
         Codec(LoadFileProc_t _loadFile, SaveFileProc_t _saveFile, GetName_t _getName, GetExtensions_t _getExtensions, void* _h_instance);
     };
-#elif _WIN32
+#else
     struct Codec
     {
         LoadFileProc_t loadFile;

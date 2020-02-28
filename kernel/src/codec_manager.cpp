@@ -47,7 +47,7 @@ namespace CodecManager
 
         return 0;
     }
-#elif __WIN32
+#else
     Codec::Codec(LoadFileProc_t _loadFile, SaveFileProc_t _saveFile, GetName_t _getName, GetExtensions_t _getExtensions, HINSTANCE _h_instance)
                : loadFile(_loadFile)
                , saveFile(_saveFile)
@@ -83,14 +83,35 @@ namespace CodecManager
         return 0;
     }
 #endif
+#ifdef __linux__
+	status_t initCodecs()
+	{
+		LOG_F(INFO, "Starting codecs init");
+
+		std::list <std::string> path_to_dll = recursiveDLLSearch("codecs\\", ".so");
+
+
+		for (std::string dll_file : path_to_dll) {
+
+			LOG_F(INFO, "Got file %s", dll_file.c_str());
+
+			if (addCodec(dll_file))
+			{
+				LOG_F(ERROR, "Cannot load codec .dll %s", dll_file.c_str());
+				return 1;
+			}
+		}
+
+		return 0;
+	}
+#else
     status_t initCodecs()
     {
         LOG_F(INFO, "Starting codecs init");
-#ifdef __linux__
-        std::list <std::string> path_to_dll = recursiveDLLSearch("codecs\\", ".so");
-#elif __WIN32
+
+
         std::list <std::string> path_to_dll = recursiveDLLSearch("codecs\\", ".dll");
-#endif
+
         for (std::string dll_file : path_to_dll) {
 
             LOG_F(INFO, "Got file %s", dll_file.c_str());
@@ -104,7 +125,7 @@ namespace CodecManager
 
         return 0;
     }
-
+#endif
     const Codec* findCodecByFileExt(std::string ext)
     {
         for (Codec& codec : g_codecs)
