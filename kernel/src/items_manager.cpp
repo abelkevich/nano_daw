@@ -86,7 +86,7 @@ namespace ItemsManager
 		Track *track = new Track(name);
 		id_t id = genUniqueId();
 
-        LOG_F(INFO, "Created track id: '%d' name: '%d'", id, name);
+        LOG_F(INFO, "Created track id: '%d' name: '%s'", id, name.c_str());
 
 		auto rec = std::make_pair(id, track);
 		g_tracks.insert(rec);
