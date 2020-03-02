@@ -6,23 +6,23 @@ static uint32_t calcSessionLength()
 {
     uint32_t max_audio_len = 0;
 
-	for (auto track_id: g_session->getTracks())
-	{
-		Track *track = ItemsManager::getTrack(track_id);
+    for (auto track_id: g_session->getTracks())
+    {
+        Track *track = ItemsManager::getTrack(track_id);
 
-		if (!track)
-		{
-			return 0;
-		}
+        if (!track)
+        {
+            return 0;
+        }
 
-		for (auto fragment_id : track->getFragments())
-		{
-			Fragment *fragment = ItemsManager::getFragment(fragment_id);
+        for (auto fragment_id : track->getFragments())
+        {
+            Fragment *fragment = ItemsManager::getFragment(fragment_id);
 
-			if (!fragment)
-			{
-				return 0;
-			}
+            if (!fragment)
+            {
+                return 0;
+            }
 
             uint32_t len = fragment->getCropTo() - fragment->getCropFrom();
             uint32_t overall_len = len + fragment->getTimeOffset();
@@ -39,27 +39,27 @@ static uint32_t calcSessionLength()
 
 static status_t mixAudioToOutBuffer(Fragment *fragment, float *out_buf, uint8_t gain, uint8_t level)
 {
-	Audio *audio = ItemsManager::getAudio(fragment->getAudio());
+    Audio *audio = ItemsManager::getAudio(fragment->getAudio());
 
-	if (!audio)
-	{
-		return 1;
-	}
+    if (!audio)
+    {
+        return 1;
+    }
 
     uint32_t audio_from_smp = g_session->msToSamples(fragment->getCropFrom());
     uint32_t audio_to_smp = g_session->msToSamples(fragment->getCropTo());
-	uint32_t audio_len_smp = audio_to_smp - audio_from_smp;
-	uint32_t out_buf_from_smp = g_session->msToSamples(fragment->getTimeOffset());
+    uint32_t audio_len_smp = audio_to_smp - audio_from_smp;
+    uint32_t out_buf_from_smp = g_session->msToSamples(fragment->getTimeOffset());
 
-	if (audio_from_smp >= audio_to_smp)
-	{
-		return 2;
-	}
+    if (audio_from_smp >= audio_to_smp)
+    {
+        return 2;
+    }
 
-	if (out_buf_from_smp + audio_len_smp > g_session->msToSamples(calcSessionLength()))
-	{
-		return 3;
-	}
+    if (out_buf_from_smp + audio_len_smp > g_session->msToSamples(calcSessionLength()))
+    {
+        return 3;
+    }
 
     float k = (gain / 10.0 + 1.0) * (level / 100.0);
 
@@ -68,7 +68,7 @@ static status_t mixAudioToOutBuffer(Fragment *fragment, float *out_buf, uint8_t 
         out_buf[out_buf_from_smp + i] += audio->getBuffer()[audio_from_smp + i] * k;
     }
 
-	return 0;
+    return 0;
 }
 
 static std::set<id_t> getTracksWithSolo()
@@ -132,13 +132,13 @@ status_t render(std::string mix_path)
     // mix right and left channels
     for (auto track_id: tracks_to_mix)
     {
-		Track *track = ItemsManager::getTrack(track_id);
+        Track *track = ItemsManager::getTrack(track_id);
 
-		if (!track)
-		{
+        if (!track)
+        {
             LOG_F(ERROR, "Failed to get track with id %d", track_id);
-			return 2;
-		}
+            return 2;
+        }
 
         LOG_F(INFO, "Got track %d: %s in mix", track_id, track->getName().c_str());
 
@@ -150,23 +150,23 @@ status_t render(std::string mix_path)
 
         for (auto fragment_id: track->getFragments())
         {
-			Fragment *fragment = ItemsManager::getFragment(fragment_id);
+            Fragment *fragment = ItemsManager::getFragment(fragment_id);
 
-			if (!fragment)
-			{
+            if (!fragment)
+            {
                 LOG_F(ERROR, "Failed to get fragment with id %d", fragment_id);
-				return 3;
-			}
+                return 3;
+            }
 
             LOG_F(INFO, "Got fragment %d with linked audio %d", fragment_id, fragment->getAudio());
             LOG_F(INFO, "Adding linked audio to intermediate buffers");
 
-			if (mixAudioToOutBuffer(fragment, left_buf, track->getGain(), track->getLevel()) != 0 ||
-				mixAudioToOutBuffer(fragment, right_buf, track->getGain(), track->getLevel()) != 0)
-			{
+            if (mixAudioToOutBuffer(fragment, left_buf, track->getGain(), track->getLevel()) != 0 ||
+                mixAudioToOutBuffer(fragment, right_buf, track->getGain(), track->getLevel()) != 0)
+            {
                 LOG_F(ERROR, "Error occured while mixing");
-				return 4;
-			}
+                return 4;
+            }
         }
     }
 
@@ -177,7 +177,7 @@ status_t render(std::string mix_path)
         return 0;
     }
 
-	float* arr[2] = { left_buf, right_buf };
+    float* arr[2] = { left_buf, right_buf };
     CodecFileInfo file_info(mix_path, arr, ses_len_smp, 1, g_session->getSampleRate());
     
     codec_info->saveFile(file_info, 2);

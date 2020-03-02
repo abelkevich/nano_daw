@@ -4,14 +4,14 @@
 namespace ClientAPI
 {
     json cmdCodec(CommandSeq seq)
-	{
-		enum EIdents { eInit, eList, eNone };
+    {
+        enum EIdents { eInit, eList, eNone };
         IdentsMap<EIdents> idents_map{ {"init", eInit}, {"list", eList}, {"none", eNone} };
         
         std::string token = seq.sliceNextToken();
 
-		EIdents cmd = idents_map.hasIdent(token) ?
-			idents_map.getIdent(token) : eNone;
+        EIdents cmd = idents_map.hasIdent(token) ?
+            idents_map.getIdent(token) : eNone;
 
         switch (cmd)
         {
@@ -39,10 +39,10 @@ namespace ClientAPI
                 response.push_back(arr_elem);
             }
 
-			return response;
+            return response;
         }
         }
 
         return jsonErrResponse(EErrCodes::eCommandNotFound);
-	}
+    }
 }

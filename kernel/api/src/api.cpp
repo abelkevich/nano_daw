@@ -52,37 +52,37 @@ namespace ClientAPI
         return json({ {"error", { {"code", err_code}, {"msg", fromErrCodeToString(err_code)}}} });
     }
 
-	CommandSeq::CommandSeq(std::string cmd_line)
-	{
-		std::stringstream ss(cmd_line);
-		std::string t;
+    CommandSeq::CommandSeq(std::string cmd_line)
+    {
+        std::stringstream ss(cmd_line);
+        std::string t;
 
-		while (std::getline(ss, t, ' '))
-		{
-			tokens.push(t);
-		}
-	}
+        while (std::getline(ss, t, ' '))
+        {
+            tokens.push(t);
+        }
+    }
 
-	std::string CommandSeq::sliceNextToken()
-	{
-		if (tokens.empty())
-		{
-			return std::string();
-		}
+    std::string CommandSeq::sliceNextToken()
+    {
+        if (tokens.empty())
+        {
+            return std::string();
+        }
 
-		std::string t = tokens.front();
-		tokens.pop();
+        std::string t = tokens.front();
+        tokens.pop();
 
-		return t;
-	}
+        return t;
+    }
 
-	bool CommandSeq::hasNTokens(uint8_t n)
-	{
-		return tokens.size() == n;
-	}
+    bool CommandSeq::hasNTokens(uint8_t n)
+    {
+        return tokens.size() == n;
+    }
 
-	status_t initAPI(std::string client_path)
-	{
+    status_t initAPI(std::string client_path)
+    {
         LOG_F(INFO, "Got lib: %s", client_path.c_str());
 #ifdef __linux__
         void* hinstLib = dlopen(client_path.c_str(), RTLD_LAZY);
@@ -113,7 +113,7 @@ namespace ClientAPI
         g_client_thread = std::thread(spawn_client, cmdReceiverWrapper);
 
         return 0;
-	}
+    }
     
     std::string cmdReceiverWrapper(std::string cmd)
     {
@@ -133,45 +133,45 @@ namespace ClientAPI
     }
 
     json cmdReceiver(std::string user_cmd_line)
-	{
-		CommandSeq seq(user_cmd_line);
+    {
+        CommandSeq seq(user_cmd_line);
 
-		enum EIdents { eCodec, eEffect, eAudio, eFragment, eTrack, eSession, ePlayback, eRender, eNone };
-		IdentsMap<EIdents> idents_map{ {"codec", eCodec }, {"effect", eEffect}, {"audio", eAudio}, {"fragment", eFragment}, {"track", eTrack},
-									   {"session", eSession}, {"playback", ePlayback}, {"render", eRender} };
+        enum EIdents { eCodec, eEffect, eAudio, eFragment, eTrack, eSession, ePlayback, eRender, eNone };
+        IdentsMap<EIdents> idents_map{ {"codec", eCodec }, {"effect", eEffect}, {"audio", eAudio}, {"fragment", eFragment}, {"track", eTrack},
+                                       {"session", eSession}, {"playback", ePlayback}, {"render", eRender} };
 
-		std::string token = seq.sliceNextToken();
+        std::string token = seq.sliceNextToken();
 
-		EIdents cmd = idents_map.hasIdent(token) ?
-			idents_map.getIdent(token) : eNone;
+        EIdents cmd = idents_map.hasIdent(token) ?
+            idents_map.getIdent(token) : eNone;
 
-		switch (cmd)
-		{
-		case eCodec:
+        switch (cmd)
+        {
+        case eCodec:
             return cmdCodec(seq);
 
-		case eEffect:
+        case eEffect:
             return cmdEffect(seq);
 
-		case eFragment:
+        case eFragment:
             return cmdFragment(seq);
 
-		case eAudio:
+        case eAudio:
             return cmdAudio(seq);
 
-		case eTrack:
+        case eTrack:
             return cmdTrack(seq);
 
-		case eSession:
+        case eSession:
             return cmdSession(seq);
 
-		case ePlayback:
+        case ePlayback:
             return cmdPlayback(seq);
 
-		case eRender:
+        case eRender:
             return cmdRender(seq);
-		}
+        }
 
         return jsonErrResponse(EErrCodes::eCommandNotFound);
-	}
+    }
 }

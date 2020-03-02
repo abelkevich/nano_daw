@@ -4,7 +4,7 @@
 namespace ClientAPI
 {
     json cmdPlayback(CommandSeq seq)
-	{
+    {
         enum EIdents { ePlay, ePause, eStop, eInit, eRender, eNone };
         IdentsMap<EIdents> idents_map{ {"play", ePlay}, {"pause", ePause}, {"stop", eStop},
                                        {"init", eInit}, {"render", eRender} };
@@ -53,5 +53,5 @@ namespace ClientAPI
         }
         }
         return jsonErrResponse(EErrCodes::eCommandNotFound);
-	}
+    }
 }

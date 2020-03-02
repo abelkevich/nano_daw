@@ -84,26 +84,26 @@ namespace CodecManager
     }
 #endif
 #ifdef __linux__
-	status_t initCodecs()
-	{
-		LOG_F(INFO, "Starting codecs init");
+    status_t initCodecs()
+    {
+        LOG_F(INFO, "Starting codecs init");
 
-		std::list <std::string> path_to_dll = recursiveDLLSearch("codecs\\", ".so");
+        std::list <std::string> path_to_dll = recursiveDLLSearch("codecs\\", ".so");
 
 
-		for (std::string dll_file : path_to_dll) {
+        for (std::string dll_file : path_to_dll) {
 
-			LOG_F(INFO, "Got file %s", dll_file.c_str());
+            LOG_F(INFO, "Got file %s", dll_file.c_str());
 
-			if (addCodec(dll_file))
-			{
-				LOG_F(ERROR, "Cannot load codec .dll %s", dll_file.c_str());
-				return 1;
-			}
-		}
+            if (addCodec(dll_file))
+            {
+                LOG_F(ERROR, "Cannot load codec .dll %s", dll_file.c_str());
+                return 1;
+            }
+        }
 
-		return 0;
-	}
+        return 0;
+    }
 #else
     status_t initCodecs()
     {

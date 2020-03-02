@@ -56,7 +56,7 @@ namespace ClientAPI
                 response.push_back(arr_elem);
             }
 
-			
+            
             return response;
         }
 
@@ -90,10 +90,10 @@ namespace ClientAPI
 
             id_t id = stoi(id_str);
 
-			if (!ItemsManager::getAudio(id))
-			{
+            if (!ItemsManager::getAudio(id))
+            {
                 return jsonErrResponse(EErrCodes::eInvalidAudio);
-			}
+            }
 
             if (!ItemsManager::removeAudio(id))
             {

@@ -3,14 +3,14 @@
 namespace ClientAPI
 {
     json cmdEffect(CommandSeq seq)
-	{
-		enum EIdents { eNone };
-		IdentsMap<EIdents> idents_map{};
-		std::string token = seq.sliceNextToken();
+    {
+        enum EIdents { eNone };
+        IdentsMap<EIdents> idents_map{};
+        std::string token = seq.sliceNextToken();
 
-		EIdents cmd = idents_map.hasIdent(token) ?
-			idents_map.getIdent(token) : eNone;
+        EIdents cmd = idents_map.hasIdent(token) ?
+            idents_map.getIdent(token) : eNone;
 
         return jsonErrResponse(EErrCodes::eCommandNotFound);
-	}
+    }
 }

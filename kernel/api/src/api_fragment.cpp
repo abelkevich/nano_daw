@@ -6,7 +6,7 @@ namespace ClientAPI
     json cmdFragment(CommandSeq seq)
     {
         enum EIdents { eList, eAdd, eRemove, eCrop, eOffset, eInfo, eNone };
-		IdentsMap<EIdents> idents_map{ {"add", eAdd}, {"remove", eRemove}, {"list", eList}, 
+        IdentsMap<EIdents> idents_map{ {"add", eAdd}, {"remove", eRemove}, {"list", eList}, 
                                        {"crop", eCrop}, {"offset", eOffset}, {"info", eInfo} };
 
         std::string token = seq.sliceNextToken();
@@ -68,17 +68,17 @@ namespace ClientAPI
             std::string audio_id_str = seq.sliceNextToken();
             id_t audio_id = stoi(audio_id_str);
 
-			if (!ItemsManager::getAudio(audio_id))
-			{
+            if (!ItemsManager::getAudio(audio_id))
+            {
                 return jsonErrResponse(EErrCodes::eInvalidAudio);
-			}
+            }
 
             id_t id = ItemsManager::createFragment(audio_id);
 
-			if (!id)
-			{
+            if (!id)
+            {
                 return jsonErrResponse(EErrCodes::eOperationFailed);
-			}
+            }
 
             return json({ {"id", id} });
         }
@@ -94,10 +94,10 @@ namespace ClientAPI
 
             id_t id = stoi(id_str);
 
-			if (!ItemsManager::getFragment(id))
-			{
+            if (!ItemsManager::getFragment(id))
+            {
                 return jsonErrResponse(EErrCodes::eInvalidFragment);
-			}
+            }
 
             if (!ItemsManager::removeFragment(id))
             {
@@ -107,40 +107,40 @@ namespace ClientAPI
             return json();
         }
 
-		case eCrop:
-		{
-			if (!seq.hasNTokens(3))
-			{
+        case eCrop:
+        {
+            if (!seq.hasNTokens(3))
+            {
                 return jsonErrResponse(EErrCodes::eInvalidArgsNum);
-			}
+            }
 
-			std::string id_str = seq.sliceNextToken();
-			id_t id = stoi(id_str);
+            std::string id_str = seq.sliceNextToken();
+            id_t id = stoi(id_str);
 
-			Fragment *fragment = ItemsManager::getFragment(id);
+            Fragment *fragment = ItemsManager::getFragment(id);
 
-			if (!fragment)
-			{
+            if (!fragment)
+            {
                 return jsonErrResponse(EErrCodes::eInvalidFragment);
-			}
+            }
 
-			{
-				std::string crop_from_str = seq.sliceNextToken();
-				int32_t crop_from = stoi(crop_from_str);
+            {
+                std::string crop_from_str = seq.sliceNextToken();
+                int32_t crop_from = stoi(crop_from_str);
 
-				std::string crop_to_str = seq.sliceNextToken();
-				int32_t crop_to = stoi(crop_to_str);
+                std::string crop_to_str = seq.sliceNextToken();
+                int32_t crop_to = stoi(crop_to_str);
 
-				if (crop_from < 0 || crop_to < 0 || crop_to <= crop_from)
-				{
+                if (crop_from < 0 || crop_to < 0 || crop_to <= crop_from)
+                {
                     return jsonErrResponse(EErrCodes::eInvalidArgValue);
-				}
+                }
 
-				fragment->crop(crop_from, crop_to);
-			}
+                fragment->crop(crop_from, crop_to);
+            }
 
             return json();
-		}
+        }
 
         case eOffset:
         {
@@ -163,10 +163,10 @@ namespace ClientAPI
                 std::string offset_str = seq.sliceNextToken();
                 int offset = stoi(offset_str);
 
-				if (offset < 0)
-				{
+                if (offset < 0)
+                {
                     return jsonErrResponse(EErrCodes::eInvalidArgValue);
-				}
+                }
 
                 fragment->setTimeOffset(offset);
             }
