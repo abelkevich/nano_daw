@@ -18,3 +18,5 @@
 
 typedef uint8_t status_t;
 typedef uint32_t id_t;
+typedef uint32_t freq_t;
+typedef uint32_t smpn_t;
