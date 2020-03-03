@@ -14,7 +14,7 @@ namespace CodecManager
     typedef const char*(__cdecl* GetName_t)();
     typedef const char* (__cdecl* GetExtensions_t)();
 #ifdef __linux__
-        struct Codec
+    struct Codec
     {
         LoadFileProc_t loadFile;
         SaveFileProc_t saveFile;

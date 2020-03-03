@@ -28,7 +28,7 @@ namespace ClientAPI
 
             std::string mix_path = seq.sliceNextToken();
 
-            if (render(mix_path) != 0)
+            if (!render(mix_path))
             {
                 return jsonErrResponse(EErrCodes::eOperationFailed);
             }

@@ -13,7 +13,7 @@ namespace CodecManager
 
     std::list <std::string> recursiveDLLSearch(const std::string& search_path, const std::string& extension);
 #ifdef __linux__
-        Codec::Codec(LoadFileProc_t _loadFile, SaveFileProc_t _saveFile, GetName_t _getName, GetExtensions_t _getExtensions, void* _h_instance)
+    Codec::Codec(LoadFileProc_t _loadFile, SaveFileProc_t _saveFile, GetName_t _getName, GetExtensions_t _getExtensions, void* _h_instance)
                : loadFile(_loadFile)
                , saveFile(_saveFile)
                , getName(_getName)

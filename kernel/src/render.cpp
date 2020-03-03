@@ -2,30 +2,44 @@
 #include "codec_manager.h"
 #include "items_manager.h"
 
-static uint32_t calcSessionLength()
+static std::string getFileExt(const std::string& s) 
 {
-    uint32_t max_audio_len = 0;
-
-    for (auto track_id: g_session->getTracks())
+    const size_t i = s.rfind('.', s.length());
+    
+    if (i != std::string::npos) 
     {
-        Track *track = ItemsManager::getTrack(track_id);
+        return(s.substr(i + 1, s.length() - i));
+    }
+
+    return std::string();
+}
+
+static ms_t calcSessionLength()
+{
+    ms_t max_audio_len = 0;
+
+    for (const auto track_id: g_session->getTracks())
+    {
+        const Track *track = ItemsManager::getTrack(track_id);
 
         if (!track)
         {
+            LOG_F(ERROR, "Cannot find track");
             return 0;
         }
 
-        for (auto fragment_id : track->getFragments())
+        for (const auto fragment_id : track->getFragments())
         {
-            Fragment *fragment = ItemsManager::getFragment(fragment_id);
+            const Fragment *fragment = ItemsManager::getFragment(fragment_id);
 
             if (!fragment)
             {
+                LOG_F(ERROR, "Cannot find fragment");
                 return 0;
             }
 
-            uint32_t len = fragment->getCropTo() - fragment->getCropFrom();
-            uint32_t overall_len = len + fragment->getTimeOffset();
+            const ms_t len = fragment->getCropTo() - fragment->getCropFrom();
+            const ms_t overall_len = len + fragment->getTimeOffset();
 
             if (max_audio_len < overall_len)
             {
@@ -37,50 +51,53 @@ static uint32_t calcSessionLength()
     return max_audio_len;
 }
 
-static status_t mixAudioToOutBuffer(Fragment *fragment, float *out_buf, uint8_t gain, uint8_t level)
+static bool mixAudioToOutBuffer(const Fragment *fragment, std::shared_ptr<float[]> out_buf, const uint8_t gain, const uint8_t level)
 {
-    Audio *audio = ItemsManager::getAudio(fragment->getAudio());
+    const Audio *audio = ItemsManager::getAudio(fragment->getAudio());
 
     if (!audio)
     {
-        return 1;
+        LOG_F(ERROR, "Cannot find linked audio");
+        return false;
     }
 
-    uint32_t audio_from_smp = g_session->msToSamples(fragment->getCropFrom());
-    uint32_t audio_to_smp = g_session->msToSamples(fragment->getCropTo());
-    uint32_t audio_len_smp = audio_to_smp - audio_from_smp;
-    uint32_t out_buf_from_smp = g_session->msToSamples(fragment->getTimeOffset());
+    const smpn_t audio_from_smp = g_session->msToSamples(fragment->getCropFrom());
+    const smpn_t audio_to_smp = g_session->msToSamples(fragment->getCropTo());
+    const smpn_t audio_len_smp = audio_to_smp - audio_from_smp;
+    const smpn_t out_buf_from_smp = g_session->msToSamples(fragment->getTimeOffset());
 
     if (audio_from_smp >= audio_to_smp)
     {
-        return 2;
+        LOG_F(ERROR, "Invalid fragment cropping");
+        return false;
     }
 
     if (out_buf_from_smp + audio_len_smp > g_session->msToSamples(calcSessionLength()))
     {
-        return 3;
+        LOG_F(ERROR, "Fragment out of bounds in session buffer");
+        return false;
     }
 
-    float k = (gain / 10.0 + 1.0) * (level / 100.0);
-
-    for (uint32_t i = 0; i < audio_len_smp; i++)
+    const float k = (gain / 10.0f + 1.0f) * (level / 100.0f);
+    for (smpn_t smp_offset = 0; smp_offset < audio_len_smp; smp_offset++)
     {
-        out_buf[out_buf_from_smp + i] += audio->getBuffer()[audio_from_smp + i] * k;
+        out_buf[smp_offset + smp_offset] += audio->getBuffer()[smp_offset + smp_offset] * k;
     }
 
-    return 0;
+    return true;
 }
 
 static std::set<id_t> getTracksWithSolo()
 {
     std::set<id_t> solo_tracks_id;
 
-    for (auto track_id : g_session->getTracks())
+    for (const auto track_id : g_session->getTracks())
     {
-        Track* track = ItemsManager::getTrack(track_id);
+        const Track* track = ItemsManager::getTrack(track_id);
 
         if (!track)
         {
+            LOG_F(ERROR, "Cannot find track");
             return std::set<id_t>();
         }
 
@@ -93,51 +110,42 @@ static std::set<id_t> getTracksWithSolo()
     return solo_tracks_id;
 }
 
-status_t render(std::string mix_path)
+bool render(const std::string &mix_path)
 {
-
     LOG_F(INFO, "Starting rendering session");
+    
     if (!g_session)
     {
-
         LOG_F(ERROR, "No session loaded");
-        return 1;
+        return false;
     }
 
-    // calc session length in samples
-    uint32_t ses_len_ms = calcSessionLength();
-    uint32_t ses_len_smp = g_session->msToSamples(ses_len_ms);
-
+    const ms_t ses_len_ms = calcSessionLength();
+    const smpn_t ses_len_smp = g_session->msToSamples(ses_len_ms);
     LOG_F(INFO, "Total sessiong length in ms: %d", ses_len_ms);
 
-    LOG_F(INFO, "Allocating intermediate buffers and zeroing them");
-    
-    // allocate intermediate buffs
-    float* left_buf = new float[ses_len_smp];
-    float* right_buf = new float[ses_len_smp];
+    LOG_F(INFO, "Allocating session buffers");
+    std::shared_ptr<float[]> left_buf(new float[ses_len_smp], std::default_delete<float[]>());
+    std::shared_ptr<float[]> right_buf(new float[ses_len_smp], std::default_delete<float[]>());
 
-    for (uint32_t i = 0; i < ses_len_smp; i++)
-    {
-        left_buf[i] = 0;
-        right_buf[i] = 0;
-    }
+    memset(left_buf.get(), 0, ses_len_smp * sizeof(float));
+    memset(right_buf.get(), 0, ses_len_smp * sizeof(float));
 
-    std::set<id_t> solo_tracks = getTracksWithSolo();
+    const std::set<id_t> solo_tracks = getTracksWithSolo();
+    LOG_F(INFO, !solo_tracks.empty() ? "There are some solo tracks, mixing only them" :
+                                       "Mixing all available tracks");
 
-    std::set<id_t> tracks_to_mix = !solo_tracks.empty() ? solo_tracks : g_session->getTracks();
-
-    LOG_F(INFO, solo_tracks.empty() ? "There are some solo tracks, mixing only them" :
-                                      "Mixing all available tracks");
+    const std::set<id_t> tracks_to_mix = !solo_tracks.empty() ? solo_tracks : g_session->getTracks();
 
     // mix right and left channels
-    for (auto track_id: tracks_to_mix)
+    for (const auto track_id: tracks_to_mix)
     {
-        Track *track = ItemsManager::getTrack(track_id);
+        const Track *track = ItemsManager::getTrack(track_id);
 
         if (!track)
         {
             LOG_F(ERROR, "Failed to get track with id %d", track_id);
-            return 2;
+            return false;
         }
 
         LOG_F(INFO, "Got track %d: %s in mix", track_id, track->getName().c_str());
@@ -148,42 +156,45 @@ status_t render(std::string mix_path)
             continue;
         }
 
-        for (auto fragment_id: track->getFragments())
+        const auto fragments = track->getFragments();
+
+        LOG_F(INFO, "Track has %d fragments", fragments.size());
+
+        for (const auto fragment_id: fragments)
         {
-            Fragment *fragment = ItemsManager::getFragment(fragment_id);
+            const Fragment *fragment = ItemsManager::getFragment(fragment_id);
 
             if (!fragment)
             {
                 LOG_F(ERROR, "Failed to get fragment with id %d", fragment_id);
-                return 3;
+                return false;
             }
 
             LOG_F(INFO, "Got fragment %d with linked audio %d", fragment_id, fragment->getAudio());
-            LOG_F(INFO, "Adding linked audio to intermediate buffers");
 
-            if (mixAudioToOutBuffer(fragment, left_buf, track->getGain(), track->getLevel()) != 0 ||
-                mixAudioToOutBuffer(fragment, right_buf, track->getGain(), track->getLevel()) != 0)
+            if (!mixAudioToOutBuffer(fragment, left_buf, track->getGain(), track->getLevel()) ||
+                !mixAudioToOutBuffer(fragment, right_buf, track->getGain(), track->getLevel()))
             {
                 LOG_F(ERROR, "Error occured while mixing");
-                return 4;
+                return false;
             }
         }
     }
 
-    auto codec_info = CodecManager::findCodecByFileExt("wav");
+    const std::string file_ext = getFileExt(mix_path);
+    LOG_F(INFO, "Searching for codec with target file extension: %s", file_ext.c_str());
+    const CodecManager::Codec* codec = CodecManager::findCodecByFileExt(file_ext);
 
-    if (!codec_info)
+    if (!codec)
     {
-        return 0;
+        LOG_F(ERROR, "Cannot find codec");
+        return false;
     }
 
-    float* arr[2] = { left_buf, right_buf };
-    CodecFileInfo file_info(mix_path, arr, ses_len_smp, 1, g_session->getSampleRate());
-    
-    codec_info->saveFile(file_info, 2);
+    float* arr[2] = { left_buf.get(), right_buf.get() };
+    codec->saveFile(CodecFileInfo(mix_path, arr, ses_len_smp, 1, g_session->getSampleRate()), 2);
 
-    delete[] left_buf;
-    delete[] right_buf;
+    LOG_F(INFO, "Session rendered!");
 
-    return 0;
+    return true;
 }
