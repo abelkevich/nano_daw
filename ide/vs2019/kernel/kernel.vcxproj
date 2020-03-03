@@ -36,6 +36,7 @@
     <ClInclude Include="..\..\..\kernel\include\kernel.h" />
     <ClInclude Include="..\..\..\kernel\include\client_api.h" />
     <ClInclude Include="..\..\..\kernel\include\render.h" />
+    <ClInclude Include="..\..\..\kernel\include\resampler.h" />
     <ClInclude Include="..\..\..\kernel\include\rt_output.h" />
     <ClInclude Include="..\..\..\kernel\items\include\audio.h" />
     <ClInclude Include="..\..\..\kernel\items\include\effect.h" />
@@ -64,6 +65,7 @@
     <ClCompile Include="..\..\..\kernel\src\items_manager.cpp" />
     <ClCompile Include="..\..\..\kernel\src\kernel.cpp" />
     <ClCompile Include="..\..\..\kernel\src\render.cpp" />
+    <ClCompile Include="..\..\..\kernel\src\resampler.cpp" />
     <ClCompile Include="..\..\..\kernel\src\rt_output.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -96,6 +96,9 @@
     <ClInclude Include="..\..\..\kernel\include\rt_output.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\kernel\include\resampler.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\kernel\src\kernel.cpp">
@@ -161,8 +164,8 @@
     <ClCompile Include="..\..\..\kernel\src\rt_output.cpp">
       <Filter>src</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
+    <ClCompile Include="..\..\..\kernel\src\resampler.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
