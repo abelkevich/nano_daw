@@ -99,6 +99,9 @@
     <ClInclude Include="..\..\..\kernel\include\resampler.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\kernel\include\utils.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\kernel\src\kernel.cpp">
@@ -165,6 +168,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\kernel\src\resampler.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\kernel\src\utils.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

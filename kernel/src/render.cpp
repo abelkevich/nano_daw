@@ -1,18 +1,7 @@
 #include "render.h"
 #include "codec_manager.h"
 #include "items_manager.h"
-
-static std::string getFileExt(const std::string& s) 
-{
-    const size_t i = s.rfind('.', s.length());
-    
-    if (i != std::string::npos) 
-    {
-        return(s.substr(i + 1, s.length() - i));
-    }
-
-    return std::string();
-}
+#include "utils.h"
 
 static ms_t calcSessionLength()
 {
@@ -181,7 +170,7 @@ bool render(const std::string &mix_path)
         }
     }
 
-    const std::string file_ext = getFileExt(mix_path);
+    const std::string file_ext = Utils::getFileExt(mix_path);
     LOG_F(INFO, "Searching for codec with target file extension: %s", file_ext.c_str());
     const CodecManager::Codec* codec = CodecManager::findCodecByFileExt(file_ext);
 

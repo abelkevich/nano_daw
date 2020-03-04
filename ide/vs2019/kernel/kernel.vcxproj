@@ -38,6 +38,7 @@
     <ClInclude Include="..\..\..\kernel\include\render.h" />
     <ClInclude Include="..\..\..\kernel\include\resampler.h" />
     <ClInclude Include="..\..\..\kernel\include\rt_output.h" />
+    <ClInclude Include="..\..\..\kernel\include\utils.h" />
     <ClInclude Include="..\..\..\kernel\items\include\audio.h" />
     <ClInclude Include="..\..\..\kernel\items\include\effect.h" />
     <ClInclude Include="..\..\..\kernel\items\include\fragment.h" />
@@ -67,6 +68,7 @@
     <ClCompile Include="..\..\..\kernel\src\render.cpp" />
     <ClCompile Include="..\..\..\kernel\src\resampler.cpp" />
     <ClCompile Include="..\..\..\kernel\src\rt_output.cpp" />
+    <ClCompile Include="..\..\..\kernel\src\utils.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

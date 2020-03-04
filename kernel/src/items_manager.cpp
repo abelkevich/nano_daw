@@ -1,5 +1,6 @@
 #include "items_manager.h"
 #include "codec_manager.h"
+#include "utils.h"
 #include <map>
 
 namespace ItemsManager
@@ -31,13 +32,14 @@ namespace ItemsManager
 
     id_t createAudio(std::string path)
     {
-        LOG_F(INFO, "Loading audio from path: %s", path.c_str());
+        LOG_F(INFO, "Trying to load audio from: '%s'", path.c_str());
 
-        const CodecManager::Codec* codec = CodecManager::findCodecByFileExt("wav");
+        const std::string file_ext = Utils::getFileExt(path);
+        const CodecManager::Codec* codec = CodecManager::findCodecByFileExt(file_ext);
 
-        if (codec != 0)
+        if (!codec)
         {
-            LOG_F(ERROR, "Cannot load codec 'pure_wave.dll'");
+            LOG_F(ERROR, "Cannot find codec to process file with '%s' extension", file_ext);
             return 0;
         }
 
