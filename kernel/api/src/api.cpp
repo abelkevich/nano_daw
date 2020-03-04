@@ -81,9 +81,9 @@ namespace ClientAPI
         return tokens.size() == n;
     }
 
-    status_t initAPI(std::string client_path)
+    bool initAPI(const std::string &client_path)
     {
-        LOG_F(INFO, "Got lib: %s", client_path.c_str());
+        LOG_F(INFO, "Got client lib path: %s", client_path.c_str());
 #ifdef __linux__
         void* hinstLib = dlopen(client_path.c_str(), RTLD_LAZY);
 #else
@@ -93,7 +93,7 @@ namespace ClientAPI
         if (!hinstLib)
         {
             LOG_F(ERROR, "Cannot load library");
-            return 1;
+            return false;
         }
 
         LOG_F(INFO, "Library loaded");
@@ -105,14 +105,14 @@ namespace ClientAPI
         if (!spawn_client)
         {
             LOG_F(ERROR, "Cannot find \"spawnClient\" procedure lib");
-            return 2;
+            return false;
         }
 
         LOG_F(INFO, "Found \"spawnClient\", now registering client callbacks and creating thread");
 
         g_client_thread = std::thread(spawn_client, cmdReceiverWrapper);
 
-        return 0;
+        return true;
     }
     
     std::string cmdReceiverWrapper(std::string cmd)
