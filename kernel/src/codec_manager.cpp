@@ -59,6 +59,7 @@ namespace CodecManager
 
     status_t addCodec(std::string path)
     {
+
         HINSTANCE h_instance = LoadLibrary(TEXT(path.c_str()));
 
         if (!h_instance)

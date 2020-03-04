@@ -6,10 +6,10 @@ namespace ClientAPI
     json cmdTrack(CommandSeq seq)
     {
         enum EIdents { eList, eAdd, eRemove, eMute, eSolo, 
-                       eVolume, eGain, ePan, eLink, eUnlink,
+                       eLevel, eGain, ePan, eLink, eUnlink,
                        eName, eInfo, eNone };
         IdentsMap<EIdents> idents_map{ {"add", eAdd}, {"remove", eRemove}, {"mute", eMute},
-                                       {"solo", eSolo}, {"volume", eVolume}, {"gain", eGain},
+                                       {"solo", eSolo}, {"level", eLevel}, {"gain", eGain},
                                        {"pan", ePan}, {"list", eList}, {"link", eLink}, 
                                        {"unlink", eUnlink}, {"info", eInfo}, {"none", eNone} };
 
@@ -217,7 +217,7 @@ namespace ClientAPI
             return json();
         }
 
-        case eVolume:
+        case eLevel:
         {
             if (!seq.hasNTokens(2))
             {
@@ -228,10 +228,10 @@ namespace ClientAPI
             id_t id = stoi(id_str);
 
 
-            std::string volume_str = seq.sliceNextToken();
-            int volume = stoi(volume_str);
+            std::string level_str = seq.sliceNextToken();
+            int level = stoi(level_str);
 
-            if (volume > 100 || volume < 0)
+            if (level > 100 || level < 0)
             {
                 return jsonErrResponse(EErrCodes::eInvalidArgValue);
             }
@@ -242,7 +242,7 @@ namespace ClientAPI
                 return jsonErrResponse(EErrCodes::eInvalidTrack);
             }
 
-            track->setLevel(volume);
+            track->setLevel(level);
 
             return json();
         }

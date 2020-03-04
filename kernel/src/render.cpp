@@ -40,7 +40,7 @@ static ms_t calcSessionLength()
     return max_audio_len;
 }
 
-static bool mixAudioToOutBuffer(const Fragment *fragment, std::shared_ptr<float[]> out_buf, const uint8_t gain, const uint8_t level)
+static bool mixAudioToOutBuffer(const Fragment *fragment, float* out_buf, const uint8_t gain, const uint8_t level)
 {
     const Audio *audio = ItemsManager::getAudio(fragment->getAudio());
 
@@ -70,7 +70,7 @@ static bool mixAudioToOutBuffer(const Fragment *fragment, std::shared_ptr<float[
     const float k = (gain / 10.0f + 1.0f) * (level / 100.0f);
     for (smpn_t smp_offset = 0; smp_offset < audio_len_smp; smp_offset++)
     {
-        out_buf[smp_offset + smp_offset] += audio->getBuffer()[smp_offset + smp_offset] * k;
+        out_buf[out_buf_from_smp + smp_offset] += audio->getBuffer()[audio_from_smp + smp_offset] * k;
     }
 
     return true;
@@ -161,8 +161,8 @@ bool render(const std::string &mix_path)
 
             LOG_F(INFO, "Got fragment %d with linked audio %d", fragment_id, fragment->getAudio());
 
-            if (!mixAudioToOutBuffer(fragment, left_buf, track->getGain(), track->getLevel()) ||
-                !mixAudioToOutBuffer(fragment, right_buf, track->getGain(), track->getLevel()))
+            if (!mixAudioToOutBuffer(fragment, left_buf.get(), track->getGain(), track->getLevel()) ||
+                !mixAudioToOutBuffer(fragment, right_buf.get(), track->getGain(), track->getLevel()))
             {
                 LOG_F(ERROR, "Error occured while mixing");
                 return false;
