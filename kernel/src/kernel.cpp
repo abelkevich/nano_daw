@@ -13,12 +13,12 @@ int main(int argc, char **argv)
 
     if (argc != 2)
     {
-        LOG_F(ERROR, "Cannot find client in cmd line args");
+        LOG_F(ERROR, "Cannot find client library in the cmd parameters list");
         return 1;
     }
 
-    LOG_F(INFO, "Starting initializing client API with client %s", argv[1]);
-    if (ClientAPI::initAPI(argv[1]) != 0)
+    LOG_F(INFO, "Initializing client API");
+    if (!ClientAPI::initAPI(argv[1]))
     {
         LOG_F(ERROR, "Cannot init api");
         return 2;
