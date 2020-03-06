@@ -39,7 +39,7 @@ namespace ItemsManager
 
         if (!codec)
         {
-            LOG_F(ERROR, "Cannot find codec to process file with '%s' extension", file_ext);
+            LOG_F(ERROR, "Cannot find codec to process file with '%s' extension", file_ext.c_str());
             return 0;
         }
 

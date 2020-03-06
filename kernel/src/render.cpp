@@ -2,6 +2,7 @@
 #include "codec_manager.h"
 #include "items_manager.h"
 #include "utils.h"
+#include <cstring>
 
 static ms_t calcSessionLength()
 {
