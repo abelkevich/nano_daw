@@ -5,6 +5,7 @@
 #include "audios_manager.h"
 #include "tracks_manager.h"
 #include "utils.h"
+#include <cstring>
 
 ms_t calcSessionLength(const id_t session_id)
 {
@@ -151,6 +152,7 @@ std::set<id_t> getTracksWithSolo(const id_t session_id)
     return solo_tracks_id;
 }
 
+<<<<<<< HEAD
 bool render(const id_t session_id, const std::string &mix_path)
 {
     LOG_F(INFO, "Rendering session (id: '%d')", session_id);
@@ -167,14 +169,36 @@ bool render(const id_t session_id, const std::string &mix_path)
     const smpn_t ses_len_smp = session->msToSamples(ses_len_ms);
     LOG_F(INFO, "Total sessiong length in ms: %d", ses_len_ms);
 
+=======
+bool render(const std::string &mix_path)
+{
+    LOG_F(INFO, "Starting rendering session");
+    
+    if (!g_session)
+    {
+        LOG_F(ERROR, "No session loaded");
+        return false;
+    }
+
+    const ms_t ses_len_ms = calcSessionLength();
+    const smpn_t ses_len_smp = g_session->msToSamples(ses_len_ms);
+    LOG_F(INFO, "Total sessiong length in ms: %d", ses_len_ms);
+
+    LOG_F(INFO, "Allocating session buffers");
+>>>>>>> f77d709dfb86deacdd922572b51f6a760abe1eb4
     std::shared_ptr<float[]> left_buf(new float[ses_len_smp], std::default_delete<float[]>());
     std::shared_ptr<float[]> right_buf(new float[ses_len_smp], std::default_delete<float[]>());
 
     memset(left_buf.get(), 0, ses_len_smp * sizeof(float));
     memset(right_buf.get(), 0, ses_len_smp * sizeof(float));
 
+<<<<<<< HEAD
     const std::set<id_t> solo_tracks = getTracksWithSolo(session_id);
     LOG_F(INFO, !solo_tracks.empty() ? "Some tracks marked solo, mixing only them" :
+=======
+    const std::set<id_t> solo_tracks = getTracksWithSolo();
+    LOG_F(INFO, !solo_tracks.empty() ? "There are some solo tracks, mixing only them" :
+>>>>>>> f77d709dfb86deacdd922572b51f6a760abe1eb4
                                        "Mixing all available tracks");
 
     const std::set<id_t> tracks_to_mix = !solo_tracks.empty() ? solo_tracks : session->getTracks();
@@ -186,6 +210,7 @@ bool render(const id_t session_id, const std::string &mix_path)
         const Track *track = TracksManager::getTrack(track_id);
 
         if (!track)
+<<<<<<< HEAD
         {
             LOG_F(ERROR, "Cannot get track (id: '%d)", track_id);
             return false;
@@ -194,6 +219,18 @@ bool render(const id_t session_id, const std::string &mix_path)
         if (track->getMute())
         {
             LOG_F(INFO, "Track (id: '%d') is muted, skipping", track_id);
+=======
+        {
+            LOG_F(ERROR, "Failed to get track with id %d", track_id);
+            return false;
+        }
+
+        LOG_F(INFO, "Got track %d: %s in mix", track_id, track->getName().c_str());
+
+        if (track->getMute())
+        {
+            LOG_F(INFO, "Track is muted, skipping");
+>>>>>>> f77d709dfb86deacdd922572b51f6a760abe1eb4
             continue;
         }
 
