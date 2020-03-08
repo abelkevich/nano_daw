@@ -133,7 +133,6 @@ namespace CodecManager
         {
             if (ext == codec.getExtensions())
             {
-                LOG_F(ERROR, "Cannot find codec with ext: %s", ext.c_str());
                 return &codec;
             }
         }

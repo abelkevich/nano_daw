@@ -5,8 +5,11 @@
 struct Track
 {
 private:
+    const id_t m_id;
+    const id_t m_linked_session_id;
     std::set<id_t> m_fragments;
     std::set<id_t> m_effects;
+    
 
     std::string m_name;
     bool m_mute;
@@ -16,13 +19,13 @@ private:
     uint8_t m_level;
 
 public:
-    Track(std::string name);
+    Track(const id_t id, const id_t session_id, const std::string &name);
 
     std::set<id_t> getFragments() const;
     std::set<id_t> getEffects() const;
 
-    status_t unlinkFragment(id_t fragment_id);
-    status_t linkFragment(id_t fragment_id);
+    bool unlinkFragment(const id_t fragment_id);
+    bool linkFragment(const id_t fragment_id);
 
     std::string getName() const;
     status_t setName(std::string name);
@@ -41,4 +44,7 @@ public:
 
     uint8_t getLevel() const;
     status_t setLevel(uint8_t level);
+
+    id_t getId() const;
+    id_t getSessionId() const;
 };

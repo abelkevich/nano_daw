@@ -1,5 +1,5 @@
 #include "api_render.h"
-#include "items_manager.h"
+#include "audios_manager.h"
 
 namespace ClientAPI
 {
@@ -26,7 +26,7 @@ namespace ClientAPI
             std::string id_str = seq.sliceNextToken();
             id_t id = stoi(id_str);
 
-            Audio* audio = ItemsManager::getAudio(id);
+            Audio* audio = AudiosManager::getAudio(id);
             if (!audio)
             {
                 return jsonErrResponse(EErrCodes::eInvalidAudio);
@@ -38,13 +38,13 @@ namespace ClientAPI
         case eList:
         {
 
-            std::set<id_t> audio_ids = ItemsManager::getAudios();
+            std::set<id_t> audio_ids = AudiosManager::getAudios();
             
             json::array_t response = json::array();
 
             for (id_t id : audio_ids)
             {
-                Audio* audio = ItemsManager::getAudio(id);
+                Audio* audio = AudiosManager::getAudio(id);
 
                 if (!audio)
                 {
@@ -52,7 +52,7 @@ namespace ClientAPI
                 }
 
                 
-                json arr_elem({ {"id", id}, {"path", audio->getPath()} });
+                json arr_elem({ {"id", id} });
                 response.push_back(arr_elem);
             }
 
@@ -67,9 +67,9 @@ namespace ClientAPI
                 return jsonErrResponse(EErrCodes::eInvalidArgsNum);
             }
 
-            std::string path = seq.sliceNextToken();
+            const std::string path = seq.sliceNextToken();
 
-            id_t id = ItemsManager::createAudio(path);
+            const id_t id = AudiosManager::createAudio(path);
 
             if (!id)
             {
@@ -90,12 +90,12 @@ namespace ClientAPI
 
             id_t id = stoi(id_str);
 
-            if (!ItemsManager::getAudio(id))
+            if (!AudiosManager::getAudio(id))
             {
                 return jsonErrResponse(EErrCodes::eInvalidAudio);
             }
 
-            if (!ItemsManager::removeAudio(id))
+            if (!AudiosManager::removeAudio(id))
             {
                 return jsonErrResponse(EErrCodes::eOperationFailed);
             }

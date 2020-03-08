@@ -1,5 +1,6 @@
 #include "api_render.h"
 #include "render.h"
+#include "sessions_manager.h"
 
 namespace ClientAPI
 {
@@ -16,19 +17,20 @@ namespace ClientAPI
         {
         case eSession:
         {
-            if (!seq.hasNTokens(1))
+            if (!seq.hasNTokens(2))
             {
                 return jsonErrResponse(EErrCodes::eInvalidArgsNum);
             }
 
-            if (!g_session)
+            const id_t session_id = stoi(seq.sliceNextToken());
+            const std::string mix_path = seq.sliceNextToken();
+
+            if (!SessionsManager::getSession(session_id))
             {
                 return jsonErrResponse(EErrCodes::eInvalidSession);
             }
 
-            std::string mix_path = seq.sliceNextToken();
-
-            if (!render(mix_path))
+            if (!render(session_id, mix_path))
             {
                 return jsonErrResponse(EErrCodes::eOperationFailed);
             }

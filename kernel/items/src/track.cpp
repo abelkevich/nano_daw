@@ -1,13 +1,16 @@
 #include "track.h"
-#include "items_manager.h"
+#include "tracks_manager.h"
+#include "fragments_manager.h"
 
-Track::Track(std::string name)
-    : m_name(name)
-    , m_mute(false)
-    , m_solo(false)
-    , m_pan(0)
-    , m_gain(0)
-    , m_level(0)
+Track::Track(const id_t id, const id_t session_id, const std::string &name)
+           : m_id(id)
+           , m_linked_session_id(session_id)
+           , m_name(name)
+           , m_mute(false)
+           , m_solo(false)
+           , m_pan(0)
+           , m_gain(0)
+           , m_level(0)
 {
 }
 
@@ -97,36 +100,46 @@ status_t Track::setLevel(uint8_t level)
     return 0;
 }
 
-status_t Track::linkFragment(id_t fragment_id)
+bool Track::linkFragment(const id_t fragment_id)
 {
-    if (!ItemsManager::getFragment(fragment_id))
+    LOG_F(INFO, "Linking track (id: '%d') with fragment (id: '%d')", this->getId(), fragment_id);
+
+    if (!FragmentsManager::getFragment(fragment_id))
     {
-        return 2;
+        LOG_F(ERROR, "Cannot get fragment (id: '%d')", fragment_id);
+        return false;
     }
 
-    // Track already have this fragment
     if (m_fragments.find(fragment_id) != m_fragments.end())
     {
-        return 3;
+        LOG_F(ERROR, "Fragment (id: '%d') already linked to the track (id: '%d')", 
+                     fragment_id, this->getId());
+        return false;
     }
 
-    m_fragments.insert(fragment_id);
-    return 0;
+    m_fragments.insert(fragment_id); 
+    LOG_F(INFO, "Fragment (id: '%d') was unlinked from track (id: '%d')", fragment_id, this->getId());
+
+    return true;
 }
 
-status_t Track::unlinkFragment(id_t fragment_id)
+bool Track::unlinkFragment(const id_t fragment_id)
 {
-    if (!ItemsManager::getFragment(fragment_id))
-    {
-        return 2;
-    }
+    LOG_F(INFO, "Unlinking fragment (id: '%d') from track (id: '%d')", fragment_id, this->getId());
 
-    // Track don't have this fragment
     if (m_fragments.find(fragment_id) == m_fragments.end())
     {
-        return 3;
+        LOG_F(ERROR, "Cannot find fragment (id: '%d') in track (id: '%d') linked fragments", 
+                     fragment_id, this->getId());
+        return false;
     }
 
-    m_fragments.erase(fragment_id);
-    return 0;
+    m_fragments.erase(fragment_id); 
+    LOG_F(INFO, "Fragment (id: '%d') was unlinked from track (id: '%d')", fragment_id, this->getId());
+
+    return true;
 }
+
+
+id_t Track::getId() const { return m_id; }
+id_t Track::getSessionId() const { return m_linked_session_id; }

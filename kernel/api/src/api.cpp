@@ -1,7 +1,6 @@
 #include "api.h"
 #include "api_audio.h"
 #include "api_codec.h"
-#include "api_effect.h"
 #include "api_fragment.h"
 #include "api_playback.h"
 #include "api_render.h"
@@ -117,27 +116,34 @@ namespace ClientAPI
     
     std::string cmdReceiverWrapper(std::string cmd)
     {
+        LOG_F(INFO, "Got request from client: '%s'", cmd.c_str());
         json response = cmdReceiver(cmd);
 
         if (response.find("error") != response.end())
         {
-            return json({ {"status", 1}, {"error", response.at("error")}}).dump();
+            const std::string response_str = json({ {"status", 1}, {"error", response.at("error")} }).dump();
+            LOG_F(ERROR, "Responding with error: '%s'", response_str.c_str());
+            return response_str;
         }
 
         if (!response.is_null())
         {
-            return json({ {"status", 0}, {"data", response} }).dump();
+            const std::string response_str = json({ {"status", 0}, {"data", response} }).dump();
+            LOG_F(INFO, "Responding with data: '%s'", response_str.c_str());
+            return response_str;
         }
 
-        return json({ {"status", 0} }).dump();
+        const std::string response_str = json({ {"status", 0} }).dump();
+        LOG_F(INFO, "Responding without data: '%s'", response_str.c_str());
+        return response_str;
     }
 
     json cmdReceiver(std::string user_cmd_line)
     {
         CommandSeq seq(user_cmd_line);
 
-        enum EIdents { eCodec, eEffect, eAudio, eFragment, eTrack, eSession, ePlayback, eRender, eNone };
-        IdentsMap<EIdents> idents_map{ {"codec", eCodec }, {"effect", eEffect}, {"audio", eAudio}, {"fragment", eFragment}, {"track", eTrack},
+        enum EIdents { eCodec, eAudio, eFragment, eTrack, eSession, ePlayback, eRender, eNone };
+        IdentsMap<EIdents> idents_map{ {"codec", eCodec }, {"audio", eAudio}, {"fragment", eFragment}, {"track", eTrack},
                                        {"session", eSession}, {"playback", ePlayback}, {"render", eRender} };
 
         std::string token = seq.sliceNextToken();
@@ -149,9 +155,6 @@ namespace ClientAPI
         {
         case eCodec:
             return cmdCodec(seq);
-
-        case eEffect:
-            return cmdEffect(seq);
 
         case eFragment:
             return cmdFragment(seq);

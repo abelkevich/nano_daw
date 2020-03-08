@@ -1,5 +1,6 @@
 #include "api_render.h"
 #include "rt_output.h"
+#include "sessions_manager.h"
 
 namespace ClientAPI
 {
@@ -18,15 +19,21 @@ namespace ClientAPI
         {
         case ePlay:
         {
-            if (!seq.hasNTokens(2))
+            if (!seq.hasNTokens(3))
             {
                 return jsonErrResponse(EErrCodes::eInvalidArgsNum);
             }
 
+            const id_t session_id = stoi(seq.sliceNextToken());
             uint32_t from_ms = stoi(seq.sliceNextToken());
             uint32_t to_ms = stoi(seq.sliceNextToken());
 
-            if (Playback::play(from_ms, to_ms) != 0)
+            if (!SessionsManager::getSession(session_id))
+            {
+                return jsonErrResponse(EErrCodes::eInvalidSession);
+            }
+
+            if (Playback::play(session_id, from_ms, to_ms) != 0)
             {
                 return jsonErrResponse(EErrCodes::eOperationFailed);
             }

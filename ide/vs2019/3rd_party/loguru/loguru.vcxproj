@@ -137,13 +137,16 @@
       <OutputFile>$(Platform)\$(Configuration)\portaudio.bsc</OutputFile>
     </Bscmake>
     <CustomBuildStep>
-      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\$(Platform)\$(Configuration)</Command>
+      <Command>
+      </Command>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\$(TargetName)$(TargetExt)</Outputs>
+      <Outputs>
+      </Outputs>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
+      <Inputs>
+      </Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -186,13 +189,16 @@
       <OutputFile>$(Platform)\$(Configuration)\portaudio_x64.bsc</OutputFile>
     </Bscmake>
     <CustomBuildStep>
-      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\$(Platform)\$(Configuration)</Command>
+      <Command>
+      </Command>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\$(TargetName)$(TargetExt)</Outputs>
+      <Outputs>
+      </Outputs>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
+      <Inputs>
+      </Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -233,13 +239,16 @@
       <OutputFile>$(Platform)\$(Configuration)\portaudio.bsc</OutputFile>
     </Bscmake>
     <CustomBuildStep>
-      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\$(Platform)\$(Configuration)</Command>
+      <Command>
+      </Command>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\$(TargetName)$(TargetExt)</Outputs>
+      <Outputs>
+      </Outputs>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
+      <Inputs>
+      </Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -281,13 +290,16 @@
       <OutputFile>$(Platform)\$(Configuration)/portaudio_x64.bsc</OutputFile>
     </Bscmake>
     <CustomBuildStep>
-      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)..\..\bin\$(Platform)\$(Configuration)</Command>
+      <Command>
+      </Command>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Outputs>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\$(TargetName)$(TargetExt)</Outputs>
+      <Outputs>
+      </Outputs>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
+      <Inputs>
+      </Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

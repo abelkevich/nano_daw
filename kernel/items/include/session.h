@@ -5,6 +5,7 @@
 struct Session
 {
 private:
+    const id_t m_id;
     const uint32_t m_sample_rate;
     std::string m_name;
     std::string m_path;
@@ -12,7 +13,7 @@ private:
     std::set<id_t> m_tracks;
 
 public:
-    Session(std::string name, std::string path, uint32_t sample_rate);
+    Session(id_t id, std::string name, std::string path, uint32_t sample_rate);
 
     uint32_t getSampleRate() const;
 
@@ -23,8 +24,11 @@ public:
     status_t setPath(std::string path);
 
     std::set<id_t> getTracks() const;
-    status_t linkTrack(id_t track_id);
+    bool linkTrack(id_t track_id);
+    bool unlinkTrack(id_t track_id);
 
-    uint32_t msToSamples(uint32_t ms);
-    uint32_t samplesToMs(uint32_t samples);
+    uint32_t msToSamples(uint32_t ms) const;
+    uint32_t samplesToMs(uint32_t samples) const;
+
+    id_t getId() const;
 };
