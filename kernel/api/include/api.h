@@ -64,5 +64,6 @@ namespace ClientAPI
 		}
 	};
 
-	bool initAPI(const std::string &client_path);
+	bool addAPIHandler(const std::string &client_path);
+	void runAPIHandlers();
 }
