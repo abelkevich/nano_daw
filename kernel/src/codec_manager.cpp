@@ -88,7 +88,7 @@ namespace CodecManager
     {
         LOG_F(INFO, "Starting codecs init");
 
-        std::list <std::string> path_to_dll = recursiveDLLSearch("codecs\\", ".so");
+        std::list <std::string> path_to_dll = Utils::searchFilesByExt("codecs\\", ".so");
 
 
         for (std::string dll_file : path_to_dll) {

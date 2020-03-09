@@ -6,11 +6,13 @@
 #include "api_render.h"
 #include "api_session.h"
 #include "api_track.h"
+
 #ifdef __linux__
-#include <dlfcn.h>
+    #include <dlfcn.h>
 #else
-#include <windows.h>
+    #include <windows.h>
 #endif
+
 #include <thread>
 #include <mutex>
 
@@ -163,7 +165,9 @@ namespace ClientAPI
         }
 
 #ifdef __linux__
-        spawnClient_t spawn_client = (spawnClient_t) dlsym(hinstLib, "spawnClient");
+        receiveResponse_t receive_response_proc = (receiveResponse_t) dlsym(hinstLib, "receiveResponse");
+        getCommand_t get_command_proc = (getCommand_t) dlsym(hinstLib, "getCommand");
+        init_t init_proc = (init_t) dlsym(hinstLib, "init");
 #else
         receiveResponse_t receive_response_proc = (receiveResponse_t) GetProcAddress(hinstLib, "receiveResponse");
         getCommand_t get_command_proc = (getCommand_t) GetProcAddress(hinstLib, "getCommand");

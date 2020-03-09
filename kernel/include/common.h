@@ -8,6 +8,7 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <list>
 #include "loguru.hpp"
 
 #ifdef _WIN32
