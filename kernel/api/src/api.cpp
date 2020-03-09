@@ -39,6 +39,7 @@ namespace ClientAPI
 
     static std::string cmdReceiverWrapper(std::string cmd);
     static json cmdReceiver(std::string cmd);
+    static bool removeAPIHandler(void* instance);
 
     static std::string fromErrCodeToString(EErrCodes err_code)
     {
@@ -121,11 +122,19 @@ namespace ClientAPI
             LOG_F(INFO, "Got request: '%s' from client (lib: '%s'; instance: '%p')", 
                         cmd.c_str(), client_lib.lib_file_name.c_str(), client_lib.system_descriptor);
             
+            if (cmd == "quit")
+            {
+                LOG_F(INFO, "Removing API handler for instance '%p' and exiting from assiciated thread", system_descriptor);
+                removeAPIHandler(system_descriptor);
+                break;
+            }
+
             s_commands_queue_mutex.lock();
             const std::string response = cmdReceiverWrapper(cmd);
             s_commands_queue_mutex.unlock();
 
             client_lib.receive_response_proc(response);
+            std::this_thread::sleep_for(std::chrono::milliseconds(20));
         }
     }
 
@@ -137,6 +146,28 @@ namespace ClientAPI
         {
             client.second.processing_thread = new std::thread(processClient, (void*) client.first);
         }
+    }
+
+    uint32_t getOnlineClients()
+    {
+        return g_client_libs_map.size();
+    }
+
+    bool removeAPIHandler(void* instance)
+    {
+        if (g_client_libs_map.find(instance) == g_client_libs_map.end())
+        {
+            LOG_F(ERROR, "Cannot find instance '%p' in api handlers map", instance);
+            return false;
+        }
+
+        {
+            const ClientLib& client_lib = g_client_libs_map.at(instance);
+            LOG_F(INFO, "Removed API handler lib: '%s' instance: '%p'", client_lib.lib_file_name.c_str(), client_lib.system_descriptor);
+        }
+
+        g_client_libs_map.erase(instance);
+        return true;
     }
 
     bool addAPIHandler(const std::string &client_path)

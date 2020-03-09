@@ -71,7 +71,7 @@ namespace CodecManager
         Codec codec(load_file_proc, save_file_proc, get_name_proc, get_ext_proc, h_instance);
         g_codecs.push_back(codec);
 
-        return 0;
+        return true;
     }
 
     bool initCodecs()

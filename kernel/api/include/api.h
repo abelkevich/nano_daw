@@ -66,4 +66,6 @@ namespace ClientAPI
 
 	bool addAPIHandler(const std::string &client_path);
 	void runAPIHandlers();
+	uint32_t getOnlineClients();
+
 }
