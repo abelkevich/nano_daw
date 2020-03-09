@@ -9,21 +9,26 @@ Session *g_session = nullptr;
 int main(int argc, char **argv)
 {
     loguru::g_stderr_verbosity = loguru::Verbosity_OFF;
-    loguru::add_file("nano_daw.log", loguru::Truncate, loguru::Verbosity_MAX);
+    loguru::add_file("kernel.log", loguru::Truncate, loguru::Verbosity_MAX);
 
-    if (argc != 2)
+    if (argc <= 1)
     {
-        LOG_F(ERROR, "Cannot find client library in the cmd parameters list");
+        LOG_F(ERROR, "Cannot find client libraries in the cmd parameters list");
         return 1;
     }
 
-    LOG_F(INFO, "Initializing client API");
-    if (!ClientAPI::initAPI(argv[1]))
+    LOG_F(INFO, "Initing '%d' clients passed by cmd params", argc - 1);
+    for (uint8_t cmd_param_index = 1; cmd_param_index < argc; cmd_param_index++)
     {
-        LOG_F(ERROR, "Cannot init api");
-        return 2;
+        if (!ClientAPI::addAPIHandler(argv[cmd_param_index]))
+        {
+            LOG_F(ERROR, "Cannot add API handler");
+            return 2;
+        }
     }
 
+    ClientAPI::runAPIHandlers();
+    
     LOG_F(INFO, "Starting wait thread");
     while (g_working)
     {

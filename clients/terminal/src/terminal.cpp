@@ -3,16 +3,22 @@
 #include "common.h"
 #include "client_api.h"
 
-void spawnClient(callback_t transmitter)
+extern "C" EXPORTED std::string getCommand()
 {
     std::string cmd;
 
-    do
-    {
-        std::cout << "nano_daw shell> ";
-        std::getline(std::cin, cmd);
+    std::cout << "nano_daw shell> ";
+    std::getline(std::cin, cmd);
 
-        std::string api_response = transmitter(cmd);
-        std::cout << api_response << std::endl;
-    } while (cmd != "quit");
+    return cmd;
+}
+
+extern "C" EXPORTED void receiveResponse(const std::string& response)
+{
+    std::cout << response << "\n";
+}
+
+extern "C" EXPORTED bool init()
+{
+    return true;
 }

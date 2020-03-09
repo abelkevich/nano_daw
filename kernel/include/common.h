@@ -3,8 +3,12 @@
 #include <cinttypes>
 #include <string>
 #include <functional>
+#include <algorithm>
 #include <thread>
 #include <vector>
+#include <map>
+#include <set>
+#include "loguru.hpp"
 
 #ifdef _WIN32
     # ifdef WIN_EXPORT

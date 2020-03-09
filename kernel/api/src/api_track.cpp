@@ -1,15 +1,16 @@
 #include "api_track.h"
-#include "items_manager.h"
+#include "tracks_manager.h"
+#include "fragments_manager.h"
 
 namespace ClientAPI
 {
     json cmdTrack(CommandSeq seq)
     {
         enum EIdents { eList, eAdd, eRemove, eMute, eSolo, 
-                       eVolume, eGain, ePan, eLink, eUnlink,
+                       eLevel, eGain, ePan, eLink, eUnlink,
                        eName, eInfo, eNone };
         IdentsMap<EIdents> idents_map{ {"add", eAdd}, {"remove", eRemove}, {"mute", eMute},
-                                       {"solo", eSolo}, {"volume", eVolume}, {"gain", eGain},
+                                       {"solo", eSolo}, {"level", eLevel}, {"gain", eGain},
                                        {"pan", ePan}, {"list", eList}, {"link", eLink}, 
                                        {"unlink", eUnlink}, {"info", eInfo}, {"none", eNone} };
 
@@ -30,32 +31,32 @@ namespace ClientAPI
             std::string id_str = seq.sliceNextToken();
             id_t id = stoi(id_str);
 
-            Track* track = ItemsManager::getTrack(id);
+            Track* track = TracksManager::getTrack(id);
             if (!track)
             {
                 return jsonErrResponse(EErrCodes::eInvalidTrack);
             }
 
-            return json({ {"name", track->getName()}, {"solo", track->getSolo()}, {"mute", track->getMute()}
+            return json({ {"id", track->getId()}, {"session", track->getSessionId()}, {"name", track->getName()}, {"solo", track->getSolo()}, {"mute", track->getMute()}
                         , {"gain", track->getGain()}, {"level", track->getLevel()}, {"fragments", track->getFragments()} });
         }
 
         case eList:
         {
-            std::set<id_t> track_ids = ItemsManager::getTracks();
+            std::set<id_t> track_ids = TracksManager::getTracks();
 
             json::array_t response = json::array();
 
             for (id_t id : track_ids)
             {
-                Track *track = ItemsManager::getTrack(id);
+                Track *track = TracksManager::getTrack(id);
 
                 if (!track)
                 {
                     return jsonErrResponse(EErrCodes::eOperationFailed);
                 }
 
-                json arr_elem({ {"id", id}, {"name", track->getName()} });
+                json arr_elem({ {"id", id} });
                 response.push_back(arr_elem);
             }
 
@@ -64,14 +65,15 @@ namespace ClientAPI
 
         case eAdd:
         {
-            if (!seq.hasNTokens(1))
+            if (!seq.hasNTokens(2))
             {
                 return jsonErrResponse(EErrCodes::eInvalidArgsNum);
             }
 
-            std::string name = seq.sliceNextToken();
+            const id_t session_id = stoi(seq.sliceNextToken());
+            const std::string name = seq.sliceNextToken();
 
-            id_t id = ItemsManager::createTrack(name);
+            const id_t id = TracksManager::createTrack(session_id, name);
 
             if (!id)
             {
@@ -92,78 +94,12 @@ namespace ClientAPI
 
             id_t id = stoi(id_str);
 
-            if (!ItemsManager::getTrack(id))
+            if (!TracksManager::getTrack(id))
             {
                 return jsonErrResponse(EErrCodes::eInvalidTrack);
             }
 
-            if (!ItemsManager::removeTrack(id))
-            {
-                return jsonErrResponse(EErrCodes::eOperationFailed);
-            }
-
-            return json();
-        }
-
-        case eLink:
-        {
-            if (!seq.hasNTokens(2))
-            {
-                return jsonErrResponse(EErrCodes::eInvalidArgsNum);
-            }
-
-            std::string track_id_str = seq.sliceNextToken();
-            id_t track_id = stoi(track_id_str);
-
-            std::string fragment_id_str = seq.sliceNextToken();
-            id_t fragment_id = stoi(fragment_id_str);
-
-            Track* track = ItemsManager::getTrack(track_id);
-
-            if (!track)
-            {
-                return jsonErrResponse(EErrCodes::eInvalidTrack);
-            }
-
-            if (!ItemsManager::getFragment(fragment_id))
-            {
-                return jsonErrResponse(EErrCodes::eInvalidFragment);
-            }
-
-            if (track->linkFragment(fragment_id))
-            {
-                return jsonErrResponse(EErrCodes::eOperationFailed);
-            }
-
-            return json();
-        }
-
-        case eUnlink:
-        {
-            if (!seq.hasNTokens(2))
-            {
-                return jsonErrResponse(EErrCodes::eInvalidArgsNum);
-            }
-
-            std::string track_id_str = seq.sliceNextToken();
-            id_t track_id = stoi(track_id_str);
-
-            std::string fragment_id_str = seq.sliceNextToken();
-            id_t fragment_id = stoi(fragment_id_str);
-
-            Track* track = ItemsManager::getTrack(track_id);
-
-            if (!track)
-            {
-                return jsonErrResponse(EErrCodes::eInvalidTrack);
-            }
-
-            if (!ItemsManager::getFragment(fragment_id))
-            {
-                return jsonErrResponse(EErrCodes::eInvalidFragment);
-            }
-
-            if (track->unlinkFragment(fragment_id))
+            if (!TracksManager::removeTrack(id))
             {
                 return jsonErrResponse(EErrCodes::eOperationFailed);
             }
@@ -182,7 +118,7 @@ namespace ClientAPI
 
             id_t id = stoi(id_str);
 
-            Track* track = ItemsManager::getTrack(id);
+            Track* track = TracksManager::getTrack(id);
 
             if (!track)
             {
@@ -205,7 +141,7 @@ namespace ClientAPI
 
             id_t id = stoi(id_str);
 
-            Track* track = ItemsManager::getTrack(id);
+            Track* track = TracksManager::getTrack(id);
 
             if (!track)
             {
@@ -217,7 +153,7 @@ namespace ClientAPI
             return json();
         }
 
-        case eVolume:
+        case eLevel:
         {
             if (!seq.hasNTokens(2))
             {
@@ -228,21 +164,21 @@ namespace ClientAPI
             id_t id = stoi(id_str);
 
 
-            std::string volume_str = seq.sliceNextToken();
-            int volume = stoi(volume_str);
+            std::string level_str = seq.sliceNextToken();
+            int level = stoi(level_str);
 
-            if (volume > 100 || volume < 0)
+            if (level > 100 || level < 0)
             {
                 return jsonErrResponse(EErrCodes::eInvalidArgValue);
             }
 
-            Track* track = ItemsManager::getTrack(id);
+            Track* track = TracksManager::getTrack(id);
             if (!track)
             {
                 return jsonErrResponse(EErrCodes::eInvalidTrack);
             }
 
-            track->setLevel(volume);
+            track->setLevel(level);
 
             return json();
         }
@@ -265,7 +201,7 @@ namespace ClientAPI
                 return jsonErrResponse(EErrCodes::eInvalidArgValue);
             }
 
-            Track* track = ItemsManager::getTrack(id);
+            Track* track = TracksManager::getTrack(id);
             if (!track)
             {
                 return jsonErrResponse(EErrCodes::eInvalidTrack);
@@ -295,7 +231,7 @@ namespace ClientAPI
                 return jsonErrResponse(EErrCodes::eInvalidArgValue);
             }
 
-            Track* track = ItemsManager::getTrack(id);
+            Track* track = TracksManager::getTrack(id);
             if (!track)
             {
                 return jsonErrResponse(EErrCodes::eInvalidTrack);
@@ -324,7 +260,7 @@ namespace ClientAPI
                 return jsonErrResponse(EErrCodes::eInvalidArgValue);
             }
 
-            Track* track = ItemsManager::getTrack(id);
+            Track* track = TracksManager::getTrack(id);
             if (!track)
             {
                 return jsonErrResponse(EErrCodes::eInvalidTrack);

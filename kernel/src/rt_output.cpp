@@ -3,7 +3,10 @@
 
 #include "render.h"
 #include "codec_manager.h"
-#include "items_manager.h"
+#include "sessions_manager.h"
+#include "fragments_manager.h"
+#include "tracks_manager.h"
+#include "audios_manager.h"
 #include "rt_output.h"
 #include "portaudio.h"
  
@@ -58,110 +61,21 @@ static int paCallback(const void* inputBuffer, void* outputBuffer, unsigned long
     return paContinue;
 }
 
-static uint32_t calcSessionLength()
-{
-    uint32_t max_audio_len = 0;
-
-    for (auto track_id : g_session->getTracks())
-    {
-        Track* track = ItemsManager::getTrack(track_id);
-
-        if (!track)
-        {
-            return 0;
-        }
-
-        for (auto fragment_id : track->getFragments())
-        {
-            Fragment* fragment = ItemsManager::getFragment(fragment_id);
-
-            if (!fragment)
-            {
-                return 0;
-            }
-
-            uint32_t len = fragment->getCropTo() - fragment->getCropFrom();
-            uint32_t overall_len = len + fragment->getTimeOffset();
-
-            if (max_audio_len < overall_len)
-            {
-                max_audio_len = overall_len;
-            }
-        }
-    }
-
-    return max_audio_len;
-}
-
-static status_t mixAudioToOutBuffer(Fragment* fragment, float* out_buf, uint8_t gain, uint8_t level)
-{
-    Audio* audio = ItemsManager::getAudio(fragment->getAudio());
-
-    if (!audio)
-    {
-        return 1;
-    }
-
-    uint32_t audio_from_smp = g_session->msToSamples(fragment->getCropFrom());
-    uint32_t audio_to_smp = g_session->msToSamples(fragment->getCropTo());
-    uint32_t audio_len_smp = audio_to_smp - audio_from_smp;
-    uint32_t out_buf_from_smp = g_session->msToSamples(fragment->getTimeOffset());
-
-    if (audio_from_smp >= audio_to_smp)
-    {
-        return 2;
-    }
-
-    if (out_buf_from_smp + audio_len_smp > g_session->msToSamples(calcSessionLength()))
-    {
-        return 3;
-    }
-
-    float k = (gain / 10.0 + 1.0) * (level / 100.0);
-
-    for (uint32_t i = 0; i < audio_len_smp; i++)
-    {
-        out_buf[out_buf_from_smp + i] += audio->getBuffer()[audio_from_smp + i] * k;
-    }
-
-    return 0;
-}
-
-static std::set<id_t> getTracksWithSolo()
-{
-    std::set<id_t> solo_tracks_id;
-
-    for (auto track_id : g_session->getTracks())
-    {
-        Track* track = ItemsManager::getTrack(track_id);
-
-        if (!track)
-        {
-            return std::set<id_t>();
-        }
-
-        if (track->getSolo())
-        {
-            solo_tracks_id.insert(track_id);
-        }
-    }
-
-    return solo_tracks_id;
-}
-
-static status_t render_selection(uint32_t from_ms, uint32_t to_ms)
+static status_t render_selection(const id_t session_id, const uint32_t from_ms, const uint32_t to_ms)
 {
     LOG_F(INFO, "Starting rendering session from %d to %d", from_ms, to_ms);
 
-    if (!g_session)
+    Session* session = SessionsManager::getSession(session_id);
+
+    if (!session)
     {
         LOG_F(ERROR, "No session loaded");
         return 1;
     }
 
     // calc session length in samples
-    uint32_t ses_len_ms = calcSessionLength();
-    uint32_t ses_len_smp = g_session->msToSamples(ses_len_ms);
+    uint32_t ses_len_ms = calcSessionLength(session_id);
+    uint32_t ses_len_smp = session->msToSamples(ses_len_ms);
 
     LOG_F(INFO, "Total sessiong length in ms: %d", ses_len_ms);
 
@@ -178,16 +92,16 @@ static status_t render_selection(uint32_t from_ms, uint32_t to_ms)
         right_buf[i] = 0;
     }
 
-    std::set<id_t> solo_tracks = getTracksWithSolo();
-    std::set<id_t> tracks_to_mix = !solo_tracks.empty() ? solo_tracks : g_session->getTracks();
+    std::set<id_t> solo_tracks = getTracksWithSolo(session_id);
+    std::set<id_t> tracks_to_mix = !solo_tracks.empty() ? solo_tracks : session->getTracks();
 
     LOG_F(INFO, solo_tracks.empty() ? "There are some solo tracks, mixing only them" :
-        "Mixing all available tracks");
+                                      "Mixing all available tracks");
 
     // mix right and left channels
     for (auto track_id : tracks_to_mix)
     {
-        Track* track = ItemsManager::getTrack(track_id);
+        Track* track = TracksManager::getTrack(track_id);
 
         if (!track)
         {
@@ -205,7 +119,7 @@ static status_t render_selection(uint32_t from_ms, uint32_t to_ms)
 
         for (auto fragment_id : track->getFragments())
         {
-            Fragment* fragment = ItemsManager::getFragment(fragment_id);
+            Fragment* fragment = FragmentsManager::getFragment(fragment_id);
 
             if (!fragment)
             {
@@ -216,8 +130,8 @@ static status_t render_selection(uint32_t from_ms, uint32_t to_ms)
             LOG_F(INFO, "Got fragment %d with linked audio %d", fragment_id, fragment->getAudio());
             LOG_F(INFO, "Adding linked audio to intermediate buffers");
 
-            if (mixAudioToOutBuffer(fragment, left_buf, track->getGain(), track->getLevel()) != 0 ||
-                mixAudioToOutBuffer(fragment, right_buf, track->getGain(), track->getLevel()) != 0)
+            if (mixAudioToOutBuffer(fragment_id, left_buf, ses_len_smp, track->getGain(), track->getLevel()) != 0 ||
+                mixAudioToOutBuffer(fragment_id, right_buf, ses_len_smp, track->getGain(), track->getLevel()) != 0)
             {
                 LOG_F(ERROR, "Error occured while mixing");
                 return 1;
@@ -305,22 +219,29 @@ status_t stop()
     return 0;
 }
 
-status_t play(uint32_t from_ms, uint32_t to_ms)
+status_t play(const id_t session_id, uint32_t from_ms, uint32_t to_ms)
 {
     if (g_state == EOutputState::eNonInited)
     {
         init();
     }
-
+    
     if (g_state == EOutputState::eStop)
     {
-        if (render_selection(from_ms, to_ms) != 0)
+        if (render_selection(session_id, from_ms, to_ms) != 0)
         {
             return 1;
         }
     }
 
-    PaError err = Pa_OpenStream(&g_stream, nullptr, &g_parameters, g_session->getSampleRate(),
+    Session* session = SessionsManager::getSession(session_id);
+
+    if (!session)
+    {
+        return 1;
+    }
+
+    PaError err = Pa_OpenStream(&g_stream, nullptr, &g_parameters, session->getSampleRate(),
                                 256, paClipOff, paCallback, nullptr);
 
     if (err != paNoError)

@@ -99,7 +99,8 @@
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\kernel\include;$(SolutionDir)\..\..\clients\$(ProjectName)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\3rd_party\loguru;$(SolutionDir)\..\..\kernel\include;$(SolutionDir)\..\..\clients\$(ProjectName)\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WINDLL;WIN_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -123,7 +124,8 @@
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\kernel\include;$(SolutionDir)\..\..\clients\$(ProjectName)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\3rd_party\loguru;$(SolutionDir)\..\..\kernel\include;$(SolutionDir)\..\..\clients\$(ProjectName)\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WINDLL;WIN_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -149,7 +151,8 @@
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\kernel\include;$(SolutionDir)\..\..\clients\$(ProjectName)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\3rd_party\loguru;$(SolutionDir)\..\..\kernel\include;$(SolutionDir)\..\..\clients\$(ProjectName)\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WINDLL;WIN_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -177,7 +180,8 @@
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\kernel\include;$(SolutionDir)\..\..\clients\$(ProjectName)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\3rd_party\loguru;$(SolutionDir)\..\..\kernel\include;$(SolutionDir)\..\..\clients\$(ProjectName)\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WINDLL;WIN_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

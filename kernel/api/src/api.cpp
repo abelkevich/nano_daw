@@ -1,7 +1,6 @@
 #include "api.h"
 #include "api_audio.h"
 #include "api_codec.h"
-#include "api_effect.h"
 #include "api_fragment.h"
 #include "api_playback.h"
 #include "api_render.h"
@@ -13,10 +12,33 @@
 #include <windows.h>
 #endif
 #include <thread>
+#include <mutex>
 
 namespace ClientAPI
 {
-    static std::thread g_client_thread;
+    struct ClientLib
+    {
+        ClientLib(getCommand_t _get_command_proc, receiveResponse_t _receive_response_proc, 
+                  std::string _lib_file_name, void* _system_descriptor)
+                : get_command_proc(_get_command_proc)
+                , receive_response_proc(_receive_response_proc)
+                , lib_file_name(_lib_file_name)
+                , system_descriptor(_system_descriptor)
+                , processing_thread(nullptr)
+        {
+        }
+
+        getCommand_t get_command_proc;
+        receiveResponse_t receive_response_proc;
+        std::string lib_file_name;
+        void* system_descriptor;
+        std::thread* processing_thread;
+    };
+
+    // instance:ClientLib pair
+    static std::map<void*, ClientLib> g_client_libs_map;
+    static std::mutex s_commands_queue_mutex;
+
     static std::string cmdReceiverWrapper(std::string cmd);
     static json cmdReceiver(std::string cmd);
 
@@ -81,9 +103,47 @@ namespace ClientAPI
         return tokens.size() == n;
     }
 
-    bool initAPI(const std::string &client_path)
+    void processClient(void* system_descriptor)
     {
-        LOG_F(INFO, "Got client lib path: %s", client_path.c_str());
+        LOG_F(INFO, "Starting processing client lib (instance: '%p')", system_descriptor);
+
+        auto find_it = g_client_libs_map.find(system_descriptor);
+
+        if (find_it == g_client_libs_map.end())
+        {
+            LOG_F(ERROR, "Cannot find lib info for instance: '%p'", system_descriptor);
+            return;
+        }
+
+        const ClientLib &client_lib = find_it->second;
+
+        while (true)
+        {
+            const std::string cmd = client_lib.get_command_proc();
+            LOG_F(INFO, "Got request: '%s' from client (lib: '%s'; instance: '%p')", 
+                        cmd.c_str(), client_lib.lib_file_name.c_str(), client_lib.system_descriptor);
+            
+            s_commands_queue_mutex.lock();
+            const std::string response = cmdReceiverWrapper(cmd);
+            s_commands_queue_mutex.unlock();
+
+            client_lib.receive_response_proc(response);
+        }
+    }
+
+    void runAPIHandlers()
+    {
+        LOG_F(INFO, "Starting loaded API handlers");
+
+        for (auto client : g_client_libs_map)
+        {
+            client.second.processing_thread = new std::thread(processClient, (void*) client.first);
+        }
+    }
+
+    bool addAPIHandler(const std::string &client_path)
+    {
+        LOG_F(INFO, "Adding new API handler: '%s'", client_path.c_str());
 #ifdef __linux__
         void* hinstLib = dlopen(client_path.c_str(), RTLD_LAZY);
 #else
@@ -92,25 +152,52 @@ namespace ClientAPI
 
         if (!hinstLib)
         {
-            LOG_F(ERROR, "Cannot load library");
+            LOG_F(ERROR, "Cannot load library: '%s'", client_path.c_str());
             return false;
         }
 
-        LOG_F(INFO, "Library loaded");
+        if (g_client_libs_map.find((void*)hinstLib) != g_client_libs_map.end())
+        {
+            LOG_F(ERROR, "Client (lib: '%s') already registered", client_path.c_str());
+            return false;
+        }
+
 #ifdef __linux__
         spawnClient_t spawn_client = (spawnClient_t) dlsym(hinstLib, "spawnClient");
 #else
-        spawnClient_t spawn_client = (spawnClient_t) GetProcAddress(hinstLib, "spawnClient");
+        receiveResponse_t receive_response_proc = (receiveResponse_t) GetProcAddress(hinstLib, "receiveResponse");
+        getCommand_t get_command_proc = (getCommand_t) GetProcAddress(hinstLib, "getCommand");
+        init_t init_proc = (init_t) GetProcAddress(hinstLib, "init");
 #endif
-        if (!spawn_client)
+        
+        if (!receive_response_proc)
         {
-            LOG_F(ERROR, "Cannot find \"spawnClient\" procedure lib");
+            LOG_F(ERROR, "Cannot find 'receiveResponse' procedure");
             return false;
         }
 
-        LOG_F(INFO, "Found \"spawnClient\", now registering client callbacks and creating thread");
+        if (!get_command_proc)
+        {
+            LOG_F(ERROR, "Cannot find 'getCommand' procedure");
+            return false;
+        }
 
-        g_client_thread = std::thread(spawn_client, cmdReceiverWrapper);
+        if (!init_proc)
+        {
+            LOG_F(ERROR, "Cannot find 'init' procedure");
+            return false;
+        }
+
+        if (!init_proc())
+        {
+            LOG_F(ERROR, "Cannot init client (lib: '%s' instance: '%p')", client_path.c_str(), hinstLib);
+            return false;
+        }
+
+        ClientLib client_lib(get_command_proc, receive_response_proc, client_path, (void*) hinstLib);
+        g_client_libs_map.insert(std::make_pair((void*) hinstLib, client_lib));
+
+        LOG_F(INFO, "API handler (lib: '%s' instance: '%p') successfully added", client_path.c_str(), hinstLib);
 
         return true;
     }
@@ -121,23 +208,29 @@ namespace ClientAPI
 
         if (response.find("error") != response.end())
         {
-            return json({ {"status", 1}, {"error", response.at("error")}}).dump();
+            const std::string response_str = json({ {"status", 1}, {"error", response.at("error")} }).dump();
+            LOG_F(ERROR, "Responding with error: '%s'", response_str.c_str());
+            return response_str;
         }
 
         if (!response.is_null())
         {
-            return json({ {"status", 0}, {"data", response} }).dump();
+            const std::string response_str = json({ {"status", 0}, {"data", response} }).dump();
+            LOG_F(INFO, "Responding with data: '%s'", response_str.c_str());
+            return response_str;
         }
 
-        return json({ {"status", 0} }).dump();
+        const std::string response_str = json({ {"status", 0} }).dump();
+        LOG_F(INFO, "Responding without data: '%s'", response_str.c_str());
+        return response_str;
     }
 
     json cmdReceiver(std::string user_cmd_line)
     {
         CommandSeq seq(user_cmd_line);
 
-        enum EIdents { eCodec, eEffect, eAudio, eFragment, eTrack, eSession, ePlayback, eRender, eNone };
-        IdentsMap<EIdents> idents_map{ {"codec", eCodec }, {"effect", eEffect}, {"audio", eAudio}, {"fragment", eFragment}, {"track", eTrack},
+        enum EIdents { eCodec, eAudio, eFragment, eTrack, eSession, ePlayback, eRender, eNone };
+        IdentsMap<EIdents> idents_map{ {"codec", eCodec }, {"audio", eAudio}, {"fragment", eFragment}, {"track", eTrack},
                                        {"session", eSession}, {"playback", ePlayback}, {"render", eRender} };
 
         std::string token = seq.sliceNextToken();
@@ -149,9 +242,6 @@ namespace ClientAPI
         {
         case eCodec:
             return cmdCodec(seq);
-
-        case eEffect:
-            return cmdEffect(seq);
 
         case eFragment:
             return cmdFragment(seq);

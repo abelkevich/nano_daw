@@ -4,24 +4,24 @@
     <LocalDebuggerCommand>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\$(TargetName)$(TargetExt)</LocalDebuggerCommand>
     <LocalDebuggerWorkingDirectory>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\clients\terminal.dll</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\clients\terminal.dll $(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\clients\autotest.dll</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LocalDebuggerCommand>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\$(TargetName)$(TargetExt)</LocalDebuggerCommand>
     <LocalDebuggerWorkingDirectory>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\clients\terminal.dll</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\clients\terminal.dll $(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\clients\autotest.dll</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerCommand>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\$(TargetName)$(TargetExt)</LocalDebuggerCommand>
     <LocalDebuggerWorkingDirectory>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\clients\terminal.dll</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\clients\terminal.dll $(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\clients\autotest.dll</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LocalDebuggerCommand>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\$(TargetName)$(TargetExt)</LocalDebuggerCommand>
     <LocalDebuggerWorkingDirectory>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\clients\terminal.dll</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\clients\terminal.dll $(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\clients\autotest.dll</LocalDebuggerCommandArguments>
   </PropertyGroup>
 </Project>

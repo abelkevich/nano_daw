@@ -1,5 +1,7 @@
 #include "api_render.h"
-#include "items_manager.h"
+#include "fragments_manager.h"
+#include "audios_manager.h"
+#include "tracks_manager.h"
 
 namespace ClientAPI
 {
@@ -27,31 +29,31 @@ namespace ClientAPI
             std::string id_str = seq.sliceNextToken();
             id_t id = stoi(id_str);
 
-            Fragment* fragment = ItemsManager::getFragment(id);
+            Fragment* fragment = FragmentsManager::getFragment(id);
             if (!fragment)
             {
                 return jsonErrResponse(EErrCodes::eInvalidFragment);
             }
 
-            return json({ {"audio", fragment->getAudio()}, {"crop_from", fragment->getCropFrom()}, {"crop_to", fragment->getCropTo()}
-                        , {"offset", fragment->getTimeOffset()}});
+            return json({ {"id", fragment->getId()}, {"audio", fragment->getAudio()}, {"track", fragment->getTrack()}, 
+                          {"crop_from", fragment->getCropFrom()}, {"crop_to", fragment->getCropTo()}, {"offset", fragment->getTimeOffset()}});
         }
 
         case eList:
         {
-            std::set<id_t> fragment_ids = ItemsManager::getFragments();
+            std::set<id_t> fragment_ids = FragmentsManager::getFragments();
 
             json::array_t response = json::array();
             for (id_t id : fragment_ids)
             {
-                Fragment* fragment = ItemsManager::getFragment(id);
+                Fragment* fragment = FragmentsManager::getFragment(id);
 
                 if (!fragment)
                 {
                     return jsonErrResponse(EErrCodes::eOperationFailed);
                 }
 
-                json arr_elem({ {"id", id}, {"audio", fragment->getAudio()} });
+                json arr_elem({ {"id", id} });
                 response.push_back(arr_elem);
             }
 
@@ -60,20 +62,25 @@ namespace ClientAPI
 
         case eAdd:
         {
-            if (!seq.hasNTokens(1))
+            if (!seq.hasNTokens(2))
             {
                 return jsonErrResponse(EErrCodes::eInvalidArgsNum);
             }
 
-            std::string audio_id_str = seq.sliceNextToken();
-            id_t audio_id = stoi(audio_id_str);
+            const id_t track_id = stoi(seq.sliceNextToken());
+            const id_t audio_id = stoi(seq.sliceNextToken());
 
-            if (!ItemsManager::getAudio(audio_id))
+            if (!AudiosManager::getAudio(audio_id))
             {
                 return jsonErrResponse(EErrCodes::eInvalidAudio);
             }
 
-            id_t id = ItemsManager::createFragment(audio_id);
+            if (!TracksManager::getTrack(track_id))
+            {
+                return jsonErrResponse(EErrCodes::eInvalidTrack);
+            }
+
+            id_t id = FragmentsManager::createFragment(track_id, audio_id);
 
             if (!id)
             {
@@ -94,12 +101,12 @@ namespace ClientAPI
 
             id_t id = stoi(id_str);
 
-            if (!ItemsManager::getFragment(id))
+            if (!FragmentsManager::getFragment(id))
             {
                 return jsonErrResponse(EErrCodes::eInvalidFragment);
             }
 
-            if (!ItemsManager::removeFragment(id))
+            if (!FragmentsManager::removeFragment(id))
             {
                 return jsonErrResponse(EErrCodes::eOperationFailed);
             }
@@ -117,7 +124,7 @@ namespace ClientAPI
             std::string id_str = seq.sliceNextToken();
             id_t id = stoi(id_str);
 
-            Fragment *fragment = ItemsManager::getFragment(id);
+            Fragment *fragment = FragmentsManager::getFragment(id);
 
             if (!fragment)
             {
@@ -152,7 +159,7 @@ namespace ClientAPI
             std::string id_str = seq.sliceNextToken();
             id_t id = stoi(id_str);
 
-            Fragment* fragment = ItemsManager::getFragment(id);
+            Fragment* fragment = FragmentsManager::getFragment(id);
 
             if (!fragment)
             {

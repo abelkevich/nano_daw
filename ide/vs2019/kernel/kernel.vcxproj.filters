@@ -25,6 +25,15 @@
     <Filter Include="items\include">
       <UniqueIdentifier>{d4d3faf1-dd96-4609-be40-82eb586e7ec0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="items_manager">
+      <UniqueIdentifier>{2270ba2b-814d-4196-b6b2-11023c2a7c13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="items_manager\include">
+      <UniqueIdentifier>{5d21b0a4-c2b0-483e-99fe-d69a27e4b8b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="items_manager\src">
+      <UniqueIdentifier>{df6db48b-2568-4f78-a74f-cd685e7d7eeb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\kernel\include\common.h">
@@ -51,9 +60,6 @@
     <ClInclude Include="..\..\..\kernel\api\include\api_audio.h">
       <Filter>api\include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\kernel\api\include\api_effect.h">
-      <Filter>api\include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\kernel\api\include\api_fragment.h">
       <Filter>api\include</Filter>
     </ClInclude>
@@ -68,9 +74,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\kernel\api\include\api_render.h">
       <Filter>api\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\kernel\include\items_manager.h">
-      <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\kernel\api\include\api_codec.h">
       <Filter>api\include</Filter>
@@ -87,9 +90,6 @@
     <ClInclude Include="..\..\..\kernel\items\include\track.h">
       <Filter>items\include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\kernel\items\include\effect.h">
-      <Filter>items\include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\kernel\include\client_api.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -101,6 +101,21 @@
     </ClInclude>
     <ClInclude Include="..\..\..\kernel\include\utils.h">
       <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\kernel\items_manager\include\items_manager.h">
+      <Filter>items_manager\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\kernel\items_manager\include\audios_manager.h">
+      <Filter>items_manager\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\kernel\items_manager\include\fragments_manager.h">
+      <Filter>items_manager\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\kernel\items_manager\include\sessions_manager.h">
+      <Filter>items_manager\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\kernel\items_manager\include\tracks_manager.h">
+      <Filter>items_manager\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -125,9 +140,6 @@
     <ClCompile Include="..\..\..\kernel\api\src\api_audio.cpp">
       <Filter>api\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\kernel\api\src\api_effect.cpp">
-      <Filter>api\src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\kernel\api\src\api_fragment.cpp">
       <Filter>api\src</Filter>
     </ClCompile>
@@ -142,9 +154,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\kernel\api\src\api_render.cpp">
       <Filter>api\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\kernel\src\items_manager.cpp">
-      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\kernel\api\src\api_codec.cpp">
       <Filter>api\src</Filter>
@@ -161,9 +170,6 @@
     <ClCompile Include="..\..\..\kernel\items\src\track.cpp">
       <Filter>items\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\kernel\items\src\effect.cpp">
-      <Filter>items\src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\kernel\src\rt_output.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -172,6 +178,21 @@
     </ClCompile>
     <ClCompile Include="..\..\..\kernel\src\utils.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\kernel\items_manager\src\fragments_manager.cpp">
+      <Filter>items_manager\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\kernel\items_manager\src\items_manager.cpp">
+      <Filter>items_manager\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\kernel\items_manager\src\sessions_manager.cpp">
+      <Filter>items_manager\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\kernel\items_manager\src\tracks_manager.cpp">
+      <Filter>items_manager\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\kernel\items_manager\src\audios_manager.cpp">
+      <Filter>items_manager\src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -6,4 +6,3 @@
 #include <loguru.hpp>
 
 extern bool g_working;
-extern Session *g_session;

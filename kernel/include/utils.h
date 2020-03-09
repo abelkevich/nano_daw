@@ -3,5 +3,7 @@
 
 namespace Utils
 {
-    std::string getFileExt(const std::string& s);
+    std::string idSetToString(const std::set<id_t>& id_set);
+    std::string getFileExt(const std::string& file_name);
+    std::list <std::string> searchFilesByExt(const std::string& search_path, const std::string& target_ext);
 }

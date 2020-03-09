@@ -22,7 +22,6 @@
     <ClInclude Include="..\..\..\kernel\api\include\api.h" />
     <ClInclude Include="..\..\..\kernel\api\include\api_audio.h" />
     <ClInclude Include="..\..\..\kernel\api\include\api_codec.h" />
-    <ClInclude Include="..\..\..\kernel\api\include\api_effect.h" />
     <ClInclude Include="..\..\..\kernel\api\include\api_fragment.h" />
     <ClInclude Include="..\..\..\kernel\api\include\api_playback.h" />
     <ClInclude Include="..\..\..\kernel\api\include\api_render.h" />
@@ -32,7 +31,6 @@
     <ClInclude Include="..\..\..\kernel\include\codec_api.h" />
     <ClInclude Include="..\..\..\kernel\include\codec_manager.h" />
     <ClInclude Include="..\..\..\kernel\include\common.h" />
-    <ClInclude Include="..\..\..\kernel\include\items_manager.h" />
     <ClInclude Include="..\..\..\kernel\include\kernel.h" />
     <ClInclude Include="..\..\..\kernel\include\client_api.h" />
     <ClInclude Include="..\..\..\kernel\include\render.h" />
@@ -40,30 +38,36 @@
     <ClInclude Include="..\..\..\kernel\include\rt_output.h" />
     <ClInclude Include="..\..\..\kernel\include\utils.h" />
     <ClInclude Include="..\..\..\kernel\items\include\audio.h" />
-    <ClInclude Include="..\..\..\kernel\items\include\effect.h" />
     <ClInclude Include="..\..\..\kernel\items\include\fragment.h" />
     <ClInclude Include="..\..\..\kernel\items\include\session.h" />
     <ClInclude Include="..\..\..\kernel\items\include\track.h" />
+    <ClInclude Include="..\..\..\kernel\items_manager\include\audios_manager.h" />
+    <ClInclude Include="..\..\..\kernel\items_manager\include\fragments_manager.h" />
+    <ClInclude Include="..\..\..\kernel\items_manager\include\items_manager.h" />
+    <ClInclude Include="..\..\..\kernel\items_manager\include\sessions_manager.h" />
+    <ClInclude Include="..\..\..\kernel\items_manager\include\tracks_manager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\kernel\api\src\api.cpp" />
     <ClCompile Include="..\..\..\kernel\api\src\api_audio.cpp" />
     <ClCompile Include="..\..\..\kernel\api\src\api_codec.cpp" />
-    <ClCompile Include="..\..\..\kernel\api\src\api_effect.cpp" />
     <ClCompile Include="..\..\..\kernel\api\src\api_fragment.cpp" />
     <ClCompile Include="..\..\..\kernel\api\src\api_playback.cpp" />
     <ClCompile Include="..\..\..\kernel\api\src\api_render.cpp" />
     <ClCompile Include="..\..\..\kernel\api\src\api_session.cpp" />
     <ClCompile Include="..\..\..\kernel\api\src\api_track.cpp" />
     <ClCompile Include="..\..\..\kernel\items\src\audio.cpp" />
-    <ClCompile Include="..\..\..\kernel\items\src\effect.cpp" />
     <ClCompile Include="..\..\..\kernel\items\src\fragment.cpp" />
     <ClCompile Include="..\..\..\kernel\items\src\session.cpp" />
     <ClCompile Include="..\..\..\kernel\items\src\track.cpp" />
+    <ClCompile Include="..\..\..\kernel\items_manager\src\audios_manager.cpp" />
+    <ClCompile Include="..\..\..\kernel\items_manager\src\fragments_manager.cpp" />
+    <ClCompile Include="..\..\..\kernel\items_manager\src\items_manager.cpp" />
+    <ClCompile Include="..\..\..\kernel\items_manager\src\sessions_manager.cpp" />
+    <ClCompile Include="..\..\..\kernel\items_manager\src\tracks_manager.cpp" />
     <ClCompile Include="..\..\..\kernel\src\codec_api.cpp" />
     <ClCompile Include="..\..\..\kernel\src\codec_file_info.cpp" />
     <ClCompile Include="..\..\..\kernel\src\codec_manager.cpp" />
-    <ClCompile Include="..\..\..\kernel\src\items_manager.cpp" />
     <ClCompile Include="..\..\..\kernel\src\kernel.cpp" />
     <ClCompile Include="..\..\..\kernel\src\render.cpp" />
     <ClCompile Include="..\..\..\kernel\src\resampler.cpp" />
@@ -148,7 +152,7 @@
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\3rd_party\portaudio\include;$(SolutionDir)\..\..\3rd_party\json\single_include;$(SolutionDir)\..\..\3rd_party\loguru;$(SolutionDir)..\..\kernel\include;$(SolutionDir)..\..\kernel\api\include;$(SolutionDir)..\..\kernel\items\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\3rd_party\portaudio\include;$(SolutionDir)\..\..\3rd_party\json\single_include;$(SolutionDir)\..\..\3rd_party\loguru;$(SolutionDir)..\..\kernel\include;$(SolutionDir)..\..\kernel\api\include;$(SolutionDir)..\..\kernel\items_manager\include;$(SolutionDir)..\..\kernel\items\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -173,7 +177,7 @@
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\3rd_party\portaudio\include;$(SolutionDir)\..\..\3rd_party\json\single_include;$(SolutionDir)\..\..\3rd_party\loguru;$(SolutionDir)..\..\kernel\include;$(SolutionDir)..\..\kernel\api\include;$(SolutionDir)..\..\kernel\items\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\3rd_party\portaudio\include;$(SolutionDir)\..\..\3rd_party\json\single_include;$(SolutionDir)\..\..\3rd_party\loguru;$(SolutionDir)..\..\kernel\include;$(SolutionDir)..\..\kernel\api\include;$(SolutionDir)..\..\kernel\items_manager\include;$(SolutionDir)..\..\kernel\items\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -200,7 +204,7 @@
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\3rd_party\portaudio\include;$(SolutionDir)\..\..\3rd_party\json\single_include;$(SolutionDir)\..\..\3rd_party\loguru;$(SolutionDir)..\..\kernel\include;$(SolutionDir)..\..\kernel\api\include;$(SolutionDir)..\..\kernel\items\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\3rd_party\portaudio\include;$(SolutionDir)\..\..\3rd_party\json\single_include;$(SolutionDir)\..\..\3rd_party\loguru;$(SolutionDir)..\..\kernel\include;$(SolutionDir)..\..\kernel\api\include;$(SolutionDir)..\..\kernel\items_manager\include;$(SolutionDir)..\..\kernel\items\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -229,7 +233,7 @@
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\3rd_party\portaudio\include;$(SolutionDir)\..\..\3rd_party\json\single_include;$(SolutionDir)\..\..\3rd_party\loguru;$(SolutionDir)..\..\kernel\include;$(SolutionDir)..\..\kernel\api\include;$(SolutionDir)..\..\kernel\items\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\3rd_party\portaudio\include;$(SolutionDir)\..\..\3rd_party\json\single_include;$(SolutionDir)\..\..\3rd_party\loguru;$(SolutionDir)..\..\kernel\include;$(SolutionDir)..\..\kernel\api\include;$(SolutionDir)..\..\kernel\items_manager\include;$(SolutionDir)..\..\kernel\items\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
