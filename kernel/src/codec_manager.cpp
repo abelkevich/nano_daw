@@ -11,7 +11,6 @@ namespace CodecManager
 {
     static std::vector<Codec> g_codecs;
 
-#ifdef __linux__
     Codec::Codec(LoadFileProc_t _loadFile, SaveFileProc_t _saveFile, GetName_t _getName, GetExtensions_t _getExtensions, void* _h_instance)
                : loadFile(_loadFile)
                , saveFile(_saveFile)
@@ -21,111 +20,79 @@ namespace CodecManager
     {
     }
 
-    status_t addCodec(std::string path)
+    static bool addCodec(const std::string &path)
     {
-        void* h_instance = dlopen(path.c_str(), RTLD_LAZY);
+        LOG_F(INFO, "Adding codec lib: '%s'", path.c_str());
+
+        void* h_instance = Utils::loadLibrary(path);
 
         if (!h_instance)
         {
-            return 1;
+            LOG_F(ERROR, "Cannot get system descriptor for lib: '%s'", path.c_str());
+            return false;
         }
 
-        LoadFileProc_t load_file_proc = (LoadFileProc_t)dlsym(h_instance, "loadFile");
-        SaveFileProc_t save_file_proc = (SaveFileProc_t)dlsym(h_instance, "saveFile");
-        GetName_t get_name_proc = (GetName_t)dlsym(h_instance, "getName");
-        GetExtensions_t get_ext_proc = (GetExtensions_t)dlsym(h_instance, "getExtensions");
+        LOG_F(INFO, "Got instance '%p' for codec lib: '%s'", h_instance, path.c_str());
 
-        if (!load_file_proc || !save_file_proc || !get_name_proc || !get_ext_proc)
+        LoadFileProc_t load_file_proc = (LoadFileProc_t) Utils::getLibProcedure(h_instance, "loadFile");
+
+        if (!load_file_proc)
         {
-            return 2;
+            LOG_F(ERROR, "Cannot get 'loadFile' procedure (lib: '%s')", path.c_str());
+            return false;
         }
+
+        SaveFileProc_t save_file_proc = (SaveFileProc_t) Utils::getLibProcedure(h_instance, "saveFile");
+
+        if (!save_file_proc)
+        {
+            LOG_F(ERROR, "Cannot get 'saveFile' procedure (lib: '%s')", path.c_str());
+            return false;
+        }
+
+        GetName_t get_name_proc = (GetName_t) Utils::getLibProcedure(h_instance, "getName");
+
+        if (!get_name_proc)
+        {
+            LOG_F(ERROR, "Cannot get 'getName' procedure (lib: '%s')", path.c_str());
+            return false;
+        }
+
+        GetExtensions_t get_ext_proc = (GetExtensions_t) Utils::getLibProcedure(h_instance, "getExtensions");
+
+        if (!get_ext_proc)
+        {
+            LOG_F(ERROR, "Cannot get 'getExtensions' procedure (lib: '%s')", path.c_str());
+            return false;
+        }
+        
+        LOG_F(INFO, "Codec lib (path: '%s' instance: '%p') was added to the inited codecs", path.c_str(), h_instance);
 
         Codec codec(load_file_proc, save_file_proc, get_name_proc, get_ext_proc, h_instance);
-
         g_codecs.push_back(codec);
 
         return 0;
     }
-#else
-    Codec::Codec(LoadFileProc_t _loadFile, SaveFileProc_t _saveFile, GetName_t _getName, GetExtensions_t _getExtensions, HINSTANCE _h_instance)
-               : loadFile(_loadFile)
-               , saveFile(_saveFile)
-               , getName(_getName)
-               , getExtensions(_getExtensions)
-               , h_instance(_h_instance)
-    {
-    }
 
-    status_t addCodec(std::string path)
-    {
-
-        HINSTANCE h_instance = LoadLibrary(TEXT(path.c_str()));
-
-        if (!h_instance)
-        {
-            return 1;
-        }
-
-        LoadFileProc_t load_file_proc = (LoadFileProc_t)GetProcAddress(h_instance, "loadFile");
-        SaveFileProc_t save_file_proc = (SaveFileProc_t)GetProcAddress(h_instance, "saveFile");
-        GetName_t get_name_proc = (GetName_t)GetProcAddress(h_instance, "getName");
-        GetExtensions_t get_ext_proc = (GetExtensions_t)GetProcAddress(h_instance, "getExtensions");
-
-        if (!load_file_proc || !save_file_proc || !get_name_proc || !get_ext_proc)
-        {
-            return 2;
-        }
-
-        Codec codec(load_file_proc, save_file_proc, get_name_proc, get_ext_proc, h_instance);
-
-        g_codecs.push_back(codec);
-
-        return 0;
-    }
-#endif
-#ifdef __linux__
-    status_t initCodecs()
+    bool initCodecs()
     {
         LOG_F(INFO, "Starting codecs init");
 
-        std::list <std::string> path_to_dll = Utils::searchFilesByExt("codecs\\", ".so");
+        std::list <std::string> libs_paths = Utils::searchFilesByExt("codecs", Utils::c_lib_extension);
+        LOG_F(INFO, "Found '%d' possible codecs libs", libs_paths.size());
 
-
-        for (std::string dll_file : path_to_dll) {
-
-            LOG_F(INFO, "Got file %s", dll_file.c_str());
-
-            if (addCodec(dll_file))
+        for (const std::string& path : libs_paths) 
+        {
+            if (!addCodec(path))
             {
-                LOG_F(ERROR, "Cannot load codec .dll %s", dll_file.c_str());
-                return 1;
+                LOG_F(ERROR, "Cannot load lib: '%s'", path.c_str());
+                return false;
             }
         }
 
-        return 0;
+        return true;
     }
-#else
-    status_t initCodecs()
-    {
-        LOG_F(INFO, "Starting codecs init");
 
-
-        std::list <std::string> path_to_dll = Utils::searchFilesByExt("codecs\\", ".dll");
-
-        for (std::string dll_file : path_to_dll) {
-
-            LOG_F(INFO, "Got file %s", dll_file.c_str());
-
-            if (addCodec(dll_file))
-            {
-                LOG_F(ERROR, "Cannot load codec .dll %s", dll_file.c_str());
-                return 1;
-            }
-        }
-
-        return 0;
-    }
-#endif
     const Codec* findCodecByFileExt(std::string ext)
     {
         for (Codec& codec : g_codecs)

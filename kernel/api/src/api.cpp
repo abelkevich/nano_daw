@@ -7,11 +7,7 @@
 #include "api_session.h"
 #include "api_track.h"
 
-#ifdef __linux__
-    #include <dlfcn.h>
-#else
-    #include <windows.h>
-#endif
+#include "utils.h"
 
 #include <thread>
 #include <mutex>
@@ -146,45 +142,38 @@ namespace ClientAPI
     bool addAPIHandler(const std::string &client_path)
     {
         LOG_F(INFO, "Adding new API handler: '%s'", client_path.c_str());
-#ifdef __linux__
-        void* hinstLib = dlopen(client_path.c_str(), RTLD_LAZY);
-#else
-        HINSTANCE hinstLib = LoadLibrary(TEXT(client_path.c_str()));
-#endif
 
-        if (!hinstLib)
+        void* instance = Utils::loadLibrary(client_path);
+
+        if (!instance)
         {
             LOG_F(ERROR, "Cannot load library: '%s'", client_path.c_str());
             return false;
         }
 
-        if (g_client_libs_map.find((void*)hinstLib) != g_client_libs_map.end())
+        if (g_client_libs_map.find((void*) instance) != g_client_libs_map.end())
         {
             LOG_F(ERROR, "Client (lib: '%s') already registered", client_path.c_str());
             return false;
         }
 
-#ifdef __linux__
-        receiveResponse_t receive_response_proc = (receiveResponse_t) dlsym(hinstLib, "receiveResponse");
-        getCommand_t get_command_proc = (getCommand_t) dlsym(hinstLib, "getCommand");
-        init_t init_proc = (init_t) dlsym(hinstLib, "init");
-#else
-        receiveResponse_t receive_response_proc = (receiveResponse_t) GetProcAddress(hinstLib, "receiveResponse");
-        getCommand_t get_command_proc = (getCommand_t) GetProcAddress(hinstLib, "getCommand");
-        init_t init_proc = (init_t) GetProcAddress(hinstLib, "init");
-#endif
+        receiveResponse_t receive_response_proc = (receiveResponse_t) Utils::getLibProcedure(instance, "receiveResponse");
         
         if (!receive_response_proc)
         {
             LOG_F(ERROR, "Cannot find 'receiveResponse' procedure");
             return false;
         }
-
+        
+        getCommand_t get_command_proc = (getCommand_t) Utils::getLibProcedure(instance, "getCommand");
+        
         if (!get_command_proc)
         {
             LOG_F(ERROR, "Cannot find 'getCommand' procedure");
             return false;
         }
+        
+        init_t init_proc = (init_t) Utils::getLibProcedure(instance, "init");
 
         if (!init_proc)
         {
@@ -194,14 +183,14 @@ namespace ClientAPI
 
         if (!init_proc())
         {
-            LOG_F(ERROR, "Cannot init client (lib: '%s' instance: '%p')", client_path.c_str(), hinstLib);
+            LOG_F(ERROR, "Cannot init client (lib: '%s' instance: '%p')", client_path.c_str(), instance);
             return false;
         }
 
-        ClientLib client_lib(get_command_proc, receive_response_proc, client_path, (void*) hinstLib);
-        g_client_libs_map.insert(std::make_pair((void*) hinstLib, client_lib));
+        ClientLib client_lib(get_command_proc, receive_response_proc, client_path, instance);
+        g_client_libs_map.insert(std::make_pair(instance, client_lib));
 
-        LOG_F(INFO, "API handler (lib: '%s' instance: '%p') successfully added", client_path.c_str(), hinstLib);
+        LOG_F(INFO, "API handler (lib: '%s' instance: '%p') successfully added", client_path.c_str(), instance);
 
         return true;
     }

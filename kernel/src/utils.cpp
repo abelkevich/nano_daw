@@ -2,8 +2,32 @@
 #include <sstream>
 #include <filesystem>
 
+#ifdef __linux__
+    #include <dlfcn.h>
+#else
+    #include <windows.h>
+#endif
+
 namespace Utils
 {
+    void* loadLibrary(const std::string &file_path)
+    {
+        #ifdef __linux__
+            return dlopen(file_path.c_str(), RTLD_LAZY);
+        #else
+            return LoadLibrary(TEXT(path.c_str()));
+        #endif
+    }
+
+    void* getLibProcedure(void* lib_instance, const std::string &proc_name)
+    {
+        #ifdef __linux__
+            return dlsym(lib_instance, proc_name.c_str());
+        #else
+            return GetProcAddress((HINSTANCE)lib_instance, TEXT(proc_name.c_str()));
+        #endif
+    }
+
     std::string idSetToString(const std::set<id_t> &id_set)
     {
         std::stringstream str_stream;

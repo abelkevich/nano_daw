@@ -17,7 +17,7 @@ namespace ClientAPI
         {
         case eInit:
         {
-            if (CodecManager::initCodecs() != 0)
+            if (!CodecManager::initCodecs())
             {
                 return jsonErrResponse(EErrCodes::eOperationFailed);
             }
