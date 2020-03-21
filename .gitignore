@@ -1,2 +1,16 @@
 ide/vs2019/.vs
 res
+*.obj
+*.o
+*.lib
+*.pdb
+*.dll
+*.exe
+*.log
+*.tlog
+*.ipdb
+*.txt
+*.exp
+*.iobj
+*.idb
+*.ilk
