@@ -9,7 +9,7 @@ namespace ClientAPI
     {
         enum EIdents { eList, eAdd, eRemove, eCrop, eOffset, eInfo, eNone };
         IdentsMap<EIdents> idents_map{ {"add", eAdd}, {"remove", eRemove}, {"list", eList}, 
-                                       {"crop", eCrop}, {"offset", eOffset}, {"info", eInfo} };
+                                       {"crop", eCrop}, {"offset", eOffset}, {"info", eInfo}};
 
         std::string token = seq.sliceNextToken();
 
@@ -36,7 +36,8 @@ namespace ClientAPI
             }
 
             return json({ {"id", fragment->getId()}, {"audio", fragment->getAudio()}, {"track", fragment->getTrack()}, 
-                          {"crop_from", fragment->getCropFrom()}, {"crop_to", fragment->getCropTo()}, {"offset", fragment->getTimeOffset()}});
+                          {"crop_from", fragment->getCropFrom()}, {"crop_to", fragment->getCropTo()}, {"timeline_offset", fragment->getTimelineOffset()}, 
+                          {"audio_length", fragment->getAudioLength()} });
         }
 
         case eList:
@@ -133,17 +134,20 @@ namespace ClientAPI
 
             {
                 std::string crop_from_str = seq.sliceNextToken();
-                int32_t crop_from = stoi(crop_from_str);
+                ms_t crop_from = stoi(crop_from_str);
 
                 std::string crop_to_str = seq.sliceNextToken();
-                int32_t crop_to = stoi(crop_to_str);
+                ms_t crop_to = stoi(crop_to_str);
 
                 if (crop_from < 0 || crop_to < 0 || crop_to <= crop_from)
                 {
                     return jsonErrResponse(EErrCodes::eInvalidArgValue);
                 }
 
-                fragment->crop(crop_from, crop_to);
+                if (!fragment->crop(crop_from, crop_to))
+                {
+                    return jsonErrResponse(EErrCodes::eOperationFailed);
+                }
             }
 
             return json();
@@ -168,14 +172,17 @@ namespace ClientAPI
 
             {
                 std::string offset_str = seq.sliceNextToken();
-                int offset = stoi(offset_str);
+                ms_t offset = stoi(offset_str);
 
                 if (offset < 0)
                 {
                     return jsonErrResponse(EErrCodes::eInvalidArgValue);
                 }
 
-                fragment->setTimeOffset(offset);
+                if (!fragment->setTimelineOffset(offset))
+                {
+                    return jsonErrResponse(EErrCodes::eOperationFailed);
+                }
             }
 
             return json();

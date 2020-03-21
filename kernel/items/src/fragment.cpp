@@ -2,6 +2,7 @@
 #include "audios_manager.h"
 #include "tracks_manager.h"
 #include "sessions_manager.h"
+#include "resampler.h"
 
 Fragment::Fragment(const id_t id, const id_t linked_track, const id_t linked_audio)
                  : m_id(id)
@@ -11,21 +12,14 @@ Fragment::Fragment(const id_t id, const id_t linked_track, const id_t linked_aud
                  , m_crop_from(0)
                  , m_crop_to(0)
 {
-    const Audio* audio = AudiosManager::getAudio(m_linked_audio);
-    const Track* track = TracksManager::getTrack(m_linked_track);
-    const Session* session = !track ? nullptr : SessionsManager::getSession(track->getSessionId());
-
-    if (audio && session)
-    {
-        m_crop_to = session->samplesToMs(audio->getBufferLength());
-    }
+    crop(0, getAudioLength());
 }
 
-uint32_t Fragment::getTimeOffset() const { return m_time_offset; }
-status_t Fragment::setTimeOffset(uint32_t offset)
+ms_t Fragment::getTimelineOffset() const { return m_time_offset; }
+bool Fragment::setTimelineOffset(ms_t offset)
 {
     m_time_offset = offset;
-    return 0;
+    return true;
 }
 
 uint32_t Fragment::getCropFrom() const { return m_crop_from; }
@@ -34,33 +28,58 @@ uint32_t Fragment::getCropTo() const { return m_crop_to; }
 id_t Fragment::getAudio() const { return m_linked_audio; }
 id_t Fragment::getTrack() const { return m_linked_track; }
 
-status_t Fragment::crop(uint32_t crop_from, uint32_t crop_to)
+ms_t Fragment::getAudioLength() const
 {
-    const Audio* audio = AudiosManager::getAudio(m_linked_audio);
-    const Track* track = TracksManager::getTrack(m_linked_track);
-    const Session* session = !track ? nullptr : SessionsManager::getSession(track->getSessionId());
-
-    if (!audio || !session)
+    Track* track = TracksManager::getTrack(m_linked_track);
+    
+    if (!track)
     {
-        return 1;
+        return 0;
     }
 
-    const uint32_t audio_ms_len = session->samplesToMs(audio->getBufferLength());
+    Session* session = SessionsManager::getSession(track->getSessionId());
 
+    if (!session)
+    {
+        return 0;
+    }
+
+    Audio* audio = AudiosManager::getAudio(m_linked_audio);
+
+    if (!audio)
+    {
+        return 0;
+    }
+
+    if (session->getSampleRate() != audio->getSampleRate())
+    {
+        float factor = Resampler::resampleFactor(audio->getSampleRate(), session->getSampleRate());
+        return session->samplesToMs((smpn_t)(audio->getBufferLength() * factor));
+    }
+    
+    return session->samplesToMs(audio->getBufferLength());
+}
+
+bool Fragment::crop(ms_t crop_from, ms_t crop_to)
+{
     if (crop_from >= crop_to)
     {
-        return 1;
+        LOG_F(ERROR, "Cannot crop fragment (id: '%d'): crop_from ('%d') >= crop_to ('%d')"
+                   , m_id, crop_from, crop_to);
+        return false;
     }
 
-    if (crop_to > audio_ms_len)
+    if (crop_to > getAudioLength())
     {
-        return 1;
+        LOG_F(ERROR, "Cannot crop fragment (id: '%d'): crop_to ('%d') > audio length ('%d')"
+                   , m_id, crop_from, getAudioLength());
+        return false;
     }
 
     m_crop_from = crop_from;
     m_crop_to = crop_to;
 
-    return 0;
+    return true;
 }
 
 id_t Fragment::getId() const { return m_id; }
