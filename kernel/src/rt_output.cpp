@@ -50,7 +50,7 @@ static int paCallback(const void* inputBuffer, void* outputBuffer, unsigned long
         g_state = EOutputState::eStop;
     }
 
-    for (int i = 0; i < framesPerBuffer; i++)
+    for (unsigned long i = 0; i < framesPerBuffer; i++)
     {
         *out++ = g_data->left_buf[g_data->samples_counter];
         *out++ = g_data->right_buf[g_data->samples_counter];
@@ -130,8 +130,8 @@ static status_t render_selection(const id_t session_id, const uint32_t from_ms, 
             LOG_F(INFO, "Got fragment %d with linked audio %d", fragment_id, fragment->getAudio());
             LOG_F(INFO, "Adding linked audio to intermediate buffers");
 
-            if (mixAudioToOutBuffer(fragment_id, left_buf, ses_len_smp, track->getGain(), track->getLevel()) != 0 ||
-                mixAudioToOutBuffer(fragment_id, right_buf, ses_len_smp, track->getGain(), track->getLevel()) != 0)
+            if (mixAudioToOutBuffer(session_id, fragment_id, left_buf, ses_len_smp, track->getGain(), track->getLevel()) != 0 ||
+                mixAudioToOutBuffer(session_id, fragment_id, right_buf, ses_len_smp, track->getGain(), track->getLevel()) != 0)
             {
                 LOG_F(ERROR, "Error occured while mixing");
                 return 1;

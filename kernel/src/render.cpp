@@ -5,6 +5,7 @@
 #include "audios_manager.h"
 #include "tracks_manager.h"
 #include "utils.h"
+#include "resampler.h"
 #include <cstring>
 
 ms_t calcSessionLength(const id_t session_id)
@@ -40,7 +41,7 @@ ms_t calcSessionLength(const id_t session_id)
             }
 
             const ms_t len = fragment->getCropTo() - fragment->getCropFrom();
-            const ms_t overall_len = len + fragment->getTimeOffset();
+            const ms_t overall_len = len + fragment->getTimelineOffset();
 
             LOG_F(INFO, "Fragment (id: %d) has length: '%d' (ms) and upper bound in timeline: '%d' (ms)", 
                         fragment_id, len, overall_len);
@@ -56,8 +57,16 @@ ms_t calcSessionLength(const id_t session_id)
     return max_audio_len;
 }
 
-bool mixAudioToOutBuffer(const id_t fragment_id, float* out_buf, const smpn_t ses_len_smp, const uint8_t gain, const uint8_t level)
+bool mixAudioToOutBuffer(const id_t session_id, const id_t fragment_id, float* out_buf, const smpn_t ses_len_smp, const uint8_t gain, const uint8_t level)
 {
+    const Session* session = SessionsManager::getSession(session_id);
+
+    if (!session)
+    {
+        LOG_F(ERROR, "Cannot get session (id: '%d')", session_id);
+        return false;
+    }
+
     const Fragment* fragment = FragmentsManager::getFragment(fragment_id);
 
     if (!fragment)
@@ -74,6 +83,23 @@ bool mixAudioToOutBuffer(const id_t fragment_id, float* out_buf, const smpn_t se
         return false;
     }
 
+    float* audio_buffer = audio->getBuffer();
+
+    if (session->getSampleRate() != audio->getSampleRate())
+    {
+        smpn_t resampled_signal_len_smp = 0;
+        if (!Resampler::resample(audio->getSampleRate(), session->getSampleRate(),
+                                 audio->getBuffer(), audio->getBufferLength(),
+                                 &audio_buffer, &resampled_signal_len_smp))
+        {
+            LOG_F(ERROR, "Cannot resample: session (id: '%d') sample rate: '%d' (hz), audio (id: '%d') sample rate: %d (hz)",
+                          session_id, session->getSampleRate(),
+                          audio->getId(), audio->getSampleRate());
+
+            return false;
+        }
+    }
+
     const Track* track = TracksManager::getTrack(fragment->getTrack());
 
     if (!track)
@@ -82,18 +108,10 @@ bool mixAudioToOutBuffer(const id_t fragment_id, float* out_buf, const smpn_t se
         return false;
     }
 
-    const Session* session = SessionsManager::getSession(track->getSessionId());
-
-    if (!session)
-    {
-        LOG_F(ERROR, "Cannot get session (id: '%d')", track->getSessionId());
-        return false;
-    }
-
     const smpn_t audio_from_smp = session->msToSamples(fragment->getCropFrom());
     const smpn_t audio_to_smp = session->msToSamples(fragment->getCropTo());
     const smpn_t audio_len_smp = audio_to_smp - audio_from_smp;
-    const smpn_t out_buf_from_smp = session->msToSamples(fragment->getTimeOffset());
+    const smpn_t out_buf_from_smp = session->msToSamples(fragment->getTimelineOffset());
 
     LOG_F(INFO, "Audio info: crop from: '%d' (smp), crop to: '%d' (smp), length: '%d' (smp)",
                 audio_from_smp, audio_to_smp, audio_len_smp);
@@ -115,7 +133,7 @@ bool mixAudioToOutBuffer(const id_t fragment_id, float* out_buf, const smpn_t se
     const float k = (gain / 10.0f + 1.0f) * (level / 100.0f);
     for (smpn_t smp_offset = 0; smp_offset < audio_len_smp; smp_offset++)
     {
-        out_buf[out_buf_from_smp + smp_offset] += audio->getBuffer()[audio_from_smp + smp_offset] * k;
+        out_buf[out_buf_from_smp + smp_offset] += audio_buffer[audio_from_smp + smp_offset] * k;
     }
 
     return true;
@@ -204,7 +222,7 @@ bool render(const id_t session_id, const std::string &mix_path)
 
         const std::set<id_t> fragments = track->getFragments();
 
-        LOG_F(INFO, "Track (id: '%d') has '%d' fragments", track->getId(), fragments.size());
+        LOG_F(INFO, "Track (id: '%d') has '%d' fragments", track->getId(), (uint32_t) fragments.size());
 
         for (const id_t fragment_id: fragments)
         {
@@ -221,13 +239,13 @@ bool render(const id_t session_id, const std::string &mix_path)
             LOG_F(INFO, "Fragment (id: %d) is linked with audio (id: %d)", fragment_id, fragment->getAudio());
 
             LOG_F(INFO, "Mixing left channel");
-            if (!mixAudioToOutBuffer(fragment_id, left_buf.get(), ses_len_smp, track->getGain(), track->getLevel()))
+            if (!mixAudioToOutBuffer(session_id, fragment_id, left_buf.get(), ses_len_smp, track->getGain(), track->getLevel()))
             {
                 return false;
             }
 
             LOG_F(INFO, "Mixing right channel");
-            if (!mixAudioToOutBuffer(fragment_id, right_buf.get(), ses_len_smp, track->getGain(), track->getLevel()))
+            if (!mixAudioToOutBuffer(session_id, fragment_id, right_buf.get(), ses_len_smp, track->getGain(), track->getLevel()))
             {
                 return false;
             }
