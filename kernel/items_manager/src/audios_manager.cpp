@@ -31,7 +31,8 @@ namespace AudiosManager
                     codec_file_info.samples_per_channel,
                     codec_file_info.sample_rate);
 
-        Audio* audio = new Audio(ItemsManager::genUniqueId(), path, codec_file_info.buffers[0], codec_file_info.samples_per_channel);
+        Audio* audio = new Audio(ItemsManager::genUniqueId(), path, codec_file_info.buffers[0], 
+                                 codec_file_info.samples_per_channel, codec_file_info.sample_rate);
 
         LOG_F(INFO, "Audio (id: '%d') was created", audio->getId());
 

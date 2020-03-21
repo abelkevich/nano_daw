@@ -1,11 +1,12 @@
 #include "audio.h"
 #include "fragments_manager.h"
 
-Audio::Audio(const id_t id, const std::string &path, float* buffer, const uint32_t buffer_size)
+Audio::Audio(const id_t id, const std::string &path, float* buffer, const uint32_t buffer_size, const freq_t sample_rate)
            : m_id(id)
            , m_path(path)
            , m_buffer(buffer)
            , m_buffer_size(buffer_size)
+           , m_sample_rate(sample_rate)
 {
 }
 
@@ -13,6 +14,7 @@ Audio::Audio(const id_t id, const std::string &path, float* buffer, const uint32
 std::string Audio::getPath() const { return m_path; }
 uint32_t Audio::getBufferLength() const { return m_buffer_size; }
 float* Audio::getBuffer() const { return m_buffer; }
+freq_t Audio::getSampleRate() const { return m_sample_rate; }
 
 bool Audio::linkFragment(const id_t fragment_id)
 {
