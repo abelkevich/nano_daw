@@ -15,7 +15,7 @@ namespace Utils
         #ifdef __linux__
             return dlopen(file_path.c_str(), RTLD_LAZY);
         #else
-            return LoadLibrary(TEXT(path.c_str()));
+            return LoadLibrary(TEXT(file_path.c_str()));
         #endif
     }
 
