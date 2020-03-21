@@ -1,11 +1,11 @@
 #include "session.h"
 #include "tracks_manager.h"
 
-Session::Session(id_t id, std::string name, std::string path, uint32_t sample_rate)
-    : m_id(id)
-    , m_name(name)
-    , m_path(path)
-    , m_sample_rate(sample_rate)
+Session::Session(const id_t id, const std::string &name, const std::string &path, const freq_t sample_rate)
+               : m_id(id)
+               , m_name(name)
+               , m_path(path)
+               , m_sample_rate(sample_rate)
 {
 }
 
@@ -48,33 +48,35 @@ bool Session::unlinkTrack(const id_t track_id)
     return true;
 }
 
-uint32_t Session::getSampleRate() const { return m_sample_rate; }
+freq_t Session::getSampleRate() const { return m_sample_rate; }
 
 std::string Session::getName() const { return m_name; }
 
-status_t Session::setName(std::string name)
+bool Session::setName(const std::string &name)
 {
     if (name.empty())
     {
-        return 1;
+        LOG_F(ERROR, "Cannot rename session (id: '%d'): value is empty", m_id);
+        return false;
     }
 
     if (name.size() > 30)
     {
-        return 2;
+        LOG_F(ERROR, "Cannot rename session (id: '%d'): value length > 30", m_id);
+        return false;
     }
 
     m_name = name;
 
-    return 0;
+    return true;
 }
 
 std::string Session::getPath() const { return m_path; }
 
-status_t Session::setPath(std::string path)
+bool Session::setPath(const std::string &path)
 {
     m_path = path;
-    return 0;
+    return true;
 }
 
 std::set<id_t> Session::getTracks() const
@@ -82,14 +84,14 @@ std::set<id_t> Session::getTracks() const
     return m_tracks;
 }
 
-uint32_t Session::msToSamples(uint32_t ms) const
+smpn_t Session::msToSamples(ms_t ms) const
 {
     return m_sample_rate / 1000 * ms;
 }
 
-uint32_t Session::samplesToMs(uint32_t samples) const
+ms_t Session::samplesToMs(smpn_t samples) const
 {
-    return (float)samples / m_sample_rate * 1000;
+    return (ms_t) (( (float) samples / m_sample_rate) * 1000);
 }
 
 id_t Session::getId() const { return m_id; }
