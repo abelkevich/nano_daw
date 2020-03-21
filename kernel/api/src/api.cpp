@@ -150,7 +150,7 @@ namespace ClientAPI
 
     uint32_t getOnlineClients()
     {
-        return g_client_libs_map.size();
+        return (uint32_t) g_client_libs_map.size();
     }
 
     bool removeAPIHandler(void* instance)
